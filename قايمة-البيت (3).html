@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="قايمة البيت">
+<meta name="theme-color" content="#1D9E75">
+<title>قايمة البيت</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans Arabic','Segoe UI',sans-serif;background:#f2f2ef;min-height:100vh;padding-bottom:70px}
+.header{background:#fff;border-bottom:1px solid #ececec;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;gap:10px}
+.header-info{flex:1;min-width:0}
+.header h1{font-size:16px;font-weight:700;color:#1a1a1a}
+.sync-bar{display:flex;align-items:center;gap:5px;font-size:11px;margin-top:2px}
+.sync-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.s-ok{background:#1D9E75}.s-push{background:#F0A500;animation:blink .8s infinite}.s-err{background:#E53935}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.sync-txt{color:#aaa}.refresh-btn{background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;line-height:1;color:#aaa}
+.header-left{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.gear-btn{background:#f5f5f2;border:1px solid #e8e8e5;border-radius:9px;padding:6px 9px;font-size:15px;cursor:pointer;line-height:1}
+.tabs{display:flex;background:#f0f0ec;border-radius:10px;overflow:hidden;border:1px solid #e5e5e0}
+.tab{flex:1;padding:6px 10px;border:none;cursor:pointer;font-family:inherit;font-size:11px;font-weight:500;background:transparent;color:#777;white-space:nowrap}
+.tab.active{background:#fff;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.container{max-width:600px;margin:0 auto;padding:14px}
+.budget-banner{background:#fff;border-radius:14px;border:1.5px solid #1D9E75;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.budget-label{font-size:13px;color:#555;font-weight:500}.budget-amount{font-size:24px;font-weight:700;color:#1D9E75;direction:ltr}.budget-sub{font-size:11px;color:#aaa;margin-top:2px}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.cat-card{background:#fff;border-radius:14px;border:1.5px solid #ececec;padding:14px 10px;text-align:center;cursor:pointer;position:relative;transition:all .15s}
+.cat-card:active{transform:scale(.95)}.cat-card.has-pending{border-color:#1D9E75}
+.c-icon{font-size:26px;margin-bottom:5px}.c-label{font-size:12px;font-weight:500;color:#444;line-height:1.3}
+.badge{position:absolute;top:7px;left:7px;background:#1D9E75;color:#fff;font-size:10px;font-weight:700;border-radius:20px;padding:1px 6px}
+.back-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.back-btn{background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:7px 13px;font-family:inherit;font-size:13px;cursor:pointer;color:#555}
+.cat-title{font-size:16px;font-weight:700;color:#1a1a1a}
+.saved-section{background:#fff;border-radius:14px;border:1px solid #ececec;padding:14px;margin-bottom:12px}
+.saved-section h3{font-size:12px;font-weight:500;color:#999;margin-bottom:10px}
+.chips-wrap{display:flex;flex-wrap:wrap;gap:8px}
+.chip-outer{display:flex;flex-direction:column;align-items:center;gap:4px}
+.item-chip{padding:8px 12px;border-radius:30px;border:1.5px solid #e0e0e0;background:#fafaf8;color:#333;font-size:13px;font-family:inherit;font-weight:500;display:flex;align-items:center;gap:5px;transition:all .15s;cursor:pointer}
+.item-chip:active{transform:scale(.93)}.item-chip.in-list{background:#E6F7F1;border-color:#1D9E75;color:#0F6E56}
+.chip-check{font-size:13px;color:transparent}.item-chip.in-list .chip-check{color:#1D9E75}
+.chip-del{font-size:11px;color:#ccc;background:none;border:none;cursor:pointer;line-height:1;padding:0 2px}
+.price-badge{font-size:11px;background:#f0f0ec;color:#666;padding:2px 8px;border-radius:20px;cursor:pointer;border:none;font-family:inherit;white-space:nowrap}
+.price-badge:hover{background:#e0e0de}.price-badge.no-price{color:#bbb;border:1px dashed #ddd;background:transparent}
+.price-edit-row{display:flex;gap:4px;align-items:center}
+.price-input{width:70px;padding:3px 8px;border-radius:8px;border:1px solid #1D9E75;font-size:12px;text-align:center;outline:none;font-family:inherit}
+.price-save-btn{background:#1D9E75;color:#fff;border:none;border-radius:7px;padding:3px 8px;font-size:12px;cursor:pointer;font-family:inherit}
+.add-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.fi{flex:1;min-width:120px;padding:10px 13px;border-radius:10px;border:1px solid #ddd;background:#fff;color:#1a1a1a;font-size:14px;outline:none;font-family:inherit}
+.fi:focus{border-color:#1D9E75}
+.sm-input{width:70px;padding:10px 8px;border-radius:10px;border:1px solid #ddd;background:#fff;color:#1a1a1a;font-size:13px;outline:none;font-family:inherit;text-align:center}
+.green-btn{background:#1D9E75;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer;white-space:nowrap}
+.green-btn:disabled{background:#9FE1CB;cursor:not-allowed}
+.list-card{background:#fff;border-radius:14px;border:1px solid #ececec;overflow:hidden}
+.sec-lbl{font-size:11px;font-weight:500;color:#aaa;padding:0 2px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.sec-total{font-size:11px;color:#1D9E75;font-weight:600}
+.list-sec-title{font-size:11px;font-weight:500;color:#aaa;margin-bottom:8px;padding:0 2px}
+.item-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #f2f2f0}
+.item-row:last-child{border-bottom:none}.item-row.done{opacity:.5}
+.icat{width:28px;height:28px;border-radius:8px;background:#E6F7F1;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.iname{font-size:14px;font-weight:500;color:#1a1a1a}.item-row.done .iname{text-decoration:line-through}
+.isub{font-size:11px;color:#aaa;margin-top:1px}
+.item-price{font-size:12px;color:#1D9E75;font-weight:600;white-space:nowrap;direction:ltr}
+.qty-ctrl{display:flex;align-items:center;background:#f5f5f2;border-radius:10px;overflow:hidden;border:1px solid #e8e8e5;flex-shrink:0}
+.qty-btn{width:30px;height:30px;border:none;background:transparent;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;padding:0;line-height:1}
+.qty-btn.minus{color:#aaa}.qty-btn.minus:disabled{color:#ddd;cursor:not-allowed}.qty-btn.plus{color:#1D9E75}
+.qty-num{width:26px;text-align:center;font-size:13px;font-weight:700;color:#1a1a1a;user-select:none}
+.xbtn{background:none;border:none;cursor:pointer;color:#ccc;font-size:15px;padding:3px;opacity:0;line-height:1}
+.item-row:hover .xbtn{opacity:1}
+.chk{width:24px;height:24px;border-radius:50%;border:2px solid #d0d0d0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;color:transparent;transition:all .15s}
+.chk.on{background:#1D9E75;border-color:#1D9E75;color:#fff}
+.info-banner{background:#E6F7F1;border:1px solid #5DCAA5;border-radius:12px;padding:11px 14px;margin-bottom:14px;display:flex;gap:10px;align-items:center}
+.info-banner p{font-size:13px;font-weight:500;color:#0F6E56}
+.info-banner small{font-size:11px;color:#1D9E75;display:block;margin-top:2px}
+.done-hdr{display:flex;justify-content:space-between;align-items:center;margin:14px 0 8px}
+.clear-btn{background:none;border:none;color:#aaa;font-size:12px;cursor:pointer;font-family:inherit}
+.record-btn{background:#1D9E75;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:500}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ececec;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;z-index:20}
+.pending-count{font-size:13px;font-weight:500;color:#1a1a1a}
+.pending-count b{color:#1D9E75}
+/* Settings */
+.settings-screen{max-width:600px;margin:0 auto;padding:14px}
+.settings-title{font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:16px}
+.store-list{background:#fff;border-radius:14px;border:1px solid #ececec;overflow:hidden;margin-bottom:16px}
+.store-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #f2f2f0}
+.store-row:last-child{border-bottom:none}
+.store-icon-big{font-size:22px;width:40px;text-align:center}
+.store-name-txt{font-size:15px;font-weight:500;color:#1a1a1a;flex:1}.store-cnt{font-size:11px;color:#aaa}
+.del-store-btn{background:none;border:1px solid #ffcdd2;border-radius:8px;padding:5px 10px;color:#E53935;font-size:12px;cursor:pointer;font-family:inherit}
+.add-store-card{background:#fff;border-radius:14px;border:1px solid #ececec;padding:16px}
+.add-store-card h3{font-size:14px;font-weight:600;color:#333;margin-bottom:12px}
+.emoji-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.emoji-opt{width:40px;height:40px;border-radius:10px;border:1.5px solid #e8e8e8;background:#fafaf8;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.emoji-opt.selected{border-color:#1D9E75;background:#E6F7F1}
+.add-store-row{display:flex;gap:8px}
+.empty{text-align:center;padding:44px 20px;color:#aaa}
+.empty .big{font-size:40px;margin-bottom:10px}
+/* Analysis */
+.analysis-screen{max-width:600px;margin:0 auto;padding:14px}
+.analysis-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.analysis-title{font-size:18px;font-weight:700;color:#1a1a1a}
+.year-badge{font-size:11px;color:#aaa;background:#fff;border:1px solid #ececec;border-radius:8px;padding:4px 10px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{background:#fff;border-radius:14px;border:1px solid #ececec;padding:14px 16px}
+.stat-label{font-size:11px;color:#aaa;margin-bottom:5px}
+.stat-val{font-size:17px;font-weight:700;direction:ltr}
+.chart-card{background:#fff;border-radius:14px;border:1px solid #ececec;padding:16px;margin-bottom:14px}
+.chart-title{font-size:13px;font-weight:600;color:#333;margin-bottom:14px}
+.bar-chart{display:flex;align-items:flex-end;gap:5px;height:130px;padding-bottom:22px;position:relative}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;position:relative}
+.bar-val{font-size:8px;font-weight:600;margin-bottom:2px;white-space:nowrap}
+.bar{width:100%;border-radius:4px 4px 0 0;transition:height .3s;min-height:0}
+.bar-lbl{font-size:8px;margin-top:3px;text-align:center;position:absolute;bottom:0;white-space:nowrap}
+.chart-legend{display:flex;gap:10px;font-size:10px;color:#aaa;margin-top:10px;flex-wrap:wrap}
+.chart-legend span{display:flex;align-items:center;gap:3px}
+.detail-card{background:#fff;border-radius:14px;border:1px solid #ececec;overflow:hidden;margin-bottom:14px}
+.detail-header{padding:12px 16px;border-bottom:1px solid #f2f2f0;font-size:13px;font-weight:600;color:#333}
+.month-row{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid #f5f5f3}
+.month-row:last-child{border-bottom:none}
+.month-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.month-name{flex:1;font-size:13px;font-weight:400;color:#555}
+.month-name.active{font-weight:600;color:#1a1a1a}
+.cur-badge{font-size:10px;background:#E6F7F1;color:#1D9E75;border-radius:6px;padding:1px 5px;margin-right:4px}
+.month-trips{font-size:10px;color:#aaa;margin-top:1px}
+.month-val{font-size:14px;font-weight:600;direction:ltr;text-align:left}
+.month-change{font-size:10px;text-align:right;margin-top:1px}
+.manual-card{background:#fff;border-radius:14px;border:1px solid #ececec;padding:16px}
+.manual-card h3{font-size:13px;font-weight:600;color:#333;margin-bottom:12px}
+.manual-row{display:flex;gap:8px}
+.sel{flex:1;padding:10px 12px;border-radius:10px;border:1px solid #ddd;background:#fff;font-size:13px;font-family:inherit;outline:none;color:#1a1a1a}
+.num-input{width:90px;padding:10px 8px;border-radius:10px;border:1px solid #ddd;background:#fff;font-size:14px;text-align:center;outline:none;font-family:inherit}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script>
+const {useState,useEffect,useRef,useCallback}=React;
+
+const FB_URL="https://home-list-96cde-default-rtdb.firebaseio.com/beit.json";
+const LS_KEY="beit_v7";
+const MONTHS=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+
+const DEF_STORES=[
+  {id:"s1",label:"خضار وفواكه",icon:"🥦"},{id:"s2",label:"مواد مطبخ",icon:"🛒"},
+  {id:"s3",label:"نظافة",icon:"🧹"},{id:"s4",label:"صيدلية",icon:"💊"},
+  {id:"s5",label:"أطفال",icon:"👶"},{id:"s6",label:"المحمص",icon:"🌶️"},{id:"s7",label:"أخرى",icon:"📦"},
+];
+const DEF_SAVED={
+  s1:[{name:"تفاح",price:null},{name:"موز",price:null},{name:"طماطم",price:null},{name:"خيار",price:null},{name:"بطاطا",price:null},{name:"بصل",price:null},{name:"ليمون",price:null},{name:"جزر",price:null},{name:"فلفل",price:null},{name:"عنب",price:null},{name:"تين",price:null}],
+  s2:[{name:"أرز",price:null},{name:"زيت",price:null},{name:"سكر",price:null},{name:"ملح",price:null},{name:"دقيق",price:null},{name:"معكرونة",price:null},{name:"عدس",price:null},{name:"حمص",price:null},{name:"فول",price:null},{name:"صلصة طماطم",price:null}],
+  s3:[{name:"صابون",price:null},{name:"شامبو",price:null},{name:"معجون أسنان",price:null},{name:"فوط ورقية",price:null},{name:"مناديل",price:null},{name:"منظف أطباق",price:null},{name:"مسحوق غسيل",price:null}],
+  s4:[{name:"باراسيتامول",price:null},{name:"ضمادات",price:null},{name:"شراب سعال",price:null},{name:"فيتامينات",price:null},{name:"كريم",price:null}],
+  s5:[{name:"حفاضات",price:null},{name:"حليب أطفال",price:null},{name:"مناديل مبللة",price:null},{name:"شامبو أطفال",price:null}],
+  s6:[{name:"كمون",price:null},{name:"كزبرة",price:null},{name:"فلفل أسود",price:null},{name:"كركم",price:null},{name:"زعتر",price:null},{name:"بهار",price:null},{name:"قرفة",price:null},{name:"هيل",price:null},{name:"يانسون",price:null},{name:"ميرمية",price:null},{name:"زنجبيل",price:null},{name:"حبة البركة",price:null}],
+  s7:[],
+};
+
+function normSaved(raw){
+  if(!raw)return DEF_SAVED;
+  const out={};
+  Object.keys(raw).forEach(k=>{out[k]=(raw[k]||[]).map(i=>typeof i==="string"?{name:i,price:null}:i);});
+  return out;
+}
+function lsLoad(){try{const s=localStorage.getItem(LS_KEY);return s?JSON.parse(s):null;}catch{return null;}}
+function lsSave(d){try{localStorage.setItem(LS_KEY,JSON.stringify(d));}catch{}}
+function getInit(){
+  const ls=lsLoad();
+  return {
+    stores:ls?.stores||DEF_STORES, items:ls?.items||[], saved:normSaved(ls?.saved)||DEF_SAVED,
+    ts:ls?.ts||0, history:ls?.history||{},
+  };
+}
+function genId(){return "x"+Date.now().toString(36)+Math.random().toString(36).slice(2,4);}
+function siInfo(stores,id){return stores.find(s=>s.id===id)||{icon:"📦",label:id};}
+function fmt(n){return n!=null?n.toFixed(2):"—";}
+function calcTotal(items){return items.filter(i=>!i.done&&i.price!=null).reduce((s,i)=>s+(i.price*(parseInt(i.qty)||1)),0);}
+function calcStoreTotal(items,storeId){return items.filter(i=>!i.done&&i.storeId===storeId&&i.price!=null).reduce((s,i)=>s+(i.price*(parseInt(i.qty)||1)),0);}
+
+function App(){
+  const init=getInit();
+  const now=new Date();
+  const CUR_YEAR=now.getFullYear().toString();
+  const CUR_MONTH=now.getMonth();
+
+  const [stores,setStores]=useState(init.stores);
+  const [items,setItems]=useState(init.items);
+  const [saved,setSaved]=useState(init.saved);
+  const [ts,setTs]=useState(init.ts);
+  const [history,setHistory]=useState(init.history);
+  const [sync,setSync]=useState("ok");
+  const [syncMsg,setSyncMsg]=useState("محفوظ");
+  const [mode,setMode]=useState("wife");
+  const [screen,setScreen]=useState("home");
+  const [curCat,setCurCat]=useState(null);
+  const [newName,setNewName]=useState("");
+  const [newQty,setNewQty]=useState("");
+  const [newPrice,setNewPrice]=useState("");
+  const [editingPrice,setEditingPrice]=useState(null);
+  const [editPriceVal,setEditPriceVal]=useState("");
+  const [newStoreLabel,setNewStoreLabel]=useState("");
+  const [newStoreIcon,setNewStoreIcon]=useState("🏪");
+  const [delConfirm,setDelConfirm]=useState(null);
+  const [manualAmt,setManualAmt]=useState("");
+  const [manualMonth,setManualMonth]=useState(CUR_MONTH);
+
+  const R=useRef({stores,items,saved,ts,history});
+  R.current={stores,items,saved,ts,history};
+
+  // ── Firebase ──────────────────────────────────────────
+  const pull=useCallback(async()=>{
+    try{
+      const r=await fetch(FB_URL);
+      if(!r.ok)throw 0;
+      const rec=await r.json();
+      if(!rec){setSync("ok");setSyncMsg("محفوظ");return;}
+      const remoteTs=rec.ts||0;
+      if(remoteTs>R.current.ts){
+        const ni=rec.items||[];
+        if(ni.length===0&&R.current.items.length>0){setSync("ok");return;}
+        const nst=rec.stores||DEF_STORES;
+        const ns=normSaved({...DEF_SAVED,...(rec.saved||{})});
+        const nh=rec.history||{};
+        setItems(ni);setStores(nst);setSaved(ns);setTs(remoteTs);setHistory(nh);
+        lsSave({items:ni,stores:nst,saved:ns,ts:remoteTs,history:nh});
+      }
+      setSync("ok");setSyncMsg("محفوظ");
+    }catch{setSync("err");setSyncMsg("تعذر الاتصال");}
+  },[]);
+
+  const pushTimer=useRef(null);
+  function schedulePush(data){
+    if(pushTimer.current)clearTimeout(pushTimer.current);
+    setSync("push");setSyncMsg("جاري الحفظ...");
+    pushTimer.current=setTimeout(async()=>{
+      try{
+        const r=await fetch(FB_URL,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+        if(!r.ok)throw 0;
+        setSync("ok");setSyncMsg("تم الحفظ ✓");
+      }catch{setSync("err");setSyncMsg("فشل الحفظ");}
+    },500);
+  }
+
+  function commit(ni,ns,nst,nh){
+    const newTs=Date.now();
+    const nh2=nh||R.current.history;
+    setItems(ni);setSaved(ns);setStores(nst);setTs(newTs);setHistory(nh2);
+    const data={items:ni,saved:ns,stores:nst,ts:newTs,history:nh2};
+    lsSave(data);schedulePush(data);
+  }
+
+  useEffect(()=>{pull();const t=setInterval(pull,10000);return()=>clearInterval(t);},[pull]);
+
+  // ── Store actions ──────────────────────────────────────
+  function addStore(){
+    if(!newStoreLabel.trim())return;
+    const id=genId();
+    const nst=[...R.current.stores,{id,label:newStoreLabel.trim(),icon:newStoreIcon}];
+    const ns={...R.current.saved,[id]:[]};
+    commit(R.current.items,ns,nst);
+    setNewStoreLabel("");setNewStoreIcon("🏪");
+  }
+  function deleteStore(id){
+    const nst=R.current.stores.filter(s=>s.id!==id);
+    const ni=R.current.items.filter(i=>i.storeId!==id);
+    const ns={...R.current.saved};delete ns[id];
+    commit(ni,ns,nst);setDelConfirm(null);
+    if(curCat===id){setScreen("home");setCurCat(null);}
+  }
+
+  // ── Item actions ───────────────────────────────────────
+  function addItem(savedItem,storeId){
+    if(R.current.items.find(i=>!i.done&&i.name===savedItem.name&&i.storeId===storeId))return;
+    commit([{id:genId(),name:savedItem.name,qty:1,price:savedItem.price,storeId,done:false,at:Date.now()},...R.current.items],R.current.saved,R.current.stores);
+  }
+  function addNew(){
+    if(!newName.trim()||!curCat)return;
+    const name=newName.trim(),qty=newQty.trim();
+    const price=newPrice.trim()?parseFloat(newPrice):null;
+    const cur=R.current.saved[curCat]||[];
+    const exists=cur.find(i=>i.name===name);
+    let ns=R.current.saved;
+    if(!exists)ns={...ns,[curCat]:[...cur,{name,price}]};
+    else if(price!=null)ns={...ns,[curCat]:cur.map(i=>i.name===name?{...i,price}:i)};
+    const already=R.current.items.find(i=>!i.done&&i.name===name&&i.storeId===curCat);
+    const ni=already?R.current.items:[{id:genId(),name,qty:1,price,storeId:curCat,done:false,at:Date.now()},...R.current.items];
+    commit(ni,ns,R.current.stores);
+    setNewName("");setNewQty("");setNewPrice("");
+  }
+  function removeItem(id){commit(R.current.items.filter(i=>i.id!==id),R.current.saved,R.current.stores);}
+  function setQty(id,qty){if(qty<1)return;commit(R.current.items.map(i=>i.id===id?{...i,qty}:i),R.current.saved,R.current.stores);}
+  function toggleDone(id){commit(R.current.items.map(i=>i.id===id?{...i,done:!i.done}:i),R.current.saved,R.current.stores);}
+
+  function clearDone(){
+    const doneItems=R.current.items.filter(i=>i.done);
+    const doneTotal=doneItems.filter(i=>i.price!=null).reduce((s,i)=>s+(i.price*(parseInt(i.qty)||1)),0);
+    const ni=R.current.items.filter(i=>!i.done);
+    let nh=R.current.history;
+    if(doneTotal>0){
+      const yr=new Date().getFullYear().toString();
+      const mo=new Date().getMonth();
+      const yrData=nh[yr]||{};
+      const moData=yrData[mo]||{total:0,trips:0};
+      nh={...nh,[yr]:{...yrData,[mo]:{total:moData.total+doneTotal,trips:moData.trips+1}}};
+    }
+    commit(ni,R.current.saved,R.current.stores,nh);
+  }
+
+  function savePrice(storeId,name){
+    const price=editPriceVal.trim()?parseFloat(editPriceVal):null;
+    const ns={...R.current.saved,[storeId]:(R.current.saved[storeId]||[]).map(i=>i.name===name?{...i,price}:i)};
+    const ni=R.current.items.map(i=>i.storeId===storeId&&i.name===name&&!i.done?{...i,price}:i);
+    commit(ni,ns,R.current.stores);
+    setEditingPrice(null);setEditPriceVal("");
+  }
+  function delSaved(storeId,name){
+    const ns={...R.current.saved,[storeId]:(R.current.saved[storeId]||[]).filter(i=>i.name!==name)};
+    commit(R.current.items,ns,R.current.stores);
+  }
+
+  // ── Manual history add ─────────────────────────────────
+  function addManualHistory(){
+    if(!manualAmt||parseFloat(manualAmt)<=0)return;
+    const yr=new Date().getFullYear().toString();
+    const yrData=R.current.history[yr]||{};
+    const moData=yrData[manualMonth]||{total:0,trips:0};
+    const nh={...R.current.history,[yr]:{...yrData,[manualMonth]:{total:moData.total+parseFloat(manualAmt),trips:moData.trips+1}}};
+    commit(R.current.items,R.current.saved,R.current.stores,nh);
+    setManualAmt("");
+  }
+
+  // ── Analysis calculations ──────────────────────────────
+  const yearData=history[CUR_YEAR]||{};
+  const monthTotals=Array.from({length:12},(_,i)=>yearData[i]?.total||0);
+  const monthTrips=Array.from({length:12},(_,i)=>yearData[i]?.trips||0);
+  const maxVal=Math.max(...monthTotals,1);
+  const yearTotal=monthTotals.reduce((s,v)=>s+v,0);
+  const activeMonths=monthTotals.filter(v=>v>0);
+  const avgMonthly=activeMonths.length?yearTotal/activeMonths.length:0;
+  const maxMonthIdx=monthTotals.indexOf(Math.max(...monthTotals));
+  const minMonthIdx=activeMonths.length?monthTotals.findIndex(v=>v===Math.min(...activeMonths)):-1;
+
+  const pending=items.filter(i=>!i.done);
+  const done=items.filter(i=>i.done);
+  const total=calcTotal(pending);
+  const h=React.createElement;
+  const stInfo=id=>siInfo(stores,id);
+  const syncCls=sync==="push"?"s-push":sync==="err"?"s-err":"s-ok";
+
+  const QtyCtrl=(id,qty)=>h("div",{className:"qty-ctrl"},
+    h("button",{className:"qty-btn minus",disabled:(parseInt(qty)||1)<=1,onClick:()=>setQty(id,(parseInt(qty)||1)-1)},"−"),
+    h("span",{className:"qty-num"},parseInt(qty)||1),
+    h("button",{className:"qty-btn plus",onClick:()=>setQty(id,(parseInt(qty)||1)+1)},"+")
+  );
+
+  return h("div",null,
+    // ── Header ──
+    h("div",{className:"header"},
+      h("div",{className:"header-info"},
+        h("h1",null,"🏠 قايمة البيت"),
+        h("div",{className:"sync-bar"},
+          h("span",{className:"sync-dot "+syncCls}),
+          h("span",{className:"sync-txt"},syncMsg),
+          h("button",{className:"refresh-btn",onClick:pull},"↻")
+        )
+      ),
+      h("div",{className:"header-left"},
+        screen!=="settings"&&mode!=="analysis"&&h("button",{className:"gear-btn",onClick:()=>setScreen("settings")},"⚙️"),
+        screen==="settings"
+          ? h("button",{style:{background:"#f5f5f2",border:"1px solid #e8e8e5",borderRadius:9,padding:"6px 11px",cursor:"pointer",fontFamily:"inherit",fontSize:12},onClick:()=>setScreen("home")},"← رجوع")
+          : h("div",{className:"tabs"},
+              h("button",{className:"tab"+(mode==="wife"    ?" active":""),onClick:()=>{setMode("wife");   setScreen("home");setCurCat(null)}},"🧺 زوجة"),
+              h("button",{className:"tab"+(mode==="husband" ?" active":""),onClick:()=>{setMode("husband");setScreen("home")}},"🛍️ زوج"),
+              h("button",{className:"tab"+(mode==="analysis"?" active":""),onClick:()=>{setMode("analysis");setScreen("home")}},"📊 جدوى")
+            )
+      )
+    ),
+
+    // ══ SETTINGS ══
+    screen==="settings"&&h("div",{className:"settings-screen"},
+      h("div",{className:"settings-title"},"⚙️ إدارة المتاجر"),
+      h("div",{className:"store-list"},
+        stores.map(s=>
+          h("div",{key:s.id,className:"store-row"},
+            h("div",{className:"store-icon-big"},s.icon),
+            h("div",{style:{flex:1}},
+              h("div",{className:"store-name-txt"},s.label),
+              h("div",{className:"store-cnt"},(saved[s.id]||[]).length+" محفوظ · "+items.filter(i=>i.storeId===s.id&&!i.done).length+" في القايمة")
+            ),
+            delConfirm===s.id
+              ? h("div",{style:{display:"flex",gap:6}},
+                  h("button",{style:{background:"none",border:"1px solid #ddd",borderRadius:8,padding:"5px 10px",cursor:"pointer",fontSize:12,fontFamily:"inherit"},onClick:()=>setDelConfirm(null)},"إلغاء"),
+                  h("button",{style:{background:"#E53935",color:"#fff",border:"none",borderRadius:8,padding:"5px 10px",cursor:"pointer",fontSize:12,fontFamily:"inherit"},onClick:()=>deleteStore(s.id)},"تأكيد")
+                )
+              : h("button",{className:"del-store-btn",onClick:()=>setDelConfirm(s.id)},"🗑️ حذف")
+          )
+        )
+      ),
+      h("div",{className:"add-store-card"},
+        h("h3",null,"+ إضافة متجر جديد"),
+        h("div",{className:"emoji-grid"},
+          ["🏪","🥩","🍞","🧀","🥚","🧃","🍫","🌿","🛍️","🏥","👗","📱","🔧","🎁","🐟","☕","🏋️","📚","🌺","🌾","🧁","🫙","🧴","🪣"].map(em=>
+            h("div",{key:em,className:"emoji-opt"+(newStoreIcon===em?" selected":""),onClick:()=>setNewStoreIcon(em)},em)
+          )
+        ),
+        h("div",{className:"add-store-row"},
+          h("input",{className:"fi",placeholder:"اسم المتجر...",value:newStoreLabel,onChange:ev=>setNewStoreLabel(ev.target.value),onKeyDown:ev=>ev.key==="Enter"&&addStore()}),
+          h("button",{className:"green-btn",disabled:!newStoreLabel.trim(),onClick:addStore},"أضف")
+        )
+      )
+    ),
+
+    screen!=="settings"&&h("div",{className:"container"},
+
+      // ══ WIFE ══
+      mode==="wife"&&screen==="home"&&h("div",null,
+        h("div",{className:"cat-grid"},
+          stores.map(s=>{
+            const cnt=pending.filter(i=>i.storeId===s.id).length;
+            return h("div",{key:s.id,className:"cat-card"+(cnt>0?" has-pending":""),onClick:()=>{setCurCat(s.id);setScreen("cat");}},
+              cnt>0&&h("div",{className:"badge"},cnt),
+              h("div",{className:"c-icon"},s.icon),
+              h("div",{className:"c-label"},s.label)
+            );
+          })
+        ),
+        items.length>0&&h("div",null,
+          h("div",{className:"list-sec-title"},"📋 القايمة الحالية"),
+          h("div",{className:"list-card"},
+            items.map(item=>
+              h("div",{key:item.id,className:"item-row"+(item.done?" done":"")},
+                h("div",{className:"icat"},stInfo(item.storeId).icon),
+                h("div",{style:{flex:1}},
+                  h("div",{className:"iname"},item.name),
+                  h("div",{className:"isub"},stInfo(item.storeId).label)
+                ),
+                !item.done&&QtyCtrl(item.id,item.qty),
+                item.price!=null&&h("span",{className:"item-price"},fmt(item.price*(parseInt(item.qty)||1))+" د.أ"),
+                item.done&&h("span",null,"✅"),
+                h("button",{className:"xbtn",onClick:()=>removeItem(item.id)},"✕")
+              )
+            )
+          )
+        )
+      ),
+
+      mode==="wife"&&screen==="cat"&&curCat&&h("div",null,
+        h("div",{className:"back-bar"},
+          h("button",{className:"back-btn",onClick:()=>{setScreen("home");setCurCat(null);setNewName("");setNewQty("");setNewPrice("");setEditingPrice(null);}},"→ رجوع"),
+          h("span",{className:"cat-title"},stInfo(curCat).icon+" "+stInfo(curCat).label)
+        ),
+        h("div",{className:"saved-section"},
+          h("h3",null,"اضغط على الشيء لإضافته — اضغط على السعر لتعديله"),
+          (saved[curCat]||[]).length===0
+            ? h("p",{style:{fontSize:13,color:"#bbb",textAlign:"center",padding:"8px 0"}},"ما في أغراض — أضيفي من الأسفل")
+            : h("div",{className:"chips-wrap"},
+                (saved[curCat]||[]).map(si_item=>{
+                  const inList=!!pending.find(i=>i.name===si_item.name&&i.storeId===curCat);
+                  const isEditing=editingPrice?.storeId===curCat&&editingPrice?.name===si_item.name;
+                  return h("div",{key:si_item.name,className:"chip-outer"},
+                    h("div",{className:"item-chip"+(inList?" in-list":"")},
+                      h("span",{className:"chip-check"},inList?"✓":""),
+                      h("span",{style:{cursor:"pointer"},onClick:()=>addItem(si_item,curCat)},si_item.name),
+                      h("button",{className:"chip-del",onClick:e=>{e.stopPropagation();delSaved(curCat,si_item.name);}},"✕")
+                    ),
+                    isEditing
+                      ? h("div",{className:"price-edit-row"},
+                          h("input",{className:"price-input",type:"number",placeholder:"السعر",value:editPriceVal,autoFocus:true,
+                            onChange:ev=>setEditPriceVal(ev.target.value),
+                            onKeyDown:ev=>{if(ev.key==="Enter")savePrice(curCat,si_item.name);if(ev.key==="Escape")setEditingPrice(null);}}),
+                          h("button",{className:"price-save-btn",onClick:()=>savePrice(curCat,si_item.name)},"✓")
+                        )
+                      : h("button",{
+                          className:"price-badge"+(si_item.price==null?" no-price":""),
+                          onClick:()=>{setEditingPrice({storeId:curCat,name:si_item.name});setEditPriceVal(si_item.price!=null?String(si_item.price):"");}
+                        },si_item.price!=null?si_item.price.toFixed(2)+" د.أ":"+ سعر")
+                  );
+                })
+              )
+        ),
+        h("div",{className:"add-row"},
+          h("input",{className:"fi",placeholder:"اسم جديد...",value:newName,onChange:ev=>setNewName(ev.target.value),onKeyDown:ev=>ev.key==="Enter"&&addNew()}),
+          h("input",{className:"sm-input",type:"number",placeholder:"السعر",value:newPrice,onChange:ev=>setNewPrice(ev.target.value)}),
+          h("button",{className:"green-btn",disabled:!newName.trim(),onClick:addNew},"+ أضيفي")
+        ),
+        pending.filter(i=>i.storeId===curCat).length>0&&h("div",null,
+          h("div",{className:"list-sec-title"},"📋 مضافة في القايمة"),
+          h("div",{className:"list-card"},
+            pending.filter(i=>i.storeId===curCat).map(item=>
+              h("div",{key:item.id,className:"item-row"},
+                h("div",{className:"icat"},stInfo(item.storeId).icon),
+                h("div",{style:{flex:1}},h("div",{className:"iname"},item.name)),
+                QtyCtrl(item.id,item.qty),
+                item.price!=null&&h("span",{className:"item-price"},fmt(item.price*(parseInt(item.qty)||1))+" د.أ"),
+                h("button",{className:"xbtn",style:{opacity:1},onClick:()=>removeItem(item.id)},"✕")
+              )
+            )
+          )
+        )
+      ),
+
+      // ══ HUSBAND ══
+      mode==="husband"&&h("div",null,
+        pending.length>0&&h("div",{className:"budget-banner"},
+          h("div",null,
+            h("div",{className:"budget-label"},"💰 الميزانية المطلوبة"),
+            h("div",{className:"budget-sub"},total>0?"بناءً على الأسعار المدخلة":"لم تُدخل أسعار بعد")
+          ),
+          h("div",{className:"budget-amount"},total>0?total.toFixed(2)+" د.أ":"—")
+        ),
+        pending.length===0&&done.length===0
+          ? h("div",{className:"empty"},h("div",{className:"big"},"🛒"),h("p",null,"ما في شي مطلوب حالياً"))
+          : pending.length===0
+          ? h("div",{className:"empty"},h("div",{className:"big"},"🎉"),h("p",{style:{fontWeight:600}},"ما شاء الله! خلصت كل المشتريات!"))
+          : h("div",null,
+              h("div",{className:"info-banner"},
+                h("span",{style:{fontSize:22}},"🛍️"),
+                h("div",null,h("p",null,"عندك "+pending.length+" طلب"),h("small",null,"اضغط على كل شيء لما تشتريه ✓"))
+              ),
+              stores.map(s=>{
+                const ci=pending.filter(i=>i.storeId===s.id);
+                if(!ci.length)return null;
+                const st=calcStoreTotal(pending,s.id);
+                return h("div",{key:s.id,style:{marginBottom:14}},
+                  h("div",{className:"sec-lbl"},
+                    h("span",null,s.icon+" "+s.label),
+                    st>0&&h("span",{className:"sec-total"},st.toFixed(2)+" د.أ")
+                  ),
+                  h("div",{className:"list-card"},
+                    ci.map(item=>
+                      h("div",{key:item.id,className:"item-row"},
+                        h("button",{className:"chk"+(item.done?" on":""),onClick:()=>toggleDone(item.id)},item.done?"✓":""),
+                        h("div",{style:{flex:1}},h("div",{className:"iname"},item.name)),
+                        QtyCtrl(item.id,item.qty),
+                        item.price!=null&&h("span",{className:"item-price"},fmt(item.price*(parseInt(item.qty)||1))+" د.أ")
+                      )
+                    )
+                  )
+                );
+              })
+            ),
+        done.length>0&&h("div",null,
+          h("div",{className:"done-hdr"},
+            h("span",{style:{fontSize:12,color:"#aaa"}},"✅ تم شراؤهم ("+done.length+")"),
+            h("button",{className:"record-btn",onClick:clearDone},"🗑️ مسح وتسجيل المصاريف")
+          ),
+          h("div",{className:"list-card",style:{opacity:.55}},
+            done.map(item=>
+              h("div",{key:item.id,className:"item-row done"},
+                h("button",{className:"chk on",onClick:()=>toggleDone(item.id)},"✓"),
+                h("div",{className:"iname",style:{textDecoration:"line-through"}},item.name+(item.qty>1?" (×"+item.qty+")":""))
+              )
+            )
+          )
+        )
+      ),
+
+      // ══ ANALYSIS ══
+      mode==="analysis"&&h("div",{className:"analysis-screen",style:{padding:0}},
+        h("div",{className:"analysis-header"},
+          h("div",{className:"analysis-title"},"📊 جدوى "+CUR_YEAR),
+          h("div",{className:"year-badge"},"تتجدد كل سنة تلقائياً")
+        ),
+
+        // Summary cards
+        h("div",{className:"stat-grid"},
+          h("div",{className:"stat-card"},
+            h("div",{className:"stat-label"},"💰 إجمالي السنة"),
+            h("div",{className:"stat-val",style:{color:"#1D9E75"}},yearTotal>0?yearTotal.toFixed(2)+" د.أ":"—")
+          ),
+          h("div",{className:"stat-card"},
+            h("div",{className:"stat-label"},"📈 متوسط الشهر"),
+            h("div",{className:"stat-val",style:{color:"#5B6EE8"}},avgMonthly>0?avgMonthly.toFixed(2)+" د.أ":"—")
+          ),
+          h("div",{className:"stat-card"},
+            h("div",{className:"stat-label"},"🔺 أعلى شهر"),
+            h("div",{className:"stat-val",style:{color:"#E85B5B",fontSize:15}},maxMonthIdx>=0&&monthTotals[maxMonthIdx]>0?MONTHS[maxMonthIdx]:"—")
+          ),
+          h("div",{className:"stat-card"},
+            h("div",{className:"stat-label"},"🔻 أقل شهر"),
+            h("div",{className:"stat-val",style:{color:"#1D9E75",fontSize:15}},minMonthIdx>=0?MONTHS[minMonthIdx]:"—")
+          )
+        ),
+
+        // Bar chart
+        h("div",{className:"chart-card"},
+          h("div",{className:"chart-title"},"المصاريف الشهرية"),
+          h("div",{className:"bar-chart"},
+            monthTotals.map((val,i)=>{
+              const barH=val>0?Math.max(8,(val/maxVal)*100):0;
+              const isMax=i===maxMonthIdx&&val>0;
+              const isCur=i===CUR_MONTH;
+              const isFuture=i>CUR_MONTH;
+              const barColor=isFuture?"#f0f0ec":isMax?"#E85B5B":isCur?"#1D9E75":"#5DCAA5";
+              return h("div",{key:i,className:"bar-wrap"},
+                val>0&&h("div",{className:"bar-val",style:{color:isMax?"#E85B5B":"#1D9E75"}},val.toFixed(0)),
+                h("div",{className:"bar",style:{height:barH||4,background:barColor,border:val===0?"1px dashed #e8e8e8":"none"}}),
+                h("div",{className:"bar-lbl",style:{color:isCur?"#1D9E75":"#bbb",fontWeight:isCur?700:400}},MONTHS[i].slice(0,3))
+              );
+            })
+          ),
+          h("div",{className:"chart-legend"},
+            h("span",null,h("span",{style:{color:"#1D9E75"}},"■")," الشهر الحالي"),
+            h("span",null,h("span",{style:{color:"#5DCAA5"}},"■")," أشهر سابقة"),
+            h("span",null,h("span",{style:{color:"#E85B5B"}},"■")," أعلى صرف"),
+            h("span",null,h("span",{style:{color:"#e8e8e8"}},"■")," لم يبدأ")
+          )
+        ),
+
+        // Monthly detail
+        h("div",{className:"detail-card"},
+          h("div",{className:"detail-header"},"تفاصيل الأشهر"),
+          MONTHS.map((m,i)=>{
+            const val=monthTotals[i];
+            const trips=monthTrips[i];
+            const isCur=i===CUR_MONTH;
+            const isFuture=i>CUR_MONTH;
+            if(isFuture&&val===0)return null;
+            const prevVal=i>0?monthTotals[i-1]:null;
+            const change=prevVal&&prevVal>0?((val-prevVal)/prevVal*100):null;
+            const dotColor=isCur?"#1D9E75":val>0?"#5DCAA5":"#e0e0e0";
+            return h("div",{key:i,className:"month-row",style:{background:isCur?"#F7FDF9":"transparent"}},
+              h("div",{className:"month-dot",style:{background:dotColor}}),
+              h("div",{style:{flex:1}},
+                h("div",{className:"month-name"+(val>0||isCur?" active":"")},
+                  isCur&&h("span",{className:"cur-badge"},"الآن"), m
+                ),
+                trips>0&&h("div",{className:"month-trips"},trips+(trips===1?" رحلة":" رحلات"))
+              ),
+              h("div",{style:{textAlign:"left"}},
+                val>0
+                  ? h("div",null,
+                      h("div",{className:"month-val"},val.toFixed(2)+" د.أ"),
+                      change!==null&&h("div",{className:"month-change",style:{color:change>0?"#E85B5B":"#1D9E75"}},
+                        (change>0?"▲ ":"▼ ")+Math.abs(change).toFixed(0)+"% "+(change>0?"زيادة":"انخفاض")
+                      )
+                    )
+                  : h("div",{style:{fontSize:12,color:"#ddd"}},"—")
+              )
+            );
+          })
+        ),
+
+        // Manual add
+        h("div",{className:"manual-card"},
+          h("h3",null,"✏️ إضافة مصاريف يدوياً"),
+          h("div",{className:"manual-row"},
+            h("select",{className:"sel",value:manualMonth,onChange:ev=>setManualMonth(parseInt(ev.target.value))},
+              MONTHS.map((m,i)=>h("option",{key:i,value:i},m))
+            ),
+            h("input",{className:"num-input",type:"number",placeholder:"المبلغ",value:manualAmt,onChange:ev=>setManualAmt(ev.target.value),
+              onKeyDown:ev=>ev.key==="Enter"&&addManualHistory()}),
+            h("button",{className:"green-btn",disabled:!manualAmt||parseFloat(manualAmt)<=0,onClick:addManualHistory},"+ أضف")
+          )
+        )
+      )
+    ),
+
+    // ── Bottom bar ──
+    screen!=="settings"&&h("div",{className:"bottom-bar"},
+      h("div",{className:"pending-count"},
+        mode==="analysis"
+          ? h("span",{style:{color:"#aaa",fontSize:12}},CUR_YEAR+" · "+activeMonths.length+" أشهر مسجلة")
+          : pending.length===0?"✅ القايمة فاضية":h("span",null,h("b",null,pending.length)," طلب في انتظارك")
+      ),
+      mode==="analysis"&&yearTotal>0&&h("span",{style:{fontSize:13,fontWeight:700,color:"#1D9E75",direction:"ltr"}},yearTotal.toFixed(2)+" د.أ"),
+      mode!=="analysis"&&total>0&&h("span",{style:{fontSize:13,fontWeight:700,color:"#1D9E75",direction:"ltr"}},total.toFixed(2)+" د.أ"),
+      mode!=="analysis"&&total===0&&done.length>0&&h("button",{className:"clear-btn",onClick:clearDone},"🗑️ مسح المنجزين")
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("app")).render(React.createElement(App));
+</script>
+</body>
+</html>
