@@ -102,6 +102,35 @@ body{font-family:'Noto Sans Arabic','Segoe UI',sans-serif;background:#f2f2ef;min
 .add-store-row{display:flex;gap:8px}
 .empty{text-align:center;padding:44px 20px;color:#aaa}
 .empty .big{font-size:40px;margin-bottom:10px}
+/* Search */
+.search-wrap{position:relative;margin-bottom:14px}
+.search-input{width:100%;padding:12px 42px 12px 14px;border-radius:14px;border:1.5px solid #ececec;background:#fff;font-size:14px;outline:none;font-family:inherit;color:#1a1a1a}
+.search-input:focus{border-color:#1D9E75}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:15px;color:#bbb;pointer-events:none}
+.search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#f0f0ec;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;color:#999;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.search-results{background:#fff;border-radius:14px;border:1px solid #ececec;overflow:hidden;margin-bottom:16px}
+.search-result-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #f2f2f0;cursor:pointer;transition:background .1s}
+.search-result-row:last-child{border-bottom:none}
+.search-result-row:active{background:#f7f7f5}
+.search-result-row.added{background:#F7FDF9}
+.search-result-name{font-size:14px;font-weight:500;color:#1a1a1a;flex:1}
+.search-result-store{font-size:11px;color:#aaa}
+.search-result-price{font-size:12px;color:#1D9E75;font-weight:600;direction:ltr}
+.search-add-mark{font-size:13px;color:#1D9E75}
+.search-empty{text-align:center;padding:30px 20px;color:#bbb;font-size:13px}
+/* Toast */
+.toast-stack{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:100%;max-width:360px;padding:0 14px}
+.toast{background:#1a1a1a;color:#fff;padding:10px 18px;border-radius:30px;font-size:13px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.18);display:flex;align-items:center;gap:8px;animation:toastIn .25s ease-out;max-width:100%}
+.toast.success{background:#1D9E75}
+.toast.error{background:#E53935}
+.toast.info{background:#333}
+@keyframes toastIn{from{opacity:0;transform:translateY(-10px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+.toast.leaving{animation:toastOut .2s ease-in forwards}
+@keyframes toastOut{to{opacity:0;transform:translateY(-8px) scale(.9)}}
+/* Confetti */
+.confetti-layer{position:fixed;inset:0;pointer-events:none;z-index:300;overflow:hidden}
+.confetti-piece{position:absolute;top:-20px;border-radius:2px;animation:confettiFall linear forwards}
+@keyframes confettiFall{to{transform:translateY(110vh) rotate(720deg);opacity:.3}}
 /* Shopping mode */
 .shop-overlay{position:fixed;inset:0;background:#f2f2ef;z-index:100;overflow-y:auto;padding-bottom:90px}
 .shop-header{background:#fff;border-bottom:1px solid #ececec;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
@@ -187,6 +216,61 @@ body{font-family:'Noto Sans Arabic','Segoe UI',sans-serif;background:#f2f2ef;min
 .receipt-confirm-btn{flex:1;background:#1D9E75;color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer}
 .receipt-cancel-btn{background:#f5f5f2;color:#888;border:1px solid #e8e8e5;border-radius:10px;padding:11px 16px;font-size:13px;font-family:inherit;cursor:pointer}
 .receipt-hint{font-size:11px;color:#bbb;text-align:center}
+/* ════════ DARK MODE ════════ */
+body.dark{background:#14161a}
+body.dark .header,body.dark .shop-header,body.dark .bottom-bar,body.dark .shop-footer{background:#1d2024;border-color:#2e3338}
+body.dark .header h1,body.dark .cat-title,body.dark .settings-title,body.dark .analysis-title,
+body.dark .iname,body.dark .item-name,body.dark .store-name-txt,body.dark .pending-count,
+body.dark .shop-title,body.dark .shop-item-name,body.dark .stat-val,body.dark .search-result-name,
+body.dark .month-val,body.dark .month-name.active{color:#ECECEC}
+body.dark .sync-txt,body.dark .refresh-btn,body.dark .isub,body.dark .c-label,body.dark .sec-lbl,
+body.dark .list-sec-title,body.dark .month-trips,body.dark .stat-label,body.dark .year-badge,
+body.dark .store-cnt,body.dark .search-result-store,body.dark .shop-budget-lbl,body.dark .shop-item-qty,
+body.dark .receipt-sub,body.dark .receipt-hint,body.dark .search-empty,body.dark .saved-section h3,
+body.dark .budget-label,body.dark .month-name{color:#8a8f94}
+body.dark .gear-btn,body.dark .back-btn,body.dark .month-edit-btn,body.dark .month-act-btn.cancel,
+body.dark .shop-cancel-btn,body.dark .receipt-cancel-btn,body.dark .clear-btn{background:#262a2f;border-color:#383d42;color:#bbb}
+body.dark .tabs{background:#1d2024;border-color:#2e3338}
+body.dark .tab{color:#8a8f94}
+body.dark .tab.active{background:#2a2e33;color:#ECECEC;box-shadow:none}
+body.dark .cat-card,body.dark .list-card,body.dark .saved-section,body.dark .add-store-card,
+body.dark .store-list,body.dark .stat-card,body.dark .chart-card,body.dark .detail-card,
+body.dark .manual-card,body.dark .receipt-card,body.dark .search-results,body.dark .budget-banner,
+body.dark .shop-item{background:#1d2024;border-color:#2e3338}
+body.dark .cat-card.has-pending{border-color:#22B989}
+body.dark .item-row,body.dark .store-row,body.dark .search-result-row,body.dark .month-row{border-color:#262a2f}
+body.dark .detail-header,body.dark .chart-title,body.dark .add-store-card h3,
+body.dark .manual-card h3,body.dark .receipt-card h3{color:#ECECEC;border-color:#262a2f}
+body.dark .fi,body.dark .sm-input,body.dark .sel,body.dark .num-input,body.dark .search-input,
+body.dark .price-input,body.dark .qty-edit-input,body.dark .month-edit-input,
+body.dark .receipt-amount-input{background:#262a2f;border-color:#383d42;color:#ECECEC}
+body.dark .item-chip{background:#262a2f;border-color:#383d42;color:#ddd}
+body.dark .item-chip.in-list{background:rgba(34,185,137,.15);border-color:#22B989;color:#5fe0b5}
+body.dark .price-badge{background:#262a2f;color:#bbb}
+body.dark .price-badge.no-price{color:#666;border-color:#383d42}
+body.dark .icat,body.dark .shop-check{background:rgba(34,185,137,.15)}
+body.dark .qty-ctrl{background:#262a2f;border-color:#383d42}
+body.dark .qty-num{color:#ECECEC}
+body.dark .qty-btn.minus{color:#7a7e83}
+body.dark .info-banner{background:rgba(34,185,137,.12);border-color:#1f6e54}
+body.dark .info-banner p{color:#5fe0b5}
+body.dark .emoji-opt{background:#262a2f;border-color:#383d42}
+body.dark .emoji-opt.selected{background:rgba(34,185,137,.15);border-color:#22B989}
+body.dark .del-store-btn{background:rgba(229,57,53,.1);border-color:rgba(229,57,53,.3)}
+body.dark .month-act-btn.del{background:rgba(229,57,53,.18)}
+body.dark .search-result-row.added{background:rgba(34,185,137,.08)}
+body.dark .search-clear{background:#262a2f;color:#aaa}
+body.dark .shop-overlay{background:#14161a}
+body.dark .shop-progress{background:#262a2f}
+body.dark .shop-item.bought{background:rgba(34,185,137,.12);border-color:#22B989}
+body.dark .shop-item.bought .shop-item-name{color:#7a7e83}
+body.dark .receipt-btn{background:#1d2024;border-color:#22B989;color:#5fe0b5}
+body.dark .receipt-spinner{border-color:#262a2f;border-top-color:#22B989}
+body.dark .cur-badge{background:rgba(34,185,137,.15);color:#5fe0b5}
+body.dark .green-btn:disabled{background:#1f4a3c;color:#5a6e67}
+body.dark .start-shop-btn:disabled{background:#1f4a3c;color:#5a6e67}
+body.dark .empty{color:#6b6f75}
+body.dark .chip-del,body.dark .xbtn{color:#6b6f75}
 </style>
 </head>
 <body>
@@ -199,6 +283,7 @@ const {useState,useEffect,useRef,useCallback}=React;
 
 const FB_URL="https://home-list-96cde-default-rtdb.firebaseio.com/beit.json";
 const LS_KEY="beit_v7";
+const THEME_KEY="beit_theme_v1";
 const MONTHS=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
 
 const DEF_STORES=[
@@ -224,6 +309,8 @@ function normSaved(raw){
 }
 function lsLoad(){try{const s=localStorage.getItem(LS_KEY);return s?JSON.parse(s):null;}catch{return null;}}
 function lsSave(d){try{localStorage.setItem(LS_KEY,JSON.stringify(d));}catch{}}
+function loadTheme(){try{return localStorage.getItem(THEME_KEY)||"auto";}catch{return "auto";}}
+function isNightNow(){const h=new Date().getHours();return h>=19||h<6;}
 function getInit(){
   const ls=lsLoad();
   return {
@@ -277,9 +364,47 @@ function App(){
   const [editQtyVal,setEditQtyVal]=useState("");
   const [editingMonth,setEditingMonth]=useState(null);
   const [editMonthVal,setEditMonthVal]=useState("");
+  const [searchQ,setSearchQ]=useState("");
+  const [toasts,setToasts]=useState([]);
+  const [confetti,setConfetti]=useState(false);
+  const [themeMode,setThemeMode]=useState(loadTheme);
 
   const R=useRef({stores,items,saved,ts,history});
   R.current={stores,items,saved,ts,history};
+
+  // ── Theme (dark mode) ───────────────────────────────────
+  function setTheme(mode){
+    setThemeMode(mode);
+    try{localStorage.setItem(THEME_KEY,mode);}catch{}
+  }
+  function cycleTheme(){
+    const next=themeMode==="auto"?"light":themeMode==="light"?"dark":"auto";
+    setTheme(next);
+  }
+  const darkActive=themeMode==="dark"||(themeMode==="auto"&&isNightNow());
+  useEffect(()=>{
+    document.body.classList.toggle("dark",darkActive);
+    const meta=document.querySelector('meta[name="theme-color"]');
+    if(meta) meta.setAttribute("content",darkActive?"#14161a":"#1D9E75");
+  },[darkActive]);
+
+  // ── Toast notifications ────────────────────────────────
+  function showToast(msg,type){
+    const id=Date.now()+Math.random();
+    setToasts(t=>[...t,{id,msg,type:type||"info",leaving:false}]);
+    setTimeout(()=>{
+      setToasts(t=>t.map(x=>x.id===id?{...x,leaving:true}:x));
+      setTimeout(()=>setToasts(t=>t.filter(x=>x.id!==id)),200);
+    },2600);
+  }
+
+  // ── Confetti ────────────────────────────────────────────
+  function fireConfetti(){
+    setConfetti(true);
+    setTimeout(()=>setConfetti(false),2500);
+  }
+
+  const lastErrRef=useRef(false);
 
   // ── Firebase ──────────────────────────────────────────
   const pull=useCallback(async()=>{
@@ -287,7 +412,7 @@ function App(){
       const r=await fetch(FB_URL);
       if(!r.ok)throw 0;
       const rec=await r.json();
-      if(!rec){setSync("ok");setSyncMsg("محفوظ");return;}
+      if(!rec){setSync("ok");setSyncMsg("محفوظ");lastErrRef.current=false;return;}
       const remoteTs=rec.ts||0;
       if(remoteTs>R.current.ts){
         const ni=rec.items||[];
@@ -299,7 +424,11 @@ function App(){
         lsSave({items:ni,stores:nst,saved:ns,ts:remoteTs,history:nh});
       }
       setSync("ok");setSyncMsg("محفوظ");
-    }catch{setSync("err");setSyncMsg("تعذر الاتصال");}
+      if(lastErrRef.current){showToast("✓ عاد الاتصال","success");lastErrRef.current=false;}
+    }catch{
+      setSync("err");setSyncMsg("تعذر الاتصال");
+      if(!lastErrRef.current){showToast("⚠️ تعذر الاتصال بالإنترنت","error");lastErrRef.current=true;}
+    }
   },[]);
 
   const pushTimer=useRef(null);
@@ -311,7 +440,11 @@ function App(){
         const r=await fetch(FB_URL,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
         if(!r.ok)throw 0;
         setSync("ok");setSyncMsg("تم الحفظ ✓");
-      }catch{setSync("err");setSyncMsg("فشل الحفظ");}
+        lastErrRef.current=false;
+      }catch{
+        setSync("err");setSyncMsg("فشل الحفظ");
+        if(!lastErrRef.current){showToast("⚠️ فشل الحفظ، تحقق من الإنترنت","error");lastErrRef.current=true;}
+      }
     },500);
   }
 
@@ -332,13 +465,16 @@ function App(){
     const nst=[...R.current.stores,{id,label:newStoreLabel.trim(),icon:newStoreIcon}];
     const ns={...R.current.saved,[id]:[]};
     commit(R.current.items,ns,nst);
+    showToast("✓ تمت إضافة "+newStoreLabel.trim(),"success");
     setNewStoreLabel("");setNewStoreIcon("🏪");
   }
   function deleteStore(id){
+    const label=siInfo(R.current.stores,id).label;
     const nst=R.current.stores.filter(s=>s.id!==id);
     const ni=R.current.items.filter(i=>i.storeId!==id);
     const ns={...R.current.saved};delete ns[id];
     commit(ni,ns,nst);setDelConfirm(null);
+    showToast("🗑️ تم حذف "+label,"info");
     if(curCat===id){setScreen("home");setCurCat(null);}
   }
 
@@ -346,6 +482,7 @@ function App(){
   function addItem(savedItem,storeId){
     if(R.current.items.find(i=>!i.done&&i.name===savedItem.name&&i.storeId===storeId))return;
     commit([{id:genId(),name:savedItem.name,qty:1,price:savedItem.price,storeId,done:false,at:Date.now()},...R.current.items],R.current.saved,R.current.stores);
+    showToast("✓ أضيفت "+savedItem.name,"success");
   }
   function addNew(){
     if(!newName.trim()||!curCat)return;
@@ -359,6 +496,7 @@ function App(){
     const already=R.current.items.find(i=>!i.done&&i.name===name&&i.storeId===curCat);
     const ni=already?R.current.items:[{id:genId(),name,qty:1,price,storeId:curCat,done:false,at:Date.now()},...R.current.items];
     commit(ni,ns,R.current.stores);
+    showToast("✓ أضيفت "+name,"success");
     setNewName("");setNewQty("");setNewPrice("");
   }
   function removeItem(id){commit(R.current.items.filter(i=>i.id!==id),R.current.saved,R.current.stores);}
@@ -381,6 +519,10 @@ function App(){
       nh={...nh,[yr]:{...yrData,[mo]:{total:moData.total+doneTotal,trips:moData.trips+1}}};
     }
     commit(ni,R.current.saved,R.current.stores,nh);
+    if(doneItems.length>0){
+      fireConfetti();
+      showToast("🎉 تم تسجيل "+doneTotal.toFixed(2)+" د.أ بمصاريف الشهر","success");
+    }
   }
 
   function endShopping(){
@@ -397,6 +539,10 @@ function App(){
     }
     commit(ni,R.current.saved,R.current.stores,nh);
     setShopMode(false);
+    if(doneItems.length>0){
+      fireConfetti();
+      showToast("🎉 خلصتي التسوق! "+doneTotal.toFixed(2)+" د.أ","success");
+    }
   }
   function savePrice(storeId,name){
     const price=editPriceVal.trim()?parseFloat(editPriceVal):null;
@@ -404,6 +550,7 @@ function App(){
     const ni=R.current.items.map(i=>i.storeId===storeId&&i.name===name&&!i.done?{...i,price}:i);
     commit(ni,ns,R.current.stores);
     setEditingPrice(null);setEditPriceVal("");
+    showToast("✓ تم تحديث سعر "+name,"success");
   }
   function delSaved(storeId,name){
     const ns={...R.current.saved,[storeId]:(R.current.saved[storeId]||[]).filter(i=>i.name!==name)};
@@ -445,6 +592,7 @@ function App(){
     const moData=yrData[mo]||{total:0,trips:0};
     const nh={...R.current.history,[yr]:{...yrData,[mo]:{total:moData.total+receiptAmount,trips:moData.trips+1}}};
     commit(R.current.items,R.current.saved,R.current.stores,nh);
+    showToast("✓ أضيف "+receiptAmount.toFixed(2)+" د.أ من الفاتورة","success");
     cancelReceipt();
   }
   function cancelReceipt(){
@@ -460,6 +608,7 @@ function App(){
     const moData=yrData[manualMonth]||{total:0,trips:0};
     const nh={...R.current.history,[yr]:{...yrData,[manualMonth]:{total:moData.total+parseFloat(manualAmt),trips:moData.trips+1}}};
     commit(R.current.items,R.current.saved,R.current.stores,nh);
+    showToast("✓ أضيف "+parseFloat(manualAmt).toFixed(2)+" د.أ لـ"+MONTHS[manualMonth],"success");
     setManualAmt("");
   }
 
@@ -475,6 +624,7 @@ function App(){
     const nh={...R.current.history,[yr]:{...yrData,[i]:{total:Math.max(0,val),trips:val>0?Math.max(1,moData.trips):0}}};
     commit(R.current.items,R.current.saved,R.current.stores,nh);
     setEditingMonth(null);setEditMonthVal("");
+    showToast("✓ تم تحديث "+MONTHS[i],"success");
   }
   function deleteMonth(i){
     const yr=CUR_YEAR;
@@ -483,6 +633,7 @@ function App(){
     const nh={...R.current.history,[yr]:yrData};
     commit(R.current.items,R.current.saved,R.current.stores,nh);
     setEditingMonth(null);
+    showToast("🗑️ تم حذف بيانات "+MONTHS[i],"info");
   }
 
 
@@ -499,6 +650,12 @@ function App(){
   const pending=items.filter(i=>!i.done);
   const done=items.filter(i=>i.done);
   const total=calcTotal(pending);
+  const searchResults=searchQ.trim().length>0
+    ? stores.flatMap(s=>(saved[s.id]||[])
+        .filter(si=>si.name.includes(searchQ.trim()))
+        .map(si=>({...si,storeId:s.id,storeLabel:s.label,storeIcon:s.icon}))
+      )
+    : [];
   const h=React.createElement;
   const stInfo=id=>siInfo(stores,id);
   const syncCls=sync==="push"?"s-push":sync==="err"?"s-err":"s-ok";
@@ -522,6 +679,26 @@ function App(){
   };
 
   return h("div",null,
+    // ── Toast notifications ──
+    toasts.length>0&&h("div",{className:"toast-stack"},
+      toasts.map(t=>h("div",{key:t.id,className:"toast "+t.type+(t.leaving?" leaving":"")},t.msg))
+    ),
+    // ── Confetti ──
+    confetti&&h("div",{className:"confetti-layer"},
+      Array.from({length:60}).map((_,i)=>{
+        const colors=["#1D9E75","#F0A500","#5B6EE8","#E85B5B","#5DCAA5","#FFD166"];
+        const left=Math.random()*100;
+        const size=6+Math.random()*6;
+        const dur=2+Math.random()*1.5;
+        const delay=Math.random()*0.4;
+        const color=colors[i%colors.length];
+        const rot=Math.random()>0.5?"50%":"2px";
+        return h("div",{key:i,className:"confetti-piece",style:{
+          left:left+"%",width:size,height:size*1.4,background:color,
+          animationDuration:dur+"s",animationDelay:delay+"s",borderRadius:rot
+        }});
+      })
+    ),
     // ══ SHOPPING MODE OVERLAY ══
     shopMode&&h("div",{className:"shop-overlay"},
       // progress bar
@@ -584,9 +761,12 @@ function App(){
         )
       ),
       h("div",{className:"header-left"},
+        h("button",{className:"gear-btn",onClick:cycleTheme,title:"الوضع: "+(themeMode==="auto"?"تلقائي":themeMode==="light"?"فاتح":"داكن")},
+          themeMode==="auto"?"🌓":themeMode==="light"?"☀️":"🌙"
+        ),
         screen!=="settings"&&mode!=="analysis"&&h("button",{className:"gear-btn",onClick:()=>setScreen("settings")},"⚙️"),
         screen==="settings"
-          ? h("button",{style:{background:"#f5f5f2",border:"1px solid #e8e8e5",borderRadius:9,padding:"6px 11px",cursor:"pointer",fontFamily:"inherit",fontSize:12},onClick:()=>setScreen("home")},"← رجوع")
+          ? h("button",{className:"gear-btn",style:{fontSize:12,padding:"6px 11px"},onClick:()=>setScreen("home")},"← رجوع")
           : h("div",{className:"tabs"},
               h("button",{className:"tab"+(mode==="wife"    ?" active":""),onClick:()=>{setMode("wife");   setScreen("home");setCurCat(null)}},"🧺 زوجة"),
               h("button",{className:"tab"+(mode==="husband" ?" active":""),onClick:()=>{setMode("husband");setScreen("home")}},"🛍️ زوج"),
@@ -633,34 +813,61 @@ function App(){
 
       // ══ WIFE ══
       mode==="wife"&&screen==="home"&&h("div",null,
-        h("div",{className:"cat-grid"},
-          stores.map(s=>{
-            const cnt=pending.filter(i=>i.storeId===s.id).length;
-            return h("div",{key:s.id,className:"cat-card"+(cnt>0?" has-pending":""),onClick:()=>{setCurCat(s.id);setScreen("cat");}},
-              cnt>0&&h("div",{className:"badge"},cnt),
-              h("div",{className:"c-icon"},s.icon),
-              h("div",{className:"c-label"},s.label)
-            );
-          })
+        h("div",{className:"search-wrap"},
+          h("span",{className:"search-icon"},"🔍"),
+          h("input",{className:"search-input",placeholder:"دوّري على أي غرض بكل المتاجر...",value:searchQ,
+            onChange:ev=>setSearchQ(ev.target.value)}),
+          searchQ&&h("button",{className:"search-clear",onClick:()=>setSearchQ("")},"✕")
         ),
-        items.length>0&&h("div",null,
-          h("div",{className:"list-sec-title"},"📋 القايمة الحالية"),
-          h("div",{className:"list-card"},
-            items.map(item=>
-              h("div",{key:item.id,className:"item-row"+(item.done?" done":"")},
-                h("div",{className:"icat"},stInfo(item.storeId).icon),
-                h("div",{style:{flex:1}},
-                  h("div",{className:"iname"},item.name),
-                  h("div",{className:"isub"},stInfo(item.storeId).label)
-                ),
-                !item.done&&QtyCtrl(item.id,item.qty),
-                item.price!=null&&h("span",{className:"item-price"},fmt(item.price*(parseFloat(item.qty)||1))+" د.أ"),
-                item.done&&h("span",null,"✅"),
-                h("button",{className:"xbtn",onClick:()=>removeItem(item.id)},"✕")
+
+        searchQ.trim().length>0
+          ? h("div",null,
+              searchResults.length===0
+                ? h("div",{className:"search-empty"},"ما في نتائج لـ \""+searchQ+"\"")
+                : h("div",{className:"search-results"},
+                    searchResults.map((si_item,idx)=>{
+                      const inList=!!pending.find(i=>i.name===si_item.name&&i.storeId===si_item.storeId);
+                      return h("div",{key:si_item.storeId+si_item.name+idx,className:"search-result-row"+(inList?" added":""),
+                        onClick:()=>addItem(si_item,si_item.storeId)},
+                        h("span",{style:{fontSize:16}},si_item.storeIcon),
+                        h("span",{className:"search-result-name"},si_item.name),
+                        h("span",{className:"search-result-store"},si_item.storeLabel),
+                        si_item.price!=null&&h("span",{className:"search-result-price"},si_item.price.toFixed(2)+" د.أ"),
+                        h("span",{className:"search-add-mark"},inList?"✓":"+")
+                      );
+                    })
+                  )
+            )
+          : h("div",null,
+              h("div",{className:"cat-grid"},
+                stores.map(s=>{
+                  const cnt=pending.filter(i=>i.storeId===s.id).length;
+                  return h("div",{key:s.id,className:"cat-card"+(cnt>0?" has-pending":""),onClick:()=>{setCurCat(s.id);setScreen("cat");}},
+                    cnt>0&&h("div",{className:"badge"},cnt),
+                    h("div",{className:"c-icon"},s.icon),
+                    h("div",{className:"c-label"},s.label)
+                  );
+                })
+              ),
+              items.length>0&&h("div",null,
+                h("div",{className:"list-sec-title"},"📋 القايمة الحالية"),
+                h("div",{className:"list-card"},
+                  items.map(item=>
+                    h("div",{key:item.id,className:"item-row"+(item.done?" done":"")},
+                      h("div",{className:"icat"},stInfo(item.storeId).icon),
+                      h("div",{style:{flex:1}},
+                        h("div",{className:"iname"},item.name),
+                        h("div",{className:"isub"},stInfo(item.storeId).label)
+                      ),
+                      !item.done&&QtyCtrl(item.id,item.qty),
+                      item.price!=null&&h("span",{className:"item-price"},fmt(item.price*(parseFloat(item.qty)||1))+" د.أ"),
+                      item.done&&h("span",null,"✅"),
+                      h("button",{className:"xbtn",onClick:()=>removeItem(item.id)},"✕")
+                    )
+                  )
+                )
               )
             )
-          )
-        )
       ),
 
       mode==="wife"&&screen==="cat"&&curCat&&h("div",null,
