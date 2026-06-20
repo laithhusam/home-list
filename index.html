@@ -69,7 +69,9 @@ body{font-family:'Noto Sans Arabic','Segoe UI',sans-serif;background:#f2f2ef;min
 .qty-ctrl{display:flex;align-items:center;background:#f5f5f2;border-radius:10px;overflow:hidden;border:1px solid #e8e8e5;flex-shrink:0}
 .qty-btn{width:30px;height:30px;border:none;background:transparent;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;padding:0;line-height:1}
 .qty-btn.minus{color:#aaa}.qty-btn.minus:disabled{color:#ddd;cursor:not-allowed}.qty-btn.plus{color:#1D9E75}
-.qty-num{width:26px;text-align:center;font-size:13px;font-weight:700;color:#1a1a1a;user-select:none}
+.qty-num{width:30px;text-align:center;font-size:13px;font-weight:700;color:#1a1a1a;user-select:none;cursor:pointer}
+.qty-edit-row{display:flex;align-items:center}
+.qty-edit-input{width:64px;padding:5px 6px;border-radius:10px;border:2px solid #1D9E75;font-size:13px;font-weight:700;text-align:center;outline:none;font-family:inherit;direction:ltr}
 .xbtn{background:none;border:none;cursor:pointer;color:#ccc;font-size:15px;padding:3px;opacity:0;line-height:1}
 .item-row:hover .xbtn{opacity:1}
 .chk{width:24px;height:24px;border-radius:50%;border:2px solid #d0d0d0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;color:transparent;transition:all .15s}
@@ -100,6 +102,33 @@ body{font-family:'Noto Sans Arabic','Segoe UI',sans-serif;background:#f2f2ef;min
 .add-store-row{display:flex;gap:8px}
 .empty{text-align:center;padding:44px 20px;color:#aaa}
 .empty .big{font-size:40px;margin-bottom:10px}
+/* Shopping mode */
+.shop-overlay{position:fixed;inset:0;background:#f2f2ef;z-index:100;overflow-y:auto;padding-bottom:90px}
+.shop-header{background:#fff;border-bottom:1px solid #ececec;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.shop-title{font-size:16px;font-weight:700;color:#1a1a1a}
+.shop-budget{font-size:20px;font-weight:700;color:#1D9E75;direction:ltr}
+.shop-budget-lbl{font-size:10px;color:#aaa;text-align:left}
+.shop-progress{height:4px;background:#e8e8e8;margin:0}
+.shop-progress-bar{height:4px;background:#1D9E75;transition:width .4s}
+.shop-body{max-width:600px;margin:0 auto;padding:14px}
+.shop-store-lbl{font-size:12px;font-weight:600;color:#aaa;margin:16px 0 8px;padding:0 2px;display:flex;justify-content:space-between}
+.shop-store-total{color:#1D9E75}
+.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.shop-item{background:#fff;border-radius:16px;border:2px solid #ececec;padding:16px 14px;cursor:pointer;transition:all .15s;position:relative;active:transform scale(.95)}
+.shop-item:active{transform:scale(.96)}
+.shop-item.bought{background:#E6F7F1;border-color:#1D9E75;opacity:.7}
+.shop-item-name{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:6px;line-height:1.3}
+.shop-item.bought .shop-item-name{text-decoration:line-through;color:#aaa}
+.shop-item-meta{display:flex;align-items:center;justify-content:space-between}
+.shop-item-qty{font-size:12px;color:#aaa;background:#f5f5f2;padding:2px 8px;border-radius:8px}
+.shop-item-price{font-size:13px;font-weight:600;color:#1D9E75;direction:ltr}
+.shop-check{position:absolute;top:10px;left:10px;width:22px;height:22px;border-radius:50%;border:2px solid #d0d0d0;background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent}
+.shop-item.bought .shop-check{background:#1D9E75;border-color:#1D9E75;color:#fff}
+.shop-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ececec;padding:12px 16px;display:flex;gap:10px;z-index:110}
+.shop-end-btn{flex:1;background:#1D9E75;color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-family:inherit;font-weight:700;cursor:pointer}
+.shop-cancel-btn{background:#f5f5f2;color:#888;border:1px solid #e8e8e5;border-radius:12px;padding:14px 18px;font-size:14px;font-family:inherit;font-weight:500;cursor:pointer}
+.start-shop-btn{width:100%;background:#1D9E75;color:#fff;border:none;border-radius:12px;padding:16px;font-size:16px;font-family:inherit;font-weight:700;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px}
+.start-shop-btn:disabled{background:#9FE1CB;cursor:not-allowed}
 /* Analysis */
 .analysis-screen{max-width:600px;margin:0 auto;padding:14px}
 .analysis-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
@@ -129,15 +158,40 @@ body{font-family:'Noto Sans Arabic','Segoe UI',sans-serif;background:#f2f2ef;min
 .month-trips{font-size:10px;color:#aaa;margin-top:1px}
 .month-val{font-size:14px;font-weight:600;direction:ltr;text-align:left}
 .month-change{font-size:10px;text-align:right;margin-top:1px}
+.month-edit-btn{background:#f5f5f2;border:1px solid #e8e8e5;border-radius:8px;width:28px;height:28px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.month-edit-row{display:flex;align-items:center;gap:5px}
+.month-edit-input{width:80px;padding:6px 8px;border-radius:8px;border:2px solid #1D9E75;font-size:13px;font-weight:600;text-align:center;outline:none;font-family:inherit;direction:ltr}
+.month-act-btn{width:28px;height:28px;border-radius:8px;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.month-act-btn.save{background:#1D9E75;color:#fff}
+.month-act-btn.del{background:#fdecea}
+.month-act-btn.cancel{background:#f5f5f2;color:#999}
 .manual-card{background:#fff;border-radius:14px;border:1px solid #ececec;padding:16px}
 .manual-card h3{font-size:13px;font-weight:600;color:#333;margin-bottom:12px}
 .manual-row{display:flex;gap:8px}
 .sel{flex:1;padding:10px 12px;border-radius:10px;border:1px solid #ddd;background:#fff;font-size:13px;font-family:inherit;outline:none;color:#1a1a1a}
 .num-input{width:90px;padding:10px 8px;border-radius:10px;border:1px solid #ddd;background:#fff;font-size:14px;text-align:center;outline:none;font-family:inherit}
+/* Receipt scan */
+.receipt-card{background:#fff;border-radius:14px;border:1px solid #ececec;padding:16px;margin-top:14px}
+.receipt-card h3{font-size:13px;font-weight:600;color:#333;margin-bottom:4px}
+.receipt-sub{font-size:11px;color:#aaa;margin-bottom:12px}
+.receipt-btn{width:100%;background:#fff;border:2px dashed #1D9E75;border-radius:12px;padding:18px;color:#1D9E75;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px}
+.receipt-btn .ic{font-size:26px}
+.receipt-loading{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px}
+.receipt-spinner{width:30px;height:30px;border:3px solid #E6F7F1;border-top-color:#1D9E75;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.receipt-result{display:flex;flex-direction:column;gap:10px;align-items:center;padding:8px 0}
+.receipt-img-preview{max-width:140px;max-height:140px;border-radius:10px;border:1px solid #ececec}
+.receipt-amount-row{display:flex;align-items:center;gap:8px}
+.receipt-amount-input{width:120px;padding:10px;border-radius:10px;border:2px solid #1D9E75;font-size:18px;font-weight:700;text-align:center;outline:none;font-family:inherit;direction:ltr}
+.receipt-actions{display:flex;gap:8px;width:100%}
+.receipt-confirm-btn{flex:1;background:#1D9E75;color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer}
+.receipt-cancel-btn{background:#f5f5f2;color:#888;border:1px solid #e8e8e5;border-radius:10px;padding:11px 16px;font-size:13px;font-family:inherit;cursor:pointer}
+.receipt-hint{font-size:11px;color:#bbb;text-align:center}
 </style>
 </head>
 <body>
 <div id="app"></div>
+<script src="https://unpkg.com/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script>
@@ -180,8 +234,12 @@ function getInit(){
 function genId(){return "x"+Date.now().toString(36)+Math.random().toString(36).slice(2,4);}
 function siInfo(stores,id){return stores.find(s=>s.id===id)||{icon:"📦",label:id};}
 function fmt(n){return n!=null?n.toFixed(2):"—";}
-function calcTotal(items){return items.filter(i=>!i.done&&i.price!=null).reduce((s,i)=>s+(i.price*(parseInt(i.qty)||1)),0);}
-function calcStoreTotal(items,storeId){return items.filter(i=>!i.done&&i.storeId===storeId&&i.price!=null).reduce((s,i)=>s+(i.price*(parseInt(i.qty)||1)),0);}
+function fmtQty(q){
+  const n=parseFloat(q)||1;
+  return Number.isInteger(n)?String(n):n.toFixed(2).replace(/0+$/,"").replace(/\.$/,"");
+}
+function calcTotal(items){return items.filter(i=>!i.done&&i.price!=null).reduce((s,i)=>s+(i.price*(parseFloat(i.qty)||1)),0);}
+function calcStoreTotal(items,storeId){return items.filter(i=>!i.done&&i.storeId===storeId&&i.price!=null).reduce((s,i)=>s+(i.price*(parseFloat(i.qty)||1)),0);}
 
 function App(){
   const init=getInit();
@@ -209,6 +267,16 @@ function App(){
   const [delConfirm,setDelConfirm]=useState(null);
   const [manualAmt,setManualAmt]=useState("");
   const [manualMonth,setManualMonth]=useState(CUR_MONTH);
+  const [shopMode,setShopMode]=useState(false);
+  const [receiptImg,setReceiptImg]=useState(null);
+  const [receiptLoading,setReceiptLoading]=useState(false);
+  const [receiptAmount,setReceiptAmount]=useState(null);
+  const [receiptErr,setReceiptErr]=useState(null);
+  const fileInputRef=useRef(null);
+  const [editingQty,setEditingQty]=useState(null);
+  const [editQtyVal,setEditQtyVal]=useState("");
+  const [editingMonth,setEditingMonth]=useState(null);
+  const [editMonthVal,setEditMonthVal]=useState("");
 
   const R=useRef({stores,items,saved,ts,history});
   R.current={stores,items,saved,ts,history};
@@ -294,12 +362,15 @@ function App(){
     setNewName("");setNewQty("");setNewPrice("");
   }
   function removeItem(id){commit(R.current.items.filter(i=>i.id!==id),R.current.saved,R.current.stores);}
-  function setQty(id,qty){if(qty<1)return;commit(R.current.items.map(i=>i.id===id?{...i,qty}:i),R.current.saved,R.current.stores);}
+  function setQty(id,qty){
+    const q=Math.round(Math.max(0.25,qty)*100)/100;
+    commit(R.current.items.map(i=>i.id===id?{...i,qty:q}:i),R.current.saved,R.current.stores);
+  }
   function toggleDone(id){commit(R.current.items.map(i=>i.id===id?{...i,done:!i.done}:i),R.current.saved,R.current.stores);}
 
   function clearDone(){
     const doneItems=R.current.items.filter(i=>i.done);
-    const doneTotal=doneItems.filter(i=>i.price!=null).reduce((s,i)=>s+(i.price*(parseInt(i.qty)||1)),0);
+    const doneTotal=doneItems.filter(i=>i.price!=null).reduce((s,i)=>s+(i.price*(parseFloat(i.qty)||1)),0);
     const ni=R.current.items.filter(i=>!i.done);
     let nh=R.current.history;
     if(doneTotal>0){
@@ -312,6 +383,21 @@ function App(){
     commit(ni,R.current.saved,R.current.stores,nh);
   }
 
+  function endShopping(){
+    const doneItems=R.current.items.filter(i=>i.done);
+    const doneTotal=doneItems.filter(i=>i.price!=null).reduce((s,i)=>s+(i.price*(parseFloat(i.qty)||1)),0);
+    const ni=R.current.items.filter(i=>!i.done);
+    let nh=R.current.history;
+    if(doneTotal>0){
+      const yr=new Date().getFullYear().toString();
+      const mo=new Date().getMonth();
+      const yrData=nh[yr]||{};
+      const moData=yrData[mo]||{total:0,trips:0};
+      nh={...nh,[yr]:{...yrData,[mo]:{total:moData.total+doneTotal,trips:moData.trips+1}}};
+    }
+    commit(ni,R.current.saved,R.current.stores,nh);
+    setShopMode(false);
+  }
   function savePrice(storeId,name){
     const price=editPriceVal.trim()?parseFloat(editPriceVal):null;
     const ns={...R.current.saved,[storeId]:(R.current.saved[storeId]||[]).map(i=>i.name===name?{...i,price}:i)};
@@ -322,6 +408,48 @@ function App(){
   function delSaved(storeId,name){
     const ns={...R.current.saved,[storeId]:(R.current.saved[storeId]||[]).filter(i=>i.name!==name)};
     commit(R.current.items,ns,R.current.stores);
+  }
+
+  // ── Receipt scan ────────────────────────────────────────
+  function onReceiptFile(e){
+    const file=e.target.files[0];
+    if(!file)return;
+    setReceiptErr(null);setReceiptAmount(null);
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const dataUrl=ev.target.result;
+      setReceiptImg(dataUrl);
+      setReceiptLoading(true);
+      Tesseract.recognize(dataUrl,"eng",{})
+        .then(({data:{text}})=>{
+          const matches=text.match(/\d{1,4}\.\d{2}/g)||[];
+          const nums=matches.map(parseFloat).filter(n=>n>0&&n<5000);
+          if(nums.length>0){
+            setReceiptAmount(Math.max(...nums));
+          }else{
+            const whole=(text.match(/\b\d{1,4}\b/g)||[]).map(Number).filter(n=>n>0&&n<5000);
+            if(whole.length>0) setReceiptAmount(Math.max(...whole));
+            else setReceiptErr("ما قدرت أقرأ رقم واضح — اكتب المبلغ يدوياً");
+          }
+        })
+        .catch(()=>setReceiptErr("صار خطأ في قراءة الصورة"))
+        .finally(()=>setReceiptLoading(false));
+    };
+    reader.readAsDataURL(file);
+  }
+  function confirmReceipt(){
+    if(receiptAmount==null||receiptAmount<=0)return;
+    const yr=new Date().getFullYear().toString();
+    const mo=new Date().getMonth();
+    const yrData=R.current.history[yr]||{};
+    const moData=yrData[mo]||{total:0,trips:0};
+    const nh={...R.current.history,[yr]:{...yrData,[mo]:{total:moData.total+receiptAmount,trips:moData.trips+1}}};
+    commit(R.current.items,R.current.saved,R.current.stores,nh);
+    cancelReceipt();
+  }
+  function cancelReceipt(){
+    setReceiptImg(null);setReceiptAmount(null);setReceiptErr(null);setReceiptLoading(false);
+    if(fileInputRef.current) fileInputRef.current.value="";
   }
 
   // ── Manual history add ─────────────────────────────────
@@ -335,7 +463,29 @@ function App(){
     setManualAmt("");
   }
 
-  // ── Analysis calculations ──────────────────────────────
+  function startEditMonth(i){
+    setEditingMonth(i);
+    setEditMonthVal(monthTotals[i]>0?String(monthTotals[i]):"");
+  }
+  function saveEditMonth(i){
+    const val=editMonthVal.trim()?parseFloat(editMonthVal):0;
+    const yr=CUR_YEAR;
+    const yrData=R.current.history[yr]||{};
+    const moData=yrData[i]||{total:0,trips:0};
+    const nh={...R.current.history,[yr]:{...yrData,[i]:{total:Math.max(0,val),trips:val>0?Math.max(1,moData.trips):0}}};
+    commit(R.current.items,R.current.saved,R.current.stores,nh);
+    setEditingMonth(null);setEditMonthVal("");
+  }
+  function deleteMonth(i){
+    const yr=CUR_YEAR;
+    const yrData={...(R.current.history[yr]||{})};
+    delete yrData[i];
+    const nh={...R.current.history,[yr]:yrData};
+    commit(R.current.items,R.current.saved,R.current.stores,nh);
+    setEditingMonth(null);
+  }
+
+
   const yearData=history[CUR_YEAR]||{};
   const monthTotals=Array.from({length:12},(_,i)=>yearData[i]?.total||0);
   const monthTrips=Array.from({length:12},(_,i)=>yearData[i]?.trips||0);
@@ -353,14 +503,77 @@ function App(){
   const stInfo=id=>siInfo(stores,id);
   const syncCls=sync==="push"?"s-push":sync==="err"?"s-err":"s-ok";
 
-  const QtyCtrl=(id,qty)=>h("div",{className:"qty-ctrl"},
-    h("button",{className:"qty-btn minus",disabled:(parseInt(qty)||1)<=1,onClick:()=>setQty(id,(parseInt(qty)||1)-1)},"−"),
-    h("span",{className:"qty-num"},parseInt(qty)||1),
-    h("button",{className:"qty-btn plus",onClick:()=>setQty(id,(parseInt(qty)||1)+1)},"+")
-  );
+  const QtyCtrl=(id,qty)=>{
+    const isEditing=editingQty===id;
+    if(isEditing){
+      return h("div",{className:"qty-edit-row"},
+        h("input",{className:"qty-edit-input",type:"number",step:"0.1",inputMode:"decimal",value:editQtyVal,autoFocus:true,
+          onChange:ev=>setEditQtyVal(ev.target.value),
+          onKeyDown:ev=>{if(ev.key==="Enter"){const v=parseFloat(editQtyVal);if(v>0)setQty(id,v);setEditingQty(null);}if(ev.key==="Escape")setEditingQty(null);},
+          onBlur:()=>{const v=parseFloat(editQtyVal);if(v>0)setQty(id,v);setEditingQty(null);}
+        })
+      );
+    }
+    return h("div",{className:"qty-ctrl"},
+      h("button",{className:"qty-btn minus",onClick:()=>setQty(id,(parseFloat(qty)||1)-0.5)},"−"),
+      h("span",{className:"qty-num",onClick:()=>{setEditingQty(id);setEditQtyVal(String(parseFloat(qty)||1));}},fmtQty(qty)),
+      h("button",{className:"qty-btn plus",onClick:()=>setQty(id,(parseFloat(qty)||1)+0.5)},"+")
+    );
+  };
 
   return h("div",null,
-    // ── Header ──
+    // ══ SHOPPING MODE OVERLAY ══
+    shopMode&&h("div",{className:"shop-overlay"},
+      // progress bar
+      h("div",{className:"shop-progress"},
+        h("div",{className:"shop-progress-bar",style:{width:(done.length/(pending.length+done.length||1)*100)+"%"}})
+      ),
+      h("div",{className:"shop-header"},
+        h("div",null,
+          h("div",{className:"shop-title"},"🛒 وضع التسوق"),
+          h("div",{style:{fontSize:11,color:"#aaa",marginTop:2}},
+            done.length>0?done.length+" اشتريت · "+pending.length+" باقي":pending.length+" غرض"
+          )
+        ),
+        h("div",{style:{textAlign:"left"}},
+          h("div",{className:"shop-budget"},total>0?total.toFixed(2)+" د.أ":"—"),
+          h("div",{className:"shop-budget-lbl"},"الميزانية")
+        )
+      ),
+      h("div",{className:"shop-body"},
+        stores.map(s=>{
+          const ci=items.filter(i=>i.storeId===s.id);
+          if(!ci.length)return null;
+          const stDone=ci.filter(i=>i.done).length;
+          const stPending=ci.filter(i=>!i.done).length;
+          const stTotal=ci.filter(i=>i.done&&i.price!=null).reduce((sum,i)=>sum+(i.price*(parseFloat(i.qty)||1)),0);
+          return h("div",{key:s.id},
+            h("div",{className:"shop-store-lbl"},
+              h("span",null,s.icon+" "+s.label+" ("+stDone+"/"+ci.length+")"),
+              stTotal>0&&h("span",{className:"shop-store-total"},stTotal.toFixed(2)+" د.أ")
+            ),
+            h("div",{className:"shop-grid"},
+              ci.map(item=>
+                h("div",{key:item.id,className:"shop-item"+(item.done?" bought":""),onClick:()=>toggleDone(item.id)},
+                  h("div",{className:"shop-check"},item.done?"✓":""),
+                  h("div",{className:"shop-item-name"},item.name),
+                  h("div",{className:"shop-item-meta"},
+                    h("span",{className:"shop-item-qty"},"×"+fmtQty(item.qty)),
+                    item.price!=null&&h("span",{className:"shop-item-price"},((item.price*(parseFloat(item.qty)||1)).toFixed(2))+" د.أ")
+                  )
+                )
+              )
+            )
+          );
+        })
+      ),
+      h("div",{className:"shop-footer"},
+        h("button",{className:"shop-cancel-btn",onClick:()=>setShopMode(false)},"← رجوع"),
+        h("button",{className:"shop-end-btn",onClick:endShopping},
+          done.length>0?"✅ انهاء وتسجيل المصاريف":"انهاء التسوق"
+        )
+      )
+    ),
     h("div",{className:"header"},
       h("div",{className:"header-info"},
         h("h1",null,"🏠 قايمة البيت"),
@@ -441,7 +654,7 @@ function App(){
                   h("div",{className:"isub"},stInfo(item.storeId).label)
                 ),
                 !item.done&&QtyCtrl(item.id,item.qty),
-                item.price!=null&&h("span",{className:"item-price"},fmt(item.price*(parseInt(item.qty)||1))+" د.أ"),
+                item.price!=null&&h("span",{className:"item-price"},fmt(item.price*(parseFloat(item.qty)||1))+" د.أ"),
                 item.done&&h("span",null,"✅"),
                 h("button",{className:"xbtn",onClick:()=>removeItem(item.id)},"✕")
               )
@@ -497,7 +710,7 @@ function App(){
                 h("div",{className:"icat"},stInfo(item.storeId).icon),
                 h("div",{style:{flex:1}},h("div",{className:"iname"},item.name)),
                 QtyCtrl(item.id,item.qty),
-                item.price!=null&&h("span",{className:"item-price"},fmt(item.price*(parseInt(item.qty)||1))+" د.أ"),
+                item.price!=null&&h("span",{className:"item-price"},fmt(item.price*(parseFloat(item.qty)||1))+" د.أ"),
                 h("button",{className:"xbtn",style:{opacity:1},onClick:()=>removeItem(item.id)},"✕")
               )
             )
@@ -507,6 +720,9 @@ function App(){
 
       // ══ HUSBAND ══
       mode==="husband"&&h("div",null,
+        pending.length>0&&h("button",{className:"start-shop-btn",onClick:()=>setShopMode(true)},
+          "🛒 ابدأ التسوق"
+        ),
         pending.length>0&&h("div",{className:"budget-banner"},
           h("div",null,
             h("div",{className:"budget-label"},"💰 الميزانية المطلوبة"),
@@ -538,7 +754,7 @@ function App(){
                         h("button",{className:"chk"+(item.done?" on":""),onClick:()=>toggleDone(item.id)},item.done?"✓":""),
                         h("div",{style:{flex:1}},h("div",{className:"iname"},item.name)),
                         QtyCtrl(item.id,item.qty),
-                        item.price!=null&&h("span",{className:"item-price"},fmt(item.price*(parseInt(item.qty)||1))+" د.أ")
+                        item.price!=null&&h("span",{className:"item-price"},fmt(item.price*(parseFloat(item.qty)||1))+" د.أ")
                       )
                     )
                   )
@@ -554,7 +770,7 @@ function App(){
             done.map(item=>
               h("div",{key:item.id,className:"item-row done"},
                 h("button",{className:"chk on",onClick:()=>toggleDone(item.id)},"✓"),
-                h("div",{className:"iname",style:{textDecoration:"line-through"}},item.name+(item.qty>1?" (×"+item.qty+")":""))
+                h("div",{className:"iname",style:{textDecoration:"line-through"}},item.name+(item.qty>1?" (×"+fmtQty(item.qty)+")":""))
               )
             )
           )
@@ -625,24 +841,37 @@ function App(){
             const prevVal=i>0?monthTotals[i-1]:null;
             const change=prevVal&&prevVal>0?((val-prevVal)/prevVal*100):null;
             const dotColor=isCur?"#1D9E75":val>0?"#5DCAA5":"#e0e0e0";
+            const isEditingThis=editingMonth===i;
             return h("div",{key:i,className:"month-row",style:{background:isCur?"#F7FDF9":"transparent"}},
               h("div",{className:"month-dot",style:{background:dotColor}}),
               h("div",{style:{flex:1}},
                 h("div",{className:"month-name"+(val>0||isCur?" active":"")},
                   isCur&&h("span",{className:"cur-badge"},"الآن"), m
                 ),
-                trips>0&&h("div",{className:"month-trips"},trips+(trips===1?" رحلة":" رحلات"))
+                trips>0&&!isEditingThis&&h("div",{className:"month-trips"},trips+(trips===1?" رحلة":" رحلات"))
               ),
-              h("div",{style:{textAlign:"left"}},
-                val>0
-                  ? h("div",null,
-                      h("div",{className:"month-val"},val.toFixed(2)+" د.أ"),
-                      change!==null&&h("div",{className:"month-change",style:{color:change>0?"#E85B5B":"#1D9E75"}},
-                        (change>0?"▲ ":"▼ ")+Math.abs(change).toFixed(0)+"% "+(change>0?"زيادة":"انخفاض")
-                      )
-                    )
-                  : h("div",{style:{fontSize:12,color:"#ddd"}},"—")
-              )
+              isEditingThis
+                ? h("div",{className:"month-edit-row"},
+                    h("input",{className:"month-edit-input",type:"number",placeholder:"0.00",value:editMonthVal,autoFocus:true,
+                      onChange:ev=>setEditMonthVal(ev.target.value),
+                      onKeyDown:ev=>{if(ev.key==="Enter")saveEditMonth(i);if(ev.key==="Escape")setEditingMonth(null);}}),
+                    h("button",{className:"month-act-btn save",onClick:()=>saveEditMonth(i)},"✓"),
+                    h("button",{className:"month-act-btn del",onClick:()=>deleteMonth(i)},"🗑️"),
+                    h("button",{className:"month-act-btn cancel",onClick:()=>setEditingMonth(null)},"✕")
+                  )
+                : h("div",{style:{display:"flex",alignItems:"center",gap:6}},
+                    h("div",{style:{textAlign:"left"}},
+                      val>0
+                        ? h("div",null,
+                            h("div",{className:"month-val"},val.toFixed(2)+" د.أ"),
+                            change!==null&&h("div",{className:"month-change",style:{color:change>0?"#E85B5B":"#1D9E75"}},
+                              (change>0?"▲ ":"▼ ")+Math.abs(change).toFixed(0)+"% "+(change>0?"زيادة":"انخفاض")
+                            )
+                          )
+                        : h("div",{style:{fontSize:12,color:"#ddd"}},"—")
+                    ),
+                    h("button",{className:"month-edit-btn",onClick:()=>startEditMonth(i)},"✏️")
+                  )
             );
           })
         ),
@@ -657,6 +886,40 @@ function App(){
             h("input",{className:"num-input",type:"number",placeholder:"المبلغ",value:manualAmt,onChange:ev=>setManualAmt(ev.target.value),
               onKeyDown:ev=>ev.key==="Enter"&&addManualHistory()}),
             h("button",{className:"green-btn",disabled:!manualAmt||parseFloat(manualAmt)<=0,onClick:addManualHistory},"+ أضف")
+          )
+        ),
+
+        // Receipt scan
+        h("div",{className:"receipt-card"},
+          h("h3",null,"📷 مسح فاتورة"),
+          h("div",{className:"receipt-sub"},"صوّر الفاتورة وراح يحاول يقرأ المبلغ تلقائياً — للشهر الحالي ("+MONTHS[CUR_MONTH]+")"),
+          h("input",{ref:fileInputRef,type:"file",accept:"image/*",capture:"environment",style:{display:"none"},onChange:onReceiptFile}),
+          !receiptImg&&h("button",{className:"receipt-btn",onClick:()=>fileInputRef.current?.click()},
+            h("span",{className:"ic"},"📷"),
+            h("span",null,"اضغط لتصوير الفاتورة")
+          ),
+          receiptImg&&receiptLoading&&h("div",{className:"receipt-loading"},
+            h("img",{src:receiptImg,className:"receipt-img-preview"}),
+            h("div",{className:"receipt-spinner"}),
+            h("div",{style:{fontSize:12,color:"#aaa"}},"جاري قراءة الفاتورة...")
+          ),
+          receiptImg&&!receiptLoading&&h("div",{className:"receipt-result"},
+            h("img",{src:receiptImg,className:"receipt-img-preview"}),
+            receiptErr
+              ? h("div",{style:{fontSize:12,color:"#E53935",textAlign:"center"}},receiptErr)
+              : null,
+            h("div",{className:"receipt-amount-row"},
+              h("input",{className:"receipt-amount-input",type:"number",placeholder:"0.00",
+                value:receiptAmount!=null?receiptAmount:"",
+                onChange:ev=>setReceiptAmount(ev.target.value?parseFloat(ev.target.value):null),
+                autoFocus:!!receiptErr}),
+              h("span",{style:{fontSize:13,color:"#aaa"}},"د.أ")
+            ),
+            h("div",{className:"receipt-hint"},"تأكد من المبلغ قبل الإضافة، أو عدّله إذا لزم"),
+            h("div",{className:"receipt-actions"},
+              h("button",{className:"receipt-cancel-btn",onClick:cancelReceipt},"إلغاء"),
+              h("button",{className:"receipt-confirm-btn",disabled:!receiptAmount||receiptAmount<=0,onClick:confirmReceipt},"✓ إضافة للمصاريف")
+            )
           )
         )
       )
