@@ -18,7 +18,7 @@ body{font-family:'Noto Sans Arabic','Segoe UI',sans-serif;background:#f2f2ef;min
 .header h1{font-size:16px;font-weight:700;color:#1a1a1a}
 .sync-bar{display:flex;align-items:center;gap:5px;font-size:11px;margin-top:2px}
 .sync-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.s-ok{background:#1D9E75}.s-push{background:#F0A500;animation:blink .8s infinite}.s-err{background:#E53935}
+.s-ok{background:#1D9E75}.s-push{background:#F0A500;animation:blink .8s infinite}.s-err{background:#E53935}.s-offline{background:#888}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 .sync-txt{color:#aaa}.refresh-btn{background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;line-height:1;color:#aaa}
 .header-left{display:flex;align-items:center;gap:6px;flex-shrink:0}
@@ -328,6 +328,39 @@ function fmtQty(q){
 function calcTotal(items){return items.filter(i=>!i.done&&i.price!=null).reduce((s,i)=>s+(i.price*(parseFloat(i.qty)||1)),0);}
 function calcStoreTotal(items,storeId){return items.filter(i=>!i.done&&i.storeId===storeId&&i.price!=null).reduce((s,i)=>s+(i.price*(parseFloat(i.qty)||1)),0);}
 
+// ── Receipt image preprocessing: grayscale + contrast boost + upscale ──
+// improves Tesseract.js OCR accuracy on faded thermal-printer receipts
+function preprocessReceiptImage(dataUrl){
+  return new Promise((resolve)=>{
+    const img=new Image();
+    img.onload=()=>{
+      const scale=img.width<1100?1.6:1; // upscale small photos so small digits are sharper
+      const canvas=document.createElement("canvas");
+      canvas.width=Math.round(img.width*scale);
+      canvas.height=Math.round(img.height*scale);
+      const ctx=canvas.getContext("2d");
+      ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      try{
+        const imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
+        const d=imgData.data;
+        const contrast=1.55;
+        for(let i=0;i<d.length;i+=4){
+          const gray=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+          let v=(gray-128)*contrast+128;
+          v=v<0?0:v>255?255:v;
+          d[i]=d[i+1]=d[i+2]=v;
+        }
+        ctx.putImageData(imgData,0,0);
+        resolve(canvas.toDataURL("image/png"));
+      }catch{
+        resolve(dataUrl); // fallback to original if canvas processing fails (e.g. CORS)
+      }
+    };
+    img.onerror=()=>resolve(dataUrl);
+    img.src=dataUrl;
+  });
+}
+
 function App(){
   const init=getInit();
   const now=new Date();
@@ -368,6 +401,7 @@ function App(){
   const [toasts,setToasts]=useState([]);
   const [confetti,setConfetti]=useState(false);
   const [themeMode,setThemeMode]=useState(loadTheme);
+  const swipeRef=useRef({x:0,y:0,t:0,active:false});
 
   const R=useRef({stores,items,saved,ts,history});
   R.current={stores,items,saved,ts,history};
@@ -405,9 +439,36 @@ function App(){
   }
 
   const lastErrRef=useRef(false);
+  const pendingDataRef=useRef(null);
+  const offlineNotifiedRef=useRef(false);
 
-  // ── Firebase ──────────────────────────────────────────
+  // ── Firebase: push helper (used by both debounced save & retry) ──
+  async function pushNow(data){
+    setSync("push");setSyncMsg("جاري الحفظ...");
+    try{
+      const r=await fetch(FB_URL,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+      if(!r.ok)throw 0;
+      pendingDataRef.current=null;
+      setSync("ok");setSyncMsg("تم الحفظ ✓");
+      lastErrRef.current=false;
+      return true;
+    }catch{
+      setSync("err");setSyncMsg("فشل الحفظ، هتُعاد المحاولة");
+      if(!lastErrRef.current){showToast("⚠️ فشل الحفظ، هتُعاد المحاولة تلقائياً","error");lastErrRef.current=true;}
+      return false;
+    }
+  }
+
+  // ── Firebase: pull + flush any queued offline changes first ──
   const pull=useCallback(async()=>{
+    if(!navigator.onLine){
+      setSync("offline");setSyncMsg("غير متصل - هيُحفظ تلقائياً");
+      return;
+    }
+    if(pendingDataRef.current){
+      const ok=await pushNow(pendingDataRef.current);
+      if(!ok)return; // will retry on next tick / online event
+    }
     try{
       const r=await fetch(FB_URL);
       if(!r.ok)throw 0;
@@ -433,19 +494,14 @@ function App(){
 
   const pushTimer=useRef(null);
   function schedulePush(data){
+    pendingDataRef.current=data;
     if(pushTimer.current)clearTimeout(pushTimer.current);
+    if(!navigator.onLine){
+      setSync("offline");setSyncMsg("غير متصل - هيُحفظ تلقائياً");
+      return;
+    }
     setSync("push");setSyncMsg("جاري الحفظ...");
-    pushTimer.current=setTimeout(async()=>{
-      try{
-        const r=await fetch(FB_URL,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
-        if(!r.ok)throw 0;
-        setSync("ok");setSyncMsg("تم الحفظ ✓");
-        lastErrRef.current=false;
-      }catch{
-        setSync("err");setSyncMsg("فشل الحفظ");
-        if(!lastErrRef.current){showToast("⚠️ فشل الحفظ، تحقق من الإنترنت","error");lastErrRef.current=true;}
-      }
-    },500);
+    pushTimer.current=setTimeout(()=>{pushNow(pendingDataRef.current);},500);
   }
 
   function commit(ni,ns,nst,nh){
@@ -456,7 +512,31 @@ function App(){
     lsSave(data);schedulePush(data);
   }
 
+  // ── Online/offline detection ──
+  useEffect(()=>{
+    function handleOnline(){
+      offlineNotifiedRef.current=false;
+      showToast("✓ عاد الاتصال، جاري المزامنة...","success");
+      pull();
+    }
+    function handleOffline(){
+      setSync("offline");setSyncMsg("غير متصل - هيُحفظ تلقائياً");
+      if(!offlineNotifiedRef.current){
+        showToast("📴 انقطع الاتصال — التغييرات هتتحفظ وتترسل تلقائياً عند رجوع النت","info");
+        offlineNotifiedRef.current=true;
+      }
+    }
+    window.addEventListener("online",handleOnline);
+    window.addEventListener("offline",handleOffline);
+    if(!navigator.onLine)handleOffline();
+    return()=>{
+      window.removeEventListener("online",handleOnline);
+      window.removeEventListener("offline",handleOffline);
+    };
+  },[pull]);
+
   useEffect(()=>{pull();const t=setInterval(pull,10000);return()=>clearInterval(t);},[pull]);
+
 
   // ── Store actions ──────────────────────────────────────
   function addStore(){
@@ -567,7 +647,8 @@ function App(){
       const dataUrl=ev.target.result;
       setReceiptImg(dataUrl);
       setReceiptLoading(true);
-      Tesseract.recognize(dataUrl,"eng",{})
+      preprocessReceiptImage(dataUrl)
+        .then(processedUrl=>Tesseract.recognize(processedUrl,"eng",{}))
         .then(({data:{text}})=>{
           const matches=text.match(/\d{1,4}\.\d{2}/g)||[];
           const nums=matches.map(parseFloat).filter(n=>n>0&&n<5000);
@@ -658,7 +739,7 @@ function App(){
     : [];
   const h=React.createElement;
   const stInfo=id=>siInfo(stores,id);
-  const syncCls=sync==="push"?"s-push":sync==="err"?"s-err":"s-ok";
+  const syncCls=sync==="push"?"s-push":sync==="err"?"s-err":sync==="offline"?"s-offline":"s-ok";
 
   const QtyCtrl=(id,qty)=>{
     const isEditing=editingQty===id;
@@ -678,7 +759,32 @@ function App(){
     );
   };
 
-  return h("div",null,
+  // ── Swipe to go back (right-edge swipe-left, RTL convention) ──
+  function goBack(){
+    if(shopMode){setShopMode(false);return;}
+    if(screen==="settings"){setScreen("home");return;}
+    if(mode==="wife"&&screen==="cat"){
+      setScreen("home");setCurCat(null);
+      setNewName("");setNewQty("");setNewPrice("");setEditingPrice(null);
+      return;
+    }
+  }
+  function onTouchStart(e){
+    const t=e.touches[0];
+    const nearRightEdge=t.clientX>window.innerWidth-56;
+    swipeRef.current={x:t.clientX,y:t.clientY,t:Date.now(),active:nearRightEdge};
+  }
+  function onTouchEnd(e){
+    if(!swipeRef.current.active)return;
+    const t=e.changedTouches[0];
+    const dx=t.clientX-swipeRef.current.x;
+    const dy=t.clientY-swipeRef.current.y;
+    const dt=Date.now()-swipeRef.current.t;
+    swipeRef.current.active=false;
+    if(dx<-70&&Math.abs(dy)<70&&dt<700) goBack();
+  }
+
+  return h("div",{onTouchStart:onTouchStart,onTouchEnd:onTouchEnd},
     // ── Toast notifications ──
     toasts.length>0&&h("div",{className:"toast-stack"},
       toasts.map(t=>h("div",{key:t.id,className:"toast "+t.type+(t.leaving?" leaving":"")},t.msg))
