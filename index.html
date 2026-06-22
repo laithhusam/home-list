@@ -216,6 +216,22 @@ body{font-family:'Noto Sans Arabic','Segoe UI',sans-serif;background:#f2f2ef;min
 .receipt-confirm-btn{flex:1;background:#1D9E75;color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer}
 .receipt-cancel-btn{background:#f5f5f2;color:#888;border:1px solid #e8e8e5;border-radius:10px;padding:11px 16px;font-size:13px;font-family:inherit;cursor:pointer}
 .receipt-hint{font-size:11px;color:#bbb;text-align:center}
+/* Vendor tagging */
+.vendor-modal-overlay{position:fixed;inset:0;background:rgba(20,22,26,.45);z-index:250;display:flex;align-items:flex-end;justify-content:center}
+.vendor-modal-card{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:600px;padding:20px;max-height:75vh;overflow-y:auto;animation:vendorUp .25s ease-out}
+@keyframes vendorUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.vendor-modal-title{font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:4px}
+.vendor-modal-sub{font-size:12px;color:#999;margin-bottom:16px}
+.vendor-chips-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.vendor-chip{padding:9px 16px;border-radius:30px;border:1.5px solid #e0e0e0;background:#fafaf8;color:#333;cursor:pointer;font-size:13px;font-family:inherit;font-weight:500;transition:all .15s}
+.vendor-chip:active{transform:scale(.94)}
+.vendor-chip.selected{background:#E6F7F1;border-color:#1D9E75;color:#0F6E56}
+.vendor-add-row{display:flex;gap:8px;margin-bottom:14px}
+.vendor-skip-btn{width:100%;background:none;border:none;color:#999;font-size:13px;cursor:pointer;font-family:inherit;padding:10px;text-align:center}
+.vendor-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;background:#f0f0ec;color:#777;padding:3px 9px;border-radius:20px;margin-top:4px}
+.mini-vendor-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.mini-vendor-chip{padding:5px 12px;border-radius:20px;border:1px solid #e0e0e0;background:#fafaf8;color:#555;cursor:pointer;font-size:12px;font-family:inherit}
+.mini-vendor-chip.selected{background:#E6F7F1;border-color:#1D9E75;color:#0F6E56}
 /* ════════ DARK MODE ════════ */
 body.dark{background:#14161a}
 body.dark .header,body.dark .shop-header,body.dark .bottom-bar,body.dark .shop-footer{background:#1d2024;border-color:#2e3338}
@@ -271,6 +287,13 @@ body.dark .green-btn:disabled{background:#1f4a3c;color:#5a6e67}
 body.dark .start-shop-btn:disabled{background:#1f4a3c;color:#5a6e67}
 body.dark .empty{color:#6b6f75}
 body.dark .chip-del,body.dark .xbtn{color:#6b6f75}
+body.dark .vendor-modal-card{background:#1d2024}
+body.dark .vendor-modal-title{color:#ECECEC}
+body.dark .vendor-modal-sub{color:#8a8f94}
+body.dark .vendor-chip,body.dark .mini-vendor-chip{background:#262a2f;border-color:#383d42;color:#ddd}
+body.dark .vendor-chip.selected,body.dark .mini-vendor-chip.selected{background:rgba(34,185,137,.15);border-color:#22B989;color:#5fe0b5}
+body.dark .vendor-skip-btn{color:#7a7e83}
+body.dark .vendor-tag{background:#262a2f;color:#9a9ea3}
 </style>
 </head>
 <body>
@@ -315,7 +338,7 @@ function getInit(){
   const ls=lsLoad();
   return {
     stores:ls?.stores||DEF_STORES, items:ls?.items||[], saved:normSaved(ls?.saved)||DEF_SAVED,
-    ts:ls?.ts||0, history:ls?.history||{},
+    ts:ls?.ts||0, history:ls?.history||{}, tripLog:ls?.tripLog||{}, vendors:ls?.vendors||[],
   };
 }
 function genId(){return "x"+Date.now().toString(36)+Math.random().toString(36).slice(2,4);}
@@ -327,6 +350,21 @@ function fmtQty(q){
 }
 function calcTotal(items){return items.filter(i=>!i.done&&i.price!=null).reduce((s,i)=>s+(i.price*(parseFloat(i.qty)||1)),0);}
 function calcStoreTotal(items,storeId){return items.filter(i=>!i.done&&i.storeId===storeId&&i.price!=null).reduce((s,i)=>s+(i.price*(parseFloat(i.qty)||1)),0);}
+function buildTripItems(doneItems){return doneItems.map(i=>({name:i.name,qty:i.qty,price:i.price,storeId:i.storeId}));}
+function addTripToLog(tripLog,yr,mo,trip){
+  const yrTrips=tripLog[yr]||{};
+  const moTrips=yrTrips[mo]||[];
+  return {...tripLog,[yr]:{...yrTrips,[mo]:[trip,...moTrips]}};
+}
+function fmtTripDate(ts){
+  const d=new Date(ts);
+  return d.getDate()+" "+MONTHS[d.getMonth()];
+}
+function addVendorIfNew(vendors,name){
+  const n=name.trim();
+  if(!n||vendors.includes(n))return vendors;
+  return [...vendors,n];
+}
 
 // ── Receipt image preprocessing: grayscale + contrast boost + upscale ──
 // improves Tesseract.js OCR accuracy on faded thermal-printer receipts
@@ -372,6 +410,8 @@ function App(){
   const [saved,setSaved]=useState(init.saved);
   const [ts,setTs]=useState(init.ts);
   const [history,setHistory]=useState(init.history);
+  const [tripLog,setTripLog]=useState(init.tripLog);
+  const [vendors,setVendors]=useState(init.vendors);
   const [sync,setSync]=useState("ok");
   const [syncMsg,setSyncMsg]=useState("محفوظ");
   const [mode,setMode]=useState("wife");
@@ -401,10 +441,16 @@ function App(){
   const [toasts,setToasts]=useState([]);
   const [confetti,setConfetti]=useState(false);
   const [themeMode,setThemeMode]=useState(loadTheme);
+  const [viewingMonth,setViewingMonth]=useState(null);
+  const [expandedTrip,setExpandedTrip]=useState(null);
+  const [vendorModalFor,setVendorModalFor]=useState(null); // null|'shop'|'clear'
+  const [vendorInput,setVendorInput]=useState("");
+  const [receiptVendor,setReceiptVendor]=useState(null);
+  const [manualVendor,setManualVendor]=useState(null);
   const swipeRef=useRef({x:0,y:0,t:0,active:false});
 
-  const R=useRef({stores,items,saved,ts,history});
-  R.current={stores,items,saved,ts,history};
+  const R=useRef({stores,items,saved,ts,history,tripLog,vendors});
+  R.current={stores,items,saved,ts,history,tripLog,vendors};
 
   // ── Theme (dark mode) ───────────────────────────────────
   function setTheme(mode){
@@ -481,8 +527,10 @@ function App(){
         const nst=rec.stores||DEF_STORES;
         const ns=normSaved({...DEF_SAVED,...(rec.saved||{})});
         const nh=rec.history||{};
-        setItems(ni);setStores(nst);setSaved(ns);setTs(remoteTs);setHistory(nh);
-        lsSave({items:ni,stores:nst,saved:ns,ts:remoteTs,history:nh});
+        const ntl=rec.tripLog||{};
+        const nv=rec.vendors||[];
+        setItems(ni);setStores(nst);setSaved(ns);setTs(remoteTs);setHistory(nh);setTripLog(ntl);setVendors(nv);
+        lsSave({items:ni,stores:nst,saved:ns,ts:remoteTs,history:nh,tripLog:ntl,vendors:nv});
       }
       setSync("ok");setSyncMsg("محفوظ");
       if(lastErrRef.current){showToast("✓ عاد الاتصال","success");lastErrRef.current=false;}
@@ -504,11 +552,13 @@ function App(){
     pushTimer.current=setTimeout(()=>{pushNow(pendingDataRef.current);},500);
   }
 
-  function commit(ni,ns,nst,nh){
+  function commit(ni,ns,nst,nh,ntl,nv){
     const newTs=Date.now();
     const nh2=nh||R.current.history;
-    setItems(ni);setSaved(ns);setStores(nst);setTs(newTs);setHistory(nh2);
-    const data={items:ni,saved:ns,stores:nst,ts:newTs,history:nh2};
+    const ntl2=ntl||R.current.tripLog;
+    const nv2=nv||R.current.vendors;
+    setItems(ni);setSaved(ns);setStores(nst);setTs(newTs);setHistory(nh2);setTripLog(ntl2);setVendors(nv2);
+    const data={items:ni,saved:ns,stores:nst,ts:newTs,history:nh2,tripLog:ntl2,vendors:nv2};
     lsSave(data);schedulePush(data);
   }
 
@@ -586,44 +636,79 @@ function App(){
   }
   function toggleDone(id){commit(R.current.items.map(i=>i.id===id?{...i,done:!i.done}:i),R.current.saved,R.current.stores);}
 
-  function clearDone(){
+  function doClearDone(vendor){
     const doneItems=R.current.items.filter(i=>i.done);
     const doneTotal=doneItems.filter(i=>i.price!=null).reduce((s,i)=>s+(i.price*(parseFloat(i.qty)||1)),0);
     const ni=R.current.items.filter(i=>!i.done);
     let nh=R.current.history;
-    if(doneTotal>0){
-      const yr=new Date().getFullYear().toString();
-      const mo=new Date().getMonth();
-      const yrData=nh[yr]||{};
-      const moData=yrData[mo]||{total:0,trips:0};
-      nh={...nh,[yr]:{...yrData,[mo]:{total:moData.total+doneTotal,trips:moData.trips+1}}};
+    let ntl=R.current.tripLog;
+    if(doneItems.length>0){
+      const now=new Date();
+      const yr=now.getFullYear().toString();
+      const mo=now.getMonth();
+      if(doneTotal>0){
+        const yrData=nh[yr]||{};
+        const moData=yrData[mo]||{total:0,trips:0};
+        nh={...nh,[yr]:{...yrData,[mo]:{total:moData.total+doneTotal,trips:moData.trips+1}}};
+      }
+      const trip={id:genId(),ts:now.getTime(),items:buildTripItems(doneItems),total:doneTotal,source:"shopping",vendor:vendor||null};
+      ntl=addTripToLog(ntl,yr,mo,trip);
     }
-    commit(ni,R.current.saved,R.current.stores,nh);
+    commit(ni,R.current.saved,R.current.stores,nh,ntl);
     if(doneItems.length>0){
       fireConfetti();
       showToast("🎉 تم تسجيل "+doneTotal.toFixed(2)+" د.أ بمصاريف الشهر","success");
     }
   }
+  function clearDone(){
+    const hasDone=R.current.items.some(i=>i.done);
+    if(hasDone){setVendorModalFor("clear");}
+    else doClearDone(null);
+  }
 
-  function endShopping(){
+  function doEndShopping(vendor){
     const doneItems=R.current.items.filter(i=>i.done);
     const doneTotal=doneItems.filter(i=>i.price!=null).reduce((s,i)=>s+(i.price*(parseFloat(i.qty)||1)),0);
     const ni=R.current.items.filter(i=>!i.done);
     let nh=R.current.history;
-    if(doneTotal>0){
-      const yr=new Date().getFullYear().toString();
-      const mo=new Date().getMonth();
-      const yrData=nh[yr]||{};
-      const moData=yrData[mo]||{total:0,trips:0};
-      nh={...nh,[yr]:{...yrData,[mo]:{total:moData.total+doneTotal,trips:moData.trips+1}}};
+    let ntl=R.current.tripLog;
+    if(doneItems.length>0){
+      const now=new Date();
+      const yr=now.getFullYear().toString();
+      const mo=now.getMonth();
+      if(doneTotal>0){
+        const yrData=nh[yr]||{};
+        const moData=yrData[mo]||{total:0,trips:0};
+        nh={...nh,[yr]:{...yrData,[mo]:{total:moData.total+doneTotal,trips:moData.trips+1}}};
+      }
+      const trip={id:genId(),ts:now.getTime(),items:buildTripItems(doneItems),total:doneTotal,source:"shopping",vendor:vendor||null};
+      ntl=addTripToLog(ntl,yr,mo,trip);
     }
-    commit(ni,R.current.saved,R.current.stores,nh);
+    commit(ni,R.current.saved,R.current.stores,nh,ntl);
     setShopMode(false);
     if(doneItems.length>0){
       fireConfetti();
       showToast("🎉 خلصتي التسوق! "+doneTotal.toFixed(2)+" د.أ","success");
     }
   }
+  function endShopping(){
+    const hasDone=R.current.items.some(i=>i.done);
+    if(hasDone){setVendorModalFor("shop");}
+    else doEndShopping(null);
+  }
+
+  // ── Vendor tagging modal ──
+  function confirmVendor(vendor){
+    if(vendor&&vendor.trim()){
+      const nv=addVendorIfNew(R.current.vendors,vendor);
+      if(nv!==R.current.vendors)setVendors(nv); // local immediate; full sync happens in the commit below
+      R.current.vendors=nv;
+    }
+    if(vendorModalFor==="clear") doClearDone(vendor);
+    else if(vendorModalFor==="shop") doEndShopping(vendor);
+    setVendorModalFor(null);setVendorInput("");
+  }
+  function skipVendor(){confirmVendor(null);}
   function savePrice(storeId,name){
     const price=editPriceVal.trim()?parseFloat(editPriceVal):null;
     const ns={...R.current.saved,[storeId]:(R.current.saved[storeId]||[]).map(i=>i.name===name?{...i,price}:i)};
@@ -667,30 +752,41 @@ function App(){
   }
   function confirmReceipt(){
     if(receiptAmount==null||receiptAmount<=0)return;
-    const yr=new Date().getFullYear().toString();
-    const mo=new Date().getMonth();
+    const now=new Date();
+    const yr=now.getFullYear().toString();
+    const mo=now.getMonth();
     const yrData=R.current.history[yr]||{};
     const moData=yrData[mo]||{total:0,trips:0};
     const nh={...R.current.history,[yr]:{...yrData,[mo]:{total:moData.total+receiptAmount,trips:moData.trips+1}}};
-    commit(R.current.items,R.current.saved,R.current.stores,nh);
+    const trip={id:genId(),ts:now.getTime(),items:[],total:receiptAmount,source:"receipt",vendor:receiptVendor||null};
+    const ntl=addTripToLog(R.current.tripLog,yr,mo,trip);
+    const nv=receiptVendor?addVendorIfNew(R.current.vendors,receiptVendor):R.current.vendors;
+    commit(R.current.items,R.current.saved,R.current.stores,nh,ntl,nv);
     showToast("✓ أضيف "+receiptAmount.toFixed(2)+" د.أ من الفاتورة","success");
     cancelReceipt();
   }
   function cancelReceipt(){
-    setReceiptImg(null);setReceiptAmount(null);setReceiptErr(null);setReceiptLoading(false);
+    setReceiptImg(null);setReceiptAmount(null);setReceiptErr(null);setReceiptLoading(false);setReceiptVendor(null);
     if(fileInputRef.current) fileInputRef.current.value="";
   }
 
   // ── Manual history add ─────────────────────────────────
   function addManualHistory(){
     if(!manualAmt||parseFloat(manualAmt)<=0)return;
-    const yr=new Date().getFullYear().toString();
+    const now=new Date();
+    const yr=now.getFullYear().toString();
+    const amt=parseFloat(manualAmt);
     const yrData=R.current.history[yr]||{};
     const moData=yrData[manualMonth]||{total:0,trips:0};
-    const nh={...R.current.history,[yr]:{...yrData,[manualMonth]:{total:moData.total+parseFloat(manualAmt),trips:moData.trips+1}}};
-    commit(R.current.items,R.current.saved,R.current.stores,nh);
-    showToast("✓ أضيف "+parseFloat(manualAmt).toFixed(2)+" د.أ لـ"+MONTHS[manualMonth],"success");
-    setManualAmt("");
+    const nh={...R.current.history,[yr]:{...yrData,[manualMonth]:{total:moData.total+amt,trips:moData.trips+1}}};
+    // use day 1 of selected month if it's not the current month, else now
+    const tripTs=manualMonth===now.getMonth()?now.getTime():new Date(parseInt(yr),manualMonth,1).getTime();
+    const trip={id:genId(),ts:tripTs,items:[],total:amt,source:"manual",vendor:manualVendor||null};
+    const ntl=addTripToLog(R.current.tripLog,yr,manualMonth,trip);
+    const nv=manualVendor?addVendorIfNew(R.current.vendors,manualVendor):R.current.vendors;
+    commit(R.current.items,R.current.saved,R.current.stores,nh,ntl,nv);
+    showToast("✓ أضيف "+amt.toFixed(2)+" د.أ لـ"+MONTHS[manualMonth],"success");
+    setManualAmt("");setManualVendor(null);
   }
 
   function startEditMonth(i){
@@ -712,9 +808,29 @@ function App(){
     const yrData={...(R.current.history[yr]||{})};
     delete yrData[i];
     const nh={...R.current.history,[yr]:yrData};
-    commit(R.current.items,R.current.saved,R.current.stores,nh);
+    const tlYrData={...(R.current.tripLog[yr]||{})};
+    delete tlYrData[i];
+    const ntl={...R.current.tripLog,[yr]:tlYrData};
+    commit(R.current.items,R.current.saved,R.current.stores,nh,ntl);
     setEditingMonth(null);
+    if(viewingMonth===i)setViewingMonth(null);
     showToast("🗑️ تم حذف بيانات "+MONTHS[i],"info");
+  }
+  function deleteTrip(yr,mo,tripId){
+    const moTrips=(R.current.tripLog[yr]||{})[mo]||[];
+    const trip=moTrips.find(t=>t.id===tripId);
+    const remaining=moTrips.filter(t=>t.id!==tripId);
+    const yrTrips={...(R.current.tripLog[yr]||{}),[mo]:remaining};
+    const ntl={...R.current.tripLog,[yr]:yrTrips};
+    let nh=R.current.history;
+    if(trip&&trip.total>0){
+      const yrData=nh[yr]||{};
+      const moData=yrData[mo]||{total:0,trips:0};
+      nh={...nh,[yr]:{...yrData,[mo]:{total:Math.max(0,moData.total-trip.total),trips:Math.max(0,moData.trips-1)}}};
+    }
+    commit(R.current.items,R.current.saved,R.current.stores,nh,ntl);
+    if(expandedTrip===tripId)setExpandedTrip(null);
+    showToast("🗑️ تم حذف الرحلة","info");
   }
 
 
@@ -804,6 +920,23 @@ function App(){
           animationDuration:dur+"s",animationDelay:delay+"s",borderRadius:rot
         }});
       })
+    ),
+    // ══ VENDOR TAGGING MODAL ══
+    vendorModalFor&&h("div",{className:"vendor-modal-overlay",onClick:()=>skipVendor()},
+      h("div",{className:"vendor-modal-card",onClick:e=>e.stopPropagation()},
+        h("div",{className:"vendor-modal-title"},"🏪 من أي محل اشتريتي؟"),
+        h("div",{className:"vendor-modal-sub"},"بنحفظ الاسم لمرات جاية، ومفيد للمقارنة بين المحلات لاحقاً"),
+        vendors.length>0&&h("div",{className:"vendor-chips-wrap"},
+          vendors.map(v=>h("div",{key:v,className:"vendor-chip",onClick:()=>confirmVendor(v)},v))
+        ),
+        h("div",{className:"vendor-add-row"},
+          h("input",{className:"fi",placeholder:"اسم محل جديد...",value:vendorInput,
+            onChange:ev=>setVendorInput(ev.target.value),
+            onKeyDown:ev=>ev.key==="Enter"&&vendorInput.trim()&&confirmVendor(vendorInput)}),
+          h("button",{className:"green-btn",disabled:!vendorInput.trim(),onClick:()=>confirmVendor(vendorInput)},"إضافة")
+        ),
+        h("button",{className:"vendor-skip-btn",onClick:skipVendor},"تخطي بدون تحديد المحل")
+      )
     ),
     // ══ SHOPPING MODE OVERLAY ══
     shopMode&&h("div",{className:"shop-overlay"},
@@ -1091,7 +1224,7 @@ function App(){
       ),
 
       // ══ ANALYSIS ══
-      mode==="analysis"&&h("div",{className:"analysis-screen",style:{padding:0}},
+      mode==="analysis"&&viewingMonth==null&&h("div",{className:"analysis-screen",style:{padding:0}},
         h("div",{className:"analysis-header"},
           h("div",{className:"analysis-title"},"📊 جدوى "+CUR_YEAR),
           h("div",{className:"year-badge"},"تتجدد كل سنة تلقائياً")
@@ -1155,16 +1288,18 @@ function App(){
             const change=prevVal&&prevVal>0?((val-prevVal)/prevVal*100):null;
             const dotColor=isCur?"#1D9E75":val>0?"#5DCAA5":"#e0e0e0";
             const isEditingThis=editingMonth===i;
-            return h("div",{key:i,className:"month-row",style:{background:isCur?"#F7FDF9":"transparent"}},
+            return h("div",{key:i,className:"month-row",
+              style:{background:isCur?"#F7FDF9":"transparent",cursor:isEditingThis?"default":"pointer"},
+              onClick:()=>{if(!isEditingThis)setViewingMonth(i);}},
               h("div",{className:"month-dot",style:{background:dotColor}}),
               h("div",{style:{flex:1}},
                 h("div",{className:"month-name"+(val>0||isCur?" active":"")},
                   isCur&&h("span",{className:"cur-badge"},"الآن"), m
                 ),
-                trips>0&&!isEditingThis&&h("div",{className:"month-trips"},trips+(trips===1?" رحلة":" رحلات"))
+                trips>0&&!isEditingThis&&h("div",{className:"month-trips"},trips+(trips===1?" رحلة":" رحلات")+" · اضغط للتفاصيل")
               ),
               isEditingThis
-                ? h("div",{className:"month-edit-row"},
+                ? h("div",{className:"month-edit-row",onClick:e=>e.stopPropagation()},
                     h("input",{className:"month-edit-input",type:"number",placeholder:"0.00",value:editMonthVal,autoFocus:true,
                       onChange:ev=>setEditMonthVal(ev.target.value),
                       onKeyDown:ev=>{if(ev.key==="Enter")saveEditMonth(i);if(ev.key==="Escape")setEditingMonth(null);}}),
@@ -1183,7 +1318,7 @@ function App(){
                           )
                         : h("div",{style:{fontSize:12,color:"#ddd"}},"—")
                     ),
-                    h("button",{className:"month-edit-btn",onClick:()=>startEditMonth(i)},"✏️")
+                    h("button",{className:"month-edit-btn",onClick:e=>{e.stopPropagation();startEditMonth(i);}},"✏️")
                   )
             );
           })
@@ -1199,6 +1334,10 @@ function App(){
             h("input",{className:"num-input",type:"number",placeholder:"المبلغ",value:manualAmt,onChange:ev=>setManualAmt(ev.target.value),
               onKeyDown:ev=>ev.key==="Enter"&&addManualHistory()}),
             h("button",{className:"green-btn",disabled:!manualAmt||parseFloat(manualAmt)<=0,onClick:addManualHistory},"+ أضف")
+          ),
+          vendors.length>0&&h("div",{className:"mini-vendor-row"},
+            vendors.map(v=>h("div",{key:v,className:"mini-vendor-chip"+(manualVendor===v?" selected":""),
+              onClick:()=>setManualVendor(manualVendor===v?null:v)},"🏪 "+v))
           )
         ),
 
@@ -1229,13 +1368,78 @@ function App(){
               h("span",{style:{fontSize:13,color:"#aaa"}},"د.أ")
             ),
             h("div",{className:"receipt-hint"},"تأكد من المبلغ قبل الإضافة، أو عدّله إذا لزم"),
+            vendors.length>0&&h("div",{className:"mini-vendor-row"},
+              vendors.map(v=>h("div",{key:v,className:"mini-vendor-chip"+(receiptVendor===v?" selected":""),
+                onClick:()=>setReceiptVendor(receiptVendor===v?null:v)},"🏪 "+v))
+            ),
             h("div",{className:"receipt-actions"},
               h("button",{className:"receipt-cancel-btn",onClick:cancelReceipt},"إلغاء"),
               h("button",{className:"receipt-confirm-btn",disabled:!receiptAmount||receiptAmount<=0,onClick:confirmReceipt},"✓ إضافة للمصاريف")
             )
           )
         )
-      )
+      ),
+
+      // ══ MONTH TRIPS DETAIL ══
+      mode==="analysis"&&viewingMonth!=null&&h("div",{className:"analysis-screen",style:{padding:0}},
+        h("div",{className:"back-bar"},
+          h("button",{className:"back-btn",onClick:()=>{setViewingMonth(null);setExpandedTrip(null);}},"→ رجوع"),
+          h("span",{className:"cat-title"},"رحلات "+MONTHS[viewingMonth])
+        ),
+        (()=>{
+          const moTrips=((tripLog[CUR_YEAR]||{})[viewingMonth])||[];
+          const moTotal=monthTotals[viewingMonth];
+          if(moTrips.length===0){
+            return h("div",{className:"empty"},
+              h("div",{className:"big"},"🧾"),
+              h("p",null,"ما في رحلات مسجلة بالتفصيل لهذا الشهر"),
+              moTotal>0&&h("p",{style:{fontSize:12,marginTop:6}},"بس مسجل إجمالي "+moTotal.toFixed(2)+" د.أ")
+            );
+          }
+          return h("div",null,
+            h("div",{className:"list-sec-title"},moTrips.length+(moTrips.length===1?" رحلة":" رحلات")+" · إجمالي "+moTotal.toFixed(2)+" د.أ"),
+            h("div",{className:"detail-card"},
+              moTrips.map((trip,idx)=>{
+                const isExpanded=expandedTrip===trip.id;
+                const sourceIcon=trip.source==="receipt"?"📷":trip.source==="manual"?"✏️":"🛒";
+                const sourceLbl=trip.source==="receipt"?"من فاتورة":trip.source==="manual"?"إدخال يدوي":"رحلة تسوق";
+                const vendorLbl=trip.vendor?" · 🏪 "+trip.vendor:"";
+                return h("div",{key:trip.id,style:{borderBottom:idx<moTrips.length-1?"1px solid #f5f5f3":"none"}},
+                  h("div",{className:"month-row",style:{cursor:"pointer"},
+                    onClick:()=>setExpandedTrip(isExpanded?null:trip.id)},
+                    h("span",{style:{fontSize:18}},sourceIcon),
+                    h("div",{style:{flex:1}},
+                      h("div",{className:"month-name active"},fmtTripDate(trip.ts)),
+                      h("div",{className:"month-trips"},sourceLbl+(trip.items.length>0?" · "+trip.items.length+" غرض":"")+vendorLbl)
+                    ),
+                    h("div",{className:"month-val"},trip.total.toFixed(2)+" د.أ"),
+                    h("span",{style:{fontSize:11,color:"#bbb",marginRight:4}},isExpanded?"▲":"▼")
+                  ),
+                  isExpanded&&h("div",{style:{padding:"0 16px 14px",background:"rgba(0,0,0,0.015)"}},
+                    trip.vendor&&h("div",{className:"vendor-tag",style:{marginBottom:8}},"🏪 "+trip.vendor),
+                    trip.items.length===0
+                      ? h("p",{style:{fontSize:12,color:"#bbb",padding:"6px 2px"}},"ما في تفاصيل أغراض مسجلة لهذا الإدخال")
+                      : h("div",{className:"list-card",style:{marginBottom:8}},
+                          trip.items.map((it,ii)=>
+                            h("div",{key:ii,className:"item-row",style:{padding:"9px 12px"}},
+                              h("div",{className:"icat"},siInfo(stores,it.storeId).icon),
+                              h("div",{style:{flex:1}},
+                                h("div",{className:"iname",style:{fontSize:13}},it.name,
+                                  it.qty&&fmtQty(it.qty)!=="1"&&h("span",{className:"qbadge"},"×"+fmtQty(it.qty))
+                                )
+                              ),
+                              it.price!=null&&h("span",{className:"item-price"},(it.price*(parseFloat(it.qty)||1)).toFixed(2)+" د.أ")
+                            )
+                          )
+                        ),
+                    h("button",{className:"del-store-btn",onClick:()=>deleteTrip(CUR_YEAR,viewingMonth,trip.id)},"🗑️ حذف هذه الرحلة")
+                  )
+                );
+              })
+            )
+          );
+        })()
+      ),
     ),
 
     // ── Bottom bar ──
