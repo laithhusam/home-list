@@ -302,7 +302,7 @@ body.dark .vendor-tag{background:#262a2f;color:#9a9ea3}
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script>
-const {useState,useEffect,useRef,useCallback}=React;
+const {useState,useEffect,useRef,useCallback,useMemo}=React;
 
 const FB_URL="https://home-list-96cde-default-rtdb.firebaseio.com/beit.json";
 const LS_KEY="beit_v7";
@@ -348,8 +348,9 @@ function fmtQty(q){
   const n=parseFloat(q)||1;
   return Number.isInteger(n)?String(n):n.toFixed(2).replace(/0+$/,"").replace(/\.$/,"");
 }
-function calcTotal(items){return items.filter(i=>!i.done&&i.price!=null).reduce((s,i)=>s+(i.price*(parseFloat(i.qty)||1)),0);}
-function calcStoreTotal(items,storeId){return items.filter(i=>!i.done&&i.storeId===storeId&&i.price!=null).reduce((s,i)=>s+(i.price*(parseFloat(i.qty)||1)),0);}
+function calcTotal(items){return items.filter(i=>!i.done&&i.price!=null).reduce((s,i)=>s+(i.price*(safeNum(i.qty)||1)),0);}
+function calcStoreTotal(items,storeId){return items.filter(i=>!i.done&&i.storeId===storeId&&i.price!=null).reduce((s,i)=>s+(i.price*(safeNum(i.qty)||1)),0);}
+function safeNum(v,fallback){const n=parseFloat(v);return(isFinite(n)&&n>=0)?n:(fallback!=null?fallback:null);}
 function buildTripItems(doneItems){return doneItems.map(i=>({name:i.name,qty:i.qty,price:i.price,storeId:i.storeId}));}
 function addTripToLog(tripLog,yr,mo,trip){
   const yrTrips=tripLog[yr]||{};
@@ -438,6 +439,7 @@ function App(){
   const [editingMonth,setEditingMonth]=useState(null);
   const [editMonthVal,setEditMonthVal]=useState("");
   const [searchQ,setSearchQ]=useState("");
+  const deferredSearchQ=React.useDeferredValue(searchQ);
   const [toasts,setToasts]=useState([]);
   const [confetti,setConfetti]=useState(false);
   const [themeMode,setThemeMode]=useState(loadTheme);
@@ -453,9 +455,9 @@ function App(){
   R.current={stores,items,saved,ts,history,tripLog,vendors};
 
   // ── Theme (dark mode) ───────────────────────────────────
-  function setTheme(mode){
-    setThemeMode(mode);
-    try{localStorage.setItem(THEME_KEY,mode);}catch{}
+  function setTheme(val){
+    setThemeMode(val);
+    try{localStorage.setItem(THEME_KEY,val);}catch{}
   }
   function cycleTheme(){
     const next=themeMode==="auto"?"light":themeMode==="light"?"dark":"auto";
@@ -617,7 +619,7 @@ function App(){
   function addNew(){
     if(!newName.trim()||!curCat)return;
     const name=newName.trim(),qty=newQty.trim();
-    const price=newPrice.trim()?parseFloat(newPrice):null;
+    const price=safeNum(newPrice);
     const cur=R.current.saved[curCat]||[];
     const exists=cur.find(i=>i.name===name);
     let ns=R.current.saved;
@@ -638,7 +640,7 @@ function App(){
 
   function doClearDone(vendor){
     const doneItems=R.current.items.filter(i=>i.done);
-    const doneTotal=doneItems.filter(i=>i.price!=null).reduce((s,i)=>s+(i.price*(parseFloat(i.qty)||1)),0);
+    const doneTotal=doneItems.filter(i=>i.price!=null).reduce((s,i)=>s+(i.price*(safeNum(i.qty)||1)),0);
     const ni=R.current.items.filter(i=>!i.done);
     let nh=R.current.history;
     let ntl=R.current.tripLog;
@@ -668,7 +670,7 @@ function App(){
 
   function doEndShopping(vendor){
     const doneItems=R.current.items.filter(i=>i.done);
-    const doneTotal=doneItems.filter(i=>i.price!=null).reduce((s,i)=>s+(i.price*(parseFloat(i.qty)||1)),0);
+    const doneTotal=doneItems.filter(i=>i.price!=null).reduce((s,i)=>s+(i.price*(safeNum(i.qty)||1)),0);
     const ni=R.current.items.filter(i=>!i.done);
     let nh=R.current.history;
     let ntl=R.current.tripLog;
@@ -710,7 +712,7 @@ function App(){
   }
   function skipVendor(){confirmVendor(null);}
   function savePrice(storeId,name){
-    const price=editPriceVal.trim()?parseFloat(editPriceVal):null;
+    const price=safeNum(editPriceVal);
     const ns={...R.current.saved,[storeId]:(R.current.saved[storeId]||[]).map(i=>i.name===name?{...i,price}:i)};
     const ni=R.current.items.map(i=>i.storeId===storeId&&i.name===name&&!i.done?{...i,price}:i);
     commit(ni,ns,R.current.stores);
@@ -728,25 +730,30 @@ function App(){
     if(!file)return;
     setReceiptErr(null);setReceiptAmount(null);
     const reader=new FileReader();
-    reader.onload=ev=>{
+    reader.onload=async ev=>{
       const dataUrl=ev.target.result;
       setReceiptImg(dataUrl);
       setReceiptLoading(true);
-      preprocessReceiptImage(dataUrl)
-        .then(processedUrl=>Tesseract.recognize(processedUrl,"eng",{}))
-        .then(({data:{text}})=>{
-          const matches=text.match(/\d{1,4}\.\d{2}/g)||[];
-          const nums=matches.map(parseFloat).filter(n=>n>0&&n<5000);
-          if(nums.length>0){
-            setReceiptAmount(Math.max(...nums));
-          }else{
-            const whole=(text.match(/\b\d{1,4}\b/g)||[]).map(Number).filter(n=>n>0&&n<5000);
-            if(whole.length>0) setReceiptAmount(Math.max(...whole));
-            else setReceiptErr("ما قدرت أقرأ رقم واضح — اكتب المبلغ يدوياً");
-          }
-        })
-        .catch(()=>setReceiptErr("صار خطأ في قراءة الصورة"))
-        .finally(()=>setReceiptLoading(false));
+      let worker=null;
+      try{
+        const processedUrl=await preprocessReceiptImage(dataUrl);
+        worker=await Tesseract.createWorker("eng");
+        const {data:{text}}=await worker.recognize(processedUrl);
+        const matches=text.match(/\d{1,4}\.\d{2}/g)||[];
+        const nums=matches.map(parseFloat).filter(n=>n>0&&n<5000);
+        if(nums.length>0){
+          setReceiptAmount(Math.max(...nums));
+        }else{
+          const whole=(text.match(/\b\d{1,4}\b/g)||[]).map(Number).filter(n=>n>0&&n<5000);
+          if(whole.length>0) setReceiptAmount(Math.max(...whole));
+          else setReceiptErr("ما قدرت أقرأ رقم واضح — اكتب المبلغ يدوياً");
+        }
+      }catch{
+        setReceiptErr("صار خطأ في قراءة الصورة");
+      }finally{
+        if(worker) await worker.terminate().catch(()=>{});
+        setReceiptLoading(false);
+      }
     };
     reader.readAsDataURL(file);
   }
@@ -772,10 +779,10 @@ function App(){
 
   // ── Manual history add ─────────────────────────────────
   function addManualHistory(){
-    if(!manualAmt||parseFloat(manualAmt)<=0)return;
+    if(!manualAmt||safeNum(manualAmt,0)<=0)return;
     const now=new Date();
     const yr=now.getFullYear().toString();
-    const amt=parseFloat(manualAmt);
+    const amt=safeNum(manualAmt,0);
     const yrData=R.current.history[yr]||{};
     const moData=yrData[manualMonth]||{total:0,trips:0};
     const nh={...R.current.history,[yr]:{...yrData,[manualMonth]:{total:moData.total+amt,trips:moData.trips+1}}};
@@ -794,7 +801,7 @@ function App(){
     setEditMonthVal(monthTotals[i]>0?String(monthTotals[i]):"");
   }
   function saveEditMonth(i){
-    const val=editMonthVal.trim()?parseFloat(editMonthVal):0;
+    const val=editMonthVal.trim()?safeNum(editMonthVal,0):0;
     const yr=CUR_YEAR;
     const yrData=R.current.history[yr]||{};
     const moData=yrData[i]||{total:0,trips:0};
@@ -846,13 +853,14 @@ function App(){
 
   const pending=items.filter(i=>!i.done);
   const done=items.filter(i=>i.done);
-  const total=calcTotal(pending);
-  const searchResults=searchQ.trim().length>0
+  const total=useMemo(()=>calcTotal(pending),[pending]);
+  const searchResults=useMemo(()=>deferredSearchQ.trim().length>0
     ? stores.flatMap(s=>(saved[s.id]||[])
-        .filter(si=>si.name.includes(searchQ.trim()))
+        .filter(si=>si.name.includes(deferredSearchQ.trim()))
         .map(si=>({...si,storeId:s.id,storeLabel:s.label,storeIcon:s.icon}))
       )
-    : [];
+    : []
+  ,[deferredSearchQ,stores,saved]);
   const h=React.createElement;
   const stInfo=id=>siInfo(stores,id);
   const syncCls=sync==="push"?"s-push":sync==="err"?"s-err":sync==="offline"?"s-offline":"s-ok";
@@ -877,6 +885,7 @@ function App(){
 
   // ── Swipe to go back (right-edge swipe-left, RTL convention) ──
   function goBack(){
+    setEditingQty(null);
     if(shopMode){setShopMode(false);return;}
     if(screen==="settings"){setScreen("home");return;}
     if(mode==="wife"&&screen==="cat"){
@@ -939,7 +948,7 @@ function App(){
       )
     ),
     // ══ SHOPPING MODE OVERLAY ══
-    shopMode&&h("div",{className:"shop-overlay"},
+    shopMode&&h("div",{className:"shop-overlay",onTouchStart:e=>e.stopPropagation(),onTouchEnd:e=>e.stopPropagation()},
       // progress bar
       h("div",{className:"shop-progress"},
         h("div",{className:"shop-progress-bar",style:{width:(done.length/(pending.length+done.length||1)*100)+"%"}})
@@ -962,7 +971,7 @@ function App(){
           if(!ci.length)return null;
           const stDone=ci.filter(i=>i.done).length;
           const stPending=ci.filter(i=>!i.done).length;
-          const stTotal=ci.filter(i=>i.done&&i.price!=null).reduce((sum,i)=>sum+(i.price*(parseFloat(i.qty)||1)),0);
+          const stTotal=ci.filter(i=>i.done&&i.price!=null).reduce((sum,i)=>sum+(i.price*(safeNum(i.qty)||1)),0);
           return h("div",{key:s.id},
             h("div",{className:"shop-store-lbl"},
               h("span",null,s.icon+" "+s.label+" ("+stDone+"/"+ci.length+")"),
@@ -975,7 +984,7 @@ function App(){
                   h("div",{className:"shop-item-name"},item.name),
                   h("div",{className:"shop-item-meta"},
                     h("span",{className:"shop-item-qty"},"×"+fmtQty(item.qty)),
-                    item.price!=null&&h("span",{className:"shop-item-price"},((item.price*(parseFloat(item.qty)||1)).toFixed(2))+" د.أ")
+                    item.price!=null&&h("span",{className:"shop-item-price"},((item.price*(safeNum(item.qty)||1)).toFixed(2))+" د.أ")
                   )
                 )
               )
@@ -1007,9 +1016,9 @@ function App(){
         screen==="settings"
           ? h("button",{className:"gear-btn",style:{fontSize:12,padding:"6px 11px"},onClick:()=>setScreen("home")},"← رجوع")
           : h("div",{className:"tabs"},
-              h("button",{className:"tab"+(mode==="wife"    ?" active":""),onClick:()=>{setMode("wife");   setScreen("home");setCurCat(null)}},"🧺 زوجة"),
-              h("button",{className:"tab"+(mode==="husband" ?" active":""),onClick:()=>{setMode("husband");setScreen("home")}},"🛍️ زوج"),
-              h("button",{className:"tab"+(mode==="analysis"?" active":""),onClick:()=>{setMode("analysis");setScreen("home")}},"📊 جدوى")
+              h("button",{className:"tab"+(mode==="wife"    ?" active":""),onClick:()=>{setMode("wife");   setScreen("home");setCurCat(null);setSearchQ("");setEditingQty(null);}},"🧺 زوجة"),
+              h("button",{className:"tab"+(mode==="husband" ?" active":""),onClick:()=>{setMode("husband");setScreen("home");setSearchQ("");setEditingQty(null);}},"🛍️ زوج"),
+              h("button",{className:"tab"+(mode==="analysis"?" active":""),onClick:()=>{setMode("analysis");setScreen("home");setSearchQ("");setEditingQty(null);}},"📊 جدوى")
             )
       )
     ),
@@ -1059,7 +1068,7 @@ function App(){
           searchQ&&h("button",{className:"search-clear",onClick:()=>setSearchQ("")},"✕")
         ),
 
-        searchQ.trim().length>0
+        deferredSearchQ.trim().length>0
           ? h("div",null,
               searchResults.length===0
                 ? h("div",{className:"search-empty"},"ما في نتائج لـ \""+searchQ+"\"")
@@ -1099,7 +1108,7 @@ function App(){
                         h("div",{className:"isub"},stInfo(item.storeId).label)
                       ),
                       !item.done&&QtyCtrl(item.id,item.qty),
-                      item.price!=null&&h("span",{className:"item-price"},fmt(item.price*(parseFloat(item.qty)||1))+" د.أ"),
+                      item.price!=null&&h("span",{className:"item-price"},fmt(item.price*(safeNum(item.qty)||1))+" د.أ"),
                       item.done&&h("span",null,"✅"),
                       h("button",{className:"xbtn",onClick:()=>removeItem(item.id)},"✕")
                     )
@@ -1156,7 +1165,7 @@ function App(){
                 h("div",{className:"icat"},stInfo(item.storeId).icon),
                 h("div",{style:{flex:1}},h("div",{className:"iname"},item.name)),
                 QtyCtrl(item.id,item.qty),
-                item.price!=null&&h("span",{className:"item-price"},fmt(item.price*(parseFloat(item.qty)||1))+" د.أ"),
+                item.price!=null&&h("span",{className:"item-price"},fmt(item.price*(safeNum(item.qty)||1))+" د.أ"),
                 h("button",{className:"xbtn",style:{opacity:1},onClick:()=>removeItem(item.id)},"✕")
               )
             )
@@ -1200,7 +1209,7 @@ function App(){
                         h("button",{className:"chk"+(item.done?" on":""),onClick:()=>toggleDone(item.id)},item.done?"✓":""),
                         h("div",{style:{flex:1}},h("div",{className:"iname"},item.name)),
                         QtyCtrl(item.id,item.qty),
-                        item.price!=null&&h("span",{className:"item-price"},fmt(item.price*(parseFloat(item.qty)||1))+" د.أ")
+                        item.price!=null&&h("span",{className:"item-price"},fmt(item.price*(safeNum(item.qty)||1))+" د.أ")
                       )
                     )
                   )
@@ -1333,7 +1342,7 @@ function App(){
             ),
             h("input",{className:"num-input",type:"number",placeholder:"المبلغ",value:manualAmt,onChange:ev=>setManualAmt(ev.target.value),
               onKeyDown:ev=>ev.key==="Enter"&&addManualHistory()}),
-            h("button",{className:"green-btn",disabled:!manualAmt||parseFloat(manualAmt)<=0,onClick:addManualHistory},"+ أضف")
+            h("button",{className:"green-btn",disabled:!manualAmt||safeNum(manualAmt,0)<=0,onClick:addManualHistory},"+ أضف")
           ),
           vendors.length>0&&h("div",{className:"mini-vendor-row"},
             vendors.map(v=>h("div",{key:v,className:"mini-vendor-chip"+(manualVendor===v?" selected":""),
@@ -1456,7 +1465,48 @@ function App(){
   );
 }
 
-ReactDOM.createRoot(document.getElementById("app")).render(React.createElement(App));
+class ErrorBoundary extends React.Component{
+  constructor(p){super(p);this.state={err:null};}
+  static getDerivedStateFromError(e){return{err:e};}
+  render(){
+    if(this.state.err){
+      return React.createElement("div",{style:{padding:"40px 20px",textAlign:"center",color:"#E53935",fontFamily:"'Noto Sans Arabic',sans-serif"}},
+        React.createElement("div",{style:{fontSize:40,marginBottom:12}},"⚠️"),
+        React.createElement("p",{style:{fontSize:16,fontWeight:600,marginBottom:8}},"صار خطأ غير متوقع"),
+        React.createElement("p",{style:{fontSize:13,color:"#888",marginBottom:16}},this.state.err.message||""),
+        React.createElement("button",{
+          style:{background:"#1D9E75",color:"#fff",border:"none",borderRadius:10,padding:"10px 24px",fontSize:14,cursor:"pointer"},
+          onClick:()=>window.location.reload()
+        },"إعادة تحميل التطبيق")
+      );
+    }
+    return this.props.children;
+  }
+}
+
+ReactDOM.createRoot(document.getElementById("app")).render(
+  React.createElement(ErrorBoundary,null,React.createElement(App))
+);
 </script>
 </body>
+<script>
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("/sw.js")
+      .then(reg=>{
+        // Check for updates every time app loads
+        reg.update();
+        reg.addEventListener("updatefound",()=>{
+          const newWorker=reg.installing;
+          newWorker.addEventListener("statechange",()=>{
+            if(newWorker.state==="installed"&&navigator.serviceWorker.controller){
+              console.log("تحديث جديد متاح — سيُطبق عند إعادة الفتح");
+            }
+          });
+        });
+      })
+      .catch(err=>console.warn("Service Worker registration failed:",err));
+  });
+}
+</script>
 </html>
