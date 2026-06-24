@@ -478,6 +478,7 @@ function App(){
   const [editTripVendorVal,setEditTripVendorVal]=useState("");
   const [receiptVendor,setReceiptVendor]=useState("");
   const [manualAmt,setManualAmt]=useState("");
+  const [smsModal,setSmsModal]=useState(null); // {amount, vendor}
   const [manualMonth,setManualMonth]=useState(CUR_MONTH);
   const [shopMode,setShopMode]=useState(false);
   const [receiptImg,setReceiptImg]=useState(null);
@@ -641,6 +642,21 @@ function App(){
   },[pull]);
 
   useEffect(()=>{pull();const t=setInterval(pull,10000);return()=>clearInterval(t);},[pull]);
+
+  // ── iOS Shortcut: detect ?amount=X&from=Y on load ─────
+  useEffect(()=>{
+    const params=new URLSearchParams(window.location.search);
+    const amount=params.get("amount");
+    const from=params.get("from");
+    if(amount){
+      const n=safeNum(amount);
+      if(n&&n>0){
+        setSmsModal({amount:n,vendor:from||null});
+        // Clean URL so refresh doesn't re-trigger
+        window.history.replaceState({},"",window.location.pathname);
+      }
+    }
+  },[]);
 
 
   // ── Store actions ──────────────────────────────────────
@@ -839,6 +855,28 @@ function App(){
     if(fileInputRef.current) fileInputRef.current.value="";
   }
 
+  function confirmSmsModal(){
+    if(!smsModal||smsModal.amount<=0)return;
+    const yr=new Date().getFullYear().toString();
+    const mo=new Date().getMonth();
+    const yrData=R.current.history[yr]||{};
+    const moData=yrData[mo]||{total:0,trips:0};
+    const trip={
+      id:genId(),
+      source:"sms",
+      vendor:smsModal.vendor||null,
+      total:smsModal.amount,
+      items:[],
+      ts:Date.now()
+    };
+    const nh={...R.current.history,[yr]:{...yrData,[mo]:{total:moData.total+smsModal.amount,trips:moData.trips+1}}};
+    const ntl=addTripToLog(R.current.tripLog,yr,mo,trip);
+    if(smsModal.vendor) addVendorIfNew(R.current.vendors,smsModal.vendor);
+    commit(R.current.items,R.current.saved,R.current.stores,nh,ntl);
+    showToast("✓ سُجّل "+smsModal.amount.toFixed(2)+" د.أ"+(smsModal.vendor?" من "+smsModal.vendor:""),"success");
+    setSmsModal(null);
+  }
+
   // ── Manual history add ─────────────────────────────────
   function addManualHistory(){
     if(!manualAmt||safeNum(manualAmt,0)<=0)return;
@@ -1010,6 +1048,42 @@ function App(){
           animationDuration:dur+"s",animationDelay:delay+"s",borderRadius:rot
         }});
       })
+    ),
+    // ══ SMS SHORTCUT MODAL ══
+    smsModal&&h("div",{
+      style:{position:"fixed",inset:0,background:"rgba(20,22,26,.55)",zIndex:450,display:"flex",alignItems:"flex-end",justifyContent:"center"},
+      onClick:()=>setSmsModal(null)},
+      h("div",{
+        style:{background:darkActive?"#1d2024":"#fff",borderRadius:"20px 20px 0 0",width:"100%",maxWidth:540,padding:24,animation:"vendorUp .25s ease-out"},
+        onClick:e=>e.stopPropagation()},
+        h("div",{style:{fontSize:36,textAlign:"center",marginBottom:8}},"💳"),
+        h("div",{style:{fontSize:16,fontWeight:700,color:darkActive?"#ECECEC":"#1a1a1a",textAlign:"center",marginBottom:4}},
+          "دفعة جديدة من JKB"
+        ),
+        smsModal.vendor&&h("div",{style:{fontSize:13,color:"#888",textAlign:"center",marginBottom:12}},"🏪 "+smsModal.vendor),
+        h("div",{style:{fontSize:38,fontWeight:700,color:"#1D9E75",textAlign:"center",marginBottom:4,direction:"ltr"}},
+          smsModal.amount.toFixed(2)+" JOD"
+        ),
+        h("div",{style:{fontSize:12,color:"#aaa",textAlign:"center",marginBottom:20}},
+          "هل تضيف هذه الدفعة لمصاريف الشهر؟"
+        ),
+        // Editable amount in case OCR was wrong
+        h("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:20,justifyContent:"center"}},
+          h("span",{style:{fontSize:12,color:"#aaa"}},"تعديل المبلغ:"),
+          h("input",{type:"number",step:"0.001",
+            style:{width:120,padding:"8px 10px",borderRadius:10,border:"1.5px solid #1D9E75",fontSize:16,fontWeight:700,textAlign:"center",outline:"none",fontFamily:"inherit",direction:"ltr",background:darkActive?"#262a2f":"#fff",color:darkActive?"#ECECEC":"#1a1a1a"},
+            value:smsModal.amount,
+            onChange:ev=>setSmsModal(s=>({...s,amount:safeNum(ev.target.value)||s.amount}))})
+        ),
+        h("div",{style:{display:"flex",gap:10}},
+          h("button",{
+            style:{flex:1,background:"#f5f5f2",border:"1px solid #e8e8e5",borderRadius:12,padding:13,fontSize:14,fontFamily:"inherit",fontWeight:500,cursor:"pointer",color:"#555"},
+            onClick:()=>setSmsModal(null)},"تجاهل"),
+          h("button",{
+            style:{flex:2,background:"#1D9E75",color:"#fff",border:"none",borderRadius:12,padding:13,fontSize:15,fontFamily:"inherit",fontWeight:700,cursor:"pointer"},
+            onClick:confirmSmsModal},"✓ أضف للمصاريف")
+        )
+      )
     ),
     // ══ UNIFIED DELETE CONFIRM DIALOG ══
     delConfirm&&!["store"].includes(delConfirm.type)&&h("div",{
