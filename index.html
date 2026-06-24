@@ -473,7 +473,10 @@ function App(){
   const [editPriceVal,setEditPriceVal]=useState("");
   const [newStoreLabel,setNewStoreLabel]=useState("");
   const [newStoreIcon,setNewStoreIcon]=useState("🏪");
-  const [delConfirm,setDelConfirm]=useState(null);
+  const [delConfirm,setDelConfirm]=useState(null);  // {type,payload} for any delete
+  const [editingTripVendor,setEditingTripVendor]=useState(null); // tripId being edited
+  const [editTripVendorVal,setEditTripVendorVal]=useState("");
+  const [receiptVendor,setReceiptVendor]=useState("");
   const [manualAmt,setManualAmt]=useState("");
   const [manualMonth,setManualMonth]=useState(CUR_MONTH);
   const [shopMode,setShopMode]=useState(false);
@@ -495,7 +498,7 @@ function App(){
   const [expandedTrip,setExpandedTrip]=useState(null);
   const [vendorModalFor,setVendorModalFor]=useState(null); // null|'shop'|'clear'
   const [vendorInput,setVendorInput]=useState("");
-  const [receiptVendor,setReceiptVendor]=useState(null);
+
   const [manualVendor,setManualVendor]=useState(null);
   const swipeRef=useRef({x:0,y:0,t:0,active:false});
 
@@ -659,6 +662,9 @@ function App(){
     showToast("🗑️ تم حذف "+label,"info");
     if(curCat===id){setScreen("home");setCurCat(null);}
   }
+  function confirmDeleteStore(id){
+    setDelConfirm({type:"store",label:siInfo(R.current.stores,id).label,payload:id});
+  }
 
   // ── Item actions ───────────────────────────────────────
   function addItem(savedItem,storeId){
@@ -770,8 +776,12 @@ function App(){
     showToast("✓ تم تحديث سعر "+name,"success");
   }
   function delSaved(storeId,name){
+    setDelConfirm({type:"saved",label:"\""+name+"\" من قائمة المحفوظات",payload:{storeId,name}});
+  }
+  function doDelSaved(storeId,name){
     const ns={...R.current.saved,[storeId]:(R.current.saved[storeId]||[]).filter(i=>i.name!==name)};
     commit(R.current.items,ns,R.current.stores);
+    setDelConfirm(null);
   }
 
   // ── Receipt scan ────────────────────────────────────────
@@ -861,6 +871,9 @@ function App(){
     showToast("✓ تم تحديث "+MONTHS[i],"success");
   }
   function deleteMonth(i){
+    setDelConfirm({type:"month",label:"كل بيانات "+MONTHS[i],payload:i});
+  }
+  function doDeleteMonth(i){
     const yr=CUR_YEAR;
     const yrData={...(R.current.history[yr]||{})};
     delete yrData[i];
@@ -872,8 +885,13 @@ function App(){
     setEditingMonth(null);
     if(viewingMonth===i)setViewingMonth(null);
     showToast("🗑️ تم حذف بيانات "+MONTHS[i],"info");
+    setDelConfirm(null);
   }
   function deleteTrip(yr,mo,tripId){
+    // Route through confirmation instead of deleting directly
+    setDelConfirm({type:"trip",payload:{yr,mo,tripId}});
+  }
+  function doDeleteTrip(yr,mo,tripId){
     const moTrips=(R.current.tripLog[yr]||{})[mo]||[];
     const trip=moTrips.find(t=>t.id===tripId);
     const remaining=moTrips.filter(t=>t.id!==tripId);
@@ -888,6 +906,17 @@ function App(){
     commit(R.current.items,R.current.saved,R.current.stores,nh,ntl);
     if(expandedTrip===tripId)setExpandedTrip(null);
     showToast("🗑️ تم حذف الرحلة","info");
+    setDelConfirm(null);
+  }
+  function saveTripVendor(yr,mo,tripId){
+    const val=editTripVendorVal.trim();
+    const ntl={...R.current.tripLog};
+    ntl[yr]={...ntl[yr]};
+    ntl[yr][mo]=(ntl[yr][mo]||[]).map(t=>t.id===tripId?{...t,vendor:val||null}:t);
+    commit(R.current.items,R.current.saved,R.current.stores,R.current.history,ntl);
+    if(val)addVendorIfNew(R.current.vendors,val);
+    setEditingTripVendor(null);setEditTripVendorVal("");
+    showToast("✓ تم تحديث اسم المحل","success");
   }
 
 
@@ -979,6 +1008,32 @@ function App(){
           animationDuration:dur+"s",animationDelay:delay+"s",borderRadius:rot
         }});
       })
+    ),
+    // ══ UNIFIED DELETE CONFIRM DIALOG ══
+    delConfirm&&!["store"].includes(delConfirm.type)&&h("div",{
+      style:{position:"fixed",inset:0,background:"rgba(20,22,26,.5)",zIndex:400,display:"flex",alignItems:"flex-end",justifyContent:"center"},
+      onClick:()=>setDelConfirm(null)},
+      h("div",{style:{background: document.body.classList.contains("dark")?"#1d2024":"#fff",borderRadius:"20px 20px 0 0",width:"100%",maxWidth:540,padding:24,animation:"vendorUp .2s ease-out"},
+        onClick:e=>e.stopPropagation()},
+        h("div",{style:{fontSize:32,textAlign:"center",marginBottom:8}},"🗑️"),
+        h("div",{style:{fontSize:16,fontWeight:700,color:darkActive?"#ECECEC":"#1a1a1a",textAlign:"center",marginBottom:6}},
+          "تأكيد الحذف"
+        ),
+        h("div",{style:{fontSize:13,color:"#888",textAlign:"center",marginBottom:20,lineHeight:1.6}},
+          "هل أنت متأكد من حذف "+delConfirm.label+"؟",h("br"),
+          h("span",{style:{color:"#E53935",fontWeight:500}},"هذا الإجراء لا يمكن التراجع عنه")
+        ),
+        h("div",{style:{display:"flex",gap:10}},
+          h("button",{style:{flex:1,background:"#f5f5f2",border:"1px solid #e8e8e5",borderRadius:12,padding:13,fontSize:14,fontFamily:"inherit",fontWeight:500,cursor:"pointer",color:"#555"},
+            onClick:()=>setDelConfirm(null)},"إلغاء"),
+          h("button",{style:{flex:1,background:"#E53935",color:"#fff",border:"none",borderRadius:12,padding:13,fontSize:14,fontFamily:"inherit",fontWeight:700,cursor:"pointer"},
+            onClick:()=>{
+              if(delConfirm.type==="trip") doDeleteTrip(delConfirm.payload.yr,delConfirm.payload.mo,delConfirm.payload.tripId);
+              else if(delConfirm.type==="month") doDeleteMonth(delConfirm.payload);
+              else if(delConfirm.type==="saved") doDelSaved(delConfirm.payload.storeId,delConfirm.payload.name);
+            }},"نعم، احذف")
+        )
+      )
     ),
     // ══ VENDOR TAGGING MODAL ══
     vendorModalFor&&h("div",{className:"vendor-modal-overlay",onClick:()=>skipVendor()},
@@ -1084,12 +1139,12 @@ function App(){
               h("div",{className:"store-name-txt"},s.label),
               h("div",{className:"store-cnt"},(saved[s.id]||[]).length+" محفوظ · "+items.filter(i=>i.storeId===s.id&&!i.done).length+" في القايمة")
             ),
-            delConfirm===s.id
+            delConfirm?.type==="store"&&delConfirm.payload===s.id
               ? h("div",{style:{display:"flex",gap:6}},
                   h("button",{style:{background:"none",border:"1px solid #ddd",borderRadius:8,padding:"5px 10px",cursor:"pointer",fontSize:12,fontFamily:"inherit"},onClick:()=>setDelConfirm(null)},"إلغاء"),
                   h("button",{style:{background:"#E53935",color:"#fff",border:"none",borderRadius:8,padding:"5px 10px",cursor:"pointer",fontSize:12,fontFamily:"inherit"},onClick:()=>deleteStore(s.id)},"تأكيد")
                 )
-              : h("button",{className:"del-store-btn",onClick:()=>setDelConfirm(s.id)},"🗑️ حذف")
+              : h("button",{className:"del-store-btn",onClick:()=>confirmDeleteStore(s.id)},"🗑️ حذف")
           )
         )
       ),
@@ -1427,9 +1482,11 @@ function App(){
               h("span",{style:{fontSize:13,color:"#aaa"}},"د.أ")
             ),
             h("div",{className:"receipt-hint"},"تأكد من المبلغ قبل الإضافة، أو عدّله إذا لزم"),
+            h("input",{className:"fi",style:{width:"100%",marginTop:8},placeholder:"🏪 اسم المحل (اختياري — مثلاً: كارفور، المحمص...)",
+              value:receiptVendor||"",onChange:ev=>setReceiptVendor(ev.target.value)}),
             vendors.length>0&&h("div",{className:"mini-vendor-row"},
               vendors.map(v=>h("div",{key:v,className:"mini-vendor-chip"+(receiptVendor===v?" selected":""),
-                onClick:()=>setReceiptVendor(receiptVendor===v?null:v)},"🏪 "+v))
+                onClick:()=>setReceiptVendor(receiptVendor===v?"":v)},"🏪 "+v))
             ),
             h("div",{className:"receipt-actions"},
               h("button",{className:"receipt-cancel-btn",onClick:cancelReceipt},"إلغاء"),
@@ -1468,18 +1525,36 @@ function App(){
                     onClick:()=>setExpandedTrip(isExpanded?null:trip.id)},
                     h("span",{style:{fontSize:18}},sourceIcon),
                     h("div",{style:{flex:1}},
-                      h("div",{className:"month-name active"},fmtTripDate(trip.ts)),
-                      h("div",{className:"month-trips"},sourceLbl+(trip.items.length>0?" · "+trip.items.length+" غرض":"")+vendorLbl)
+                      h("div",{className:"month-name active"},
+                        trip.vendor ? ("🏪 "+trip.vendor) : sourceLbl
+                      ),
+                      h("div",{className:"month-trips"},
+                        fmtTripDate(trip.ts)
+                        +(trip.vendor?" · "+sourceLbl:"")
+                        +(( trip.items||[] ).length>0?" · "+( trip.items||[] ).length+" غرض":"")
+                      )
                     ),
                     h("div",{className:"month-val"},trip.total.toFixed(2)+" د.أ"),
                     h("span",{style:{fontSize:11,color:"#bbb",marginRight:4}},isExpanded?"▲":"▼")
                   ),
                   isExpanded&&h("div",{style:{padding:"0 16px 14px",background:"rgba(0,0,0,0.015)"}},
-                    trip.vendor&&h("div",{className:"vendor-tag",style:{marginBottom:8}},"🏪 "+trip.vendor),
-                    trip.items.length===0
+                    // Vendor edit row
+                    editingTripVendor===trip.id
+                      ? h("div",{style:{display:"flex",gap:6,marginBottom:10},onClick:e=>e.stopPropagation()},
+                          h("input",{className:"fi",placeholder:"اسم المحل...",value:editTripVendorVal,autoFocus:true,
+                            onChange:ev=>setEditTripVendorVal(ev.target.value),
+                            onKeyDown:ev=>{if(ev.key==="Enter")saveTripVendor(CUR_YEAR,viewingMonth,trip.id);if(ev.key==="Escape")setEditingTripVendor(null);}}),
+                          h("button",{className:"green-btn",style:{padding:"10px 14px"},onClick:()=>saveTripVendor(CUR_YEAR,viewingMonth,trip.id)},"✓"),
+                          h("button",{className:"month-act-btn cancel",onClick:()=>setEditingTripVendor(null)},"✕")
+                        )
+                      : h("button",{className:"month-edit-btn",style:{marginBottom:10,display:"flex",alignItems:"center",gap:5,padding:"5px 12px",width:"auto",borderRadius:20,fontSize:12},
+                          onClick:e=>{e.stopPropagation();setEditingTripVendor(trip.id);setEditTripVendorVal(trip.vendor||"");}},
+                          "✏️ "+(trip.vendor?"تعديل اسم المحل":"إضافة اسم المحل")
+                        ),
+                    ( trip.items||[] ).length===0
                       ? h("p",{style:{fontSize:12,color:"#bbb",padding:"6px 2px"}},"ما في تفاصيل أغراض مسجلة لهذا الإدخال")
                       : h("div",{className:"list-card",style:{marginBottom:8}},
-                          trip.items.map((it,ii)=>
+                          (trip.items||[]).map((it,ii)=>
                             h("div",{key:ii,className:"item-row",style:{padding:"9px 12px"}},
                               h("div",{className:"icat"},siInfo(stores,it.storeId).icon),
                               h("div",{style:{flex:1}},
@@ -1491,7 +1566,7 @@ function App(){
                             )
                           )
                         ),
-                    h("button",{className:"del-store-btn",onClick:()=>deleteTrip(CUR_YEAR,viewingMonth,trip.id)},"🗑️ حذف هذه الرحلة")
+                    h("button",{className:"del-store-btn",onClick:e=>{e.stopPropagation();deleteTrip(CUR_YEAR,viewingMonth,trip.id);}},"🗑️ حذف هذه الرحلة")
                   )
                 );
               })
