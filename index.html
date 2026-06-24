@@ -799,12 +799,14 @@ function App(){
         const processedUrl=await preprocessReceiptImage(dataUrl);
         worker=await Tesseract.createWorker("eng");
         const {data:{text}}=await worker.recognize(processedUrl);
-        const matches=text.match(/\d{1,4}\.\d{2}/g)||[];
-        const nums=matches.map(parseFloat).filter(n=>n>0&&n<5000);
+        // Clean OCR text: remove currency symbols, Arabic chars, extra spaces
+        const cleanText=text.replace(/[^\d.\s]/g," ").replace(/\s+/g," ");
+        const matches=cleanText.match(/\d{1,4}\.\d{2}/g)||[];
+        const nums=matches.map(m=>parseFloat(m.replace(/[^\d.]/g,""))).filter(n=>isFinite(n)&&n>0&&n<5000);
         if(nums.length>0){
           setReceiptAmount(Math.max(...nums));
         }else{
-          const whole=(text.match(/\b\d{1,4}\b/g)||[]).map(Number).filter(n=>n>0&&n<5000);
+          const whole=(cleanText.match(/\b\d{1,4}\b/g)||[]).map(Number).filter(n=>isFinite(n)&&n>0&&n<5000);
           if(whole.length>0) setReceiptAmount(Math.max(...whole));
           else setReceiptErr("ما قدرت أقرأ رقم واضح — اكتب المبلغ يدوياً");
         }
