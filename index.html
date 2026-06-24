@@ -305,6 +305,8 @@ body.dark .vendor-tag{background:#262a2f;color:#9a9ea3}
 const {useState,useEffect,useRef,useCallback,useMemo}=React;
 
 const FB_URL="https://home-list-96cde-default-rtdb.firebaseio.com/beit.json";
+const FB_API_KEY="AIzaSyDi6hL_c2Bds8AqcZA7GWgXDJ7668SoeKc";
+const FB_AUTH_KEY="beit_auth_v1";
 const LS_KEY="beit_v7";
 const THEME_KEY="beit_theme_v1";
 const MONTHS=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
@@ -398,6 +400,52 @@ function preprocessReceiptImage(dataUrl){
     img.onerror=()=>resolve(dataUrl);
     img.src=dataUrl;
   });
+}
+
+// ── Firebase Anonymous Auth ────────────────────────────────
+// Token cache: {idToken, refreshToken, expiresAt}
+let _authCache=null;
+function loadAuthCache(){
+  try{const s=localStorage.getItem(FB_AUTH_KEY);return s?JSON.parse(s):null;}catch{return null;}
+}
+function saveAuthCache(c){
+  try{localStorage.setItem(FB_AUTH_KEY,JSON.stringify(c));}catch{}
+}
+async function getAuthToken(){
+  // Return valid cached token
+  if(_authCache&&_authCache.expiresAt>Date.now()+60000) return _authCache.idToken;
+  // Try refresh token from localStorage
+  const stored=loadAuthCache();
+  if(stored?.refreshToken){
+    try{
+      const r=await fetch("https://securetoken.googleapis.com/v1/token?key="+FB_API_KEY,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({grant_type:"refresh_token",refresh_token:stored.refreshToken})
+      });
+      if(r.ok){
+        const d=await r.json();
+        const cache={idToken:d.id_token,refreshToken:d.refresh_token,expiresAt:Date.now()+parseInt(d.expires_in)*1000};
+        _authCache=cache;saveAuthCache(cache);
+        return cache.idToken;
+      }
+    }catch{}
+  }
+  // Anonymous sign-in (first time)
+  const r=await fetch("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key="+FB_API_KEY,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({returnSecureToken:true})
+  });
+  if(!r.ok) throw new Error("auth failed");
+  const d=await r.json();
+  const cache={idToken:d.idToken,refreshToken:d.refreshToken,expiresAt:Date.now()+parseInt(d.expiresIn)*1000};
+  _authCache=cache;saveAuthCache(cache);
+  return cache.idToken;
+}
+async function fbUrl(){
+  const token=await getAuthToken();
+  return "https://home-list-96cde-default-rtdb.firebaseio.com/beit.json?auth="+token;
 }
 
 function App(){
@@ -494,7 +542,8 @@ function App(){
   async function pushNow(data){
     setSync("push");setSyncMsg("جاري الحفظ...");
     try{
-      const r=await fetch(FB_URL,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+      const url=await fbUrl();
+      const r=await fetch(url,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
       if(!r.ok)throw 0;
       pendingDataRef.current=null;
       setSync("ok");setSyncMsg("تم الحفظ ✓");
@@ -518,7 +567,8 @@ function App(){
       if(!ok)return; // will retry on next tick / online event
     }
     try{
-      const r=await fetch(FB_URL);
+      const url=await fbUrl();
+      const r=await fetch(url);
       if(!r.ok)throw 0;
       const rec=await r.json();
       if(!rec){setSync("ok");setSyncMsg("محفوظ");lastErrRef.current=false;return;}
