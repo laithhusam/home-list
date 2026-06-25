@@ -402,7 +402,20 @@ function preprocessReceiptImage(dataUrl){
   });
 }
 
-// ── Firebase Anonymous Auth ────────────────────────────────
+// ── Read URL params on startup (iOS Shortcut integration) ─
+function readUrlParams(){
+  try{
+    const p=new URLSearchParams(window.location.search);
+    const amount=parseFloat(p.get("amount"));
+    const from=p.get("from")||"";
+    if(amount>0&&amount<50000) return {amount,from};
+  }catch{}
+  return null;
+}
+// Clean URL after reading params (so refresh doesn't re-trigger)
+function clearUrlParams(){
+  try{window.history.replaceState({},"",window.location.pathname);}catch{}
+}
 // Token cache: {idToken, refreshToken, expiresAt}
 let _authCache=null;
 function loadAuthCache(){
@@ -477,6 +490,7 @@ function App(){
   const [editingTripVendor,setEditingTripVendor]=useState(null); // tripId being edited
   const [editTripVendorVal,setEditTripVendorVal]=useState("");
   const [receiptVendor,setReceiptVendor]=useState("");
+  const [bankModal,setBankModal]=useState(null); // {amount, from}
   const [manualAmt,setManualAmt]=useState("");
   const [smsModal,setSmsModal]=useState(null); // {amount, vendor}
   const [manualMonth,setManualMonth]=useState(CUR_MONTH);
@@ -642,6 +656,15 @@ function App(){
   },[pull]);
 
   useEffect(()=>{pull();const t=setInterval(pull,10000);return()=>clearInterval(t);},[pull]);
+
+  // ── iOS Shortcut: read URL params on startup ───────────────
+  useEffect(()=>{
+    const params=readUrlParams();
+    if(params){
+      clearUrlParams();
+      setBankModal(params);
+    }
+  },[]);
 
   // ── iOS Shortcut: detect ?amount=X&from=Y on load ─────
   useEffect(()=>{
@@ -877,6 +900,24 @@ function App(){
     setSmsModal(null);
   }
 
+  function confirmBankExpense(amount,vendor){
+    const yr=new Date().getFullYear().toString();
+    const mo=new Date().getMonth();
+    const yrData=R.current.history[yr]||{};
+    const moData=yrData[mo]||{total:0,trips:0};
+    const nh={...R.current.history,[yr]:{...yrData,[mo]:{total:moData.total+amount,trips:moData.trips+1}}};
+    const trip={
+      id:genId(),ts:Date.now(),total:amount,
+      vendor:vendor||null,
+      source:"bank",items:[]
+    };
+    const ntl=addTripToLog(R.current.tripLog,yr,mo,trip);
+    if(vendor) addVendorIfNew(R.current.vendors,vendor);
+    commit(R.current.items,R.current.saved,R.current.stores,nh,ntl);
+    showToast("✓ سُجّل "+amount.toFixed(2)+" د.أ من رسالة البنك","success");
+    setBankModal(null);
+  }
+
   // ── Manual history add ─────────────────────────────────
   function addManualHistory(){
     if(!manualAmt||safeNum(manualAmt,0)<=0)return;
@@ -1082,6 +1123,50 @@ function App(){
           h("button",{
             style:{flex:2,background:"#1D9E75",color:"#fff",border:"none",borderRadius:12,padding:13,fontSize:15,fontFamily:"inherit",fontWeight:700,cursor:"pointer"},
             onClick:confirmSmsModal},"✓ أضف للمصاريف")
+        )
+      )
+    ),
+    // ══ BANK SMS MODAL ══
+    bankModal&&h("div",{
+      style:{position:"fixed",inset:0,background:"rgba(20,22,26,.55)",zIndex:500,display:"flex",alignItems:"flex-end",justifyContent:"center"},
+      onClick:()=>setBankModal(null)},
+      h("div",{
+        style:{background:darkActive?"#1d2024":"#fff",borderRadius:"20px 20px 0 0",width:"100%",maxWidth:540,padding:24,animation:"vendorUp .2s ease-out"},
+        onClick:e=>e.stopPropagation()},
+        h("div",{style:{fontSize:32,textAlign:"center",marginBottom:6}},"🏦"),
+        h("div",{style:{fontSize:15,fontWeight:700,color:darkActive?"#ECECEC":"#1a1a1a",textAlign:"center",marginBottom:4}},
+          "رسالة بنكية جديدة"
+        ),
+        h("div",{style:{fontSize:13,color:"#888",textAlign:"center",marginBottom:16}},
+          "JKBCC"+(bankModal.from?" · "+bankModal.from.slice(0,60):"")
+        ),
+        h("div",{style:{background:darkActive?"#262a2f":"#f5f5f2",borderRadius:14,padding:"16px",textAlign:"center",marginBottom:16}},
+          h("div",{style:{fontSize:11,color:"#aaa",marginBottom:4}},"المبلغ المكتشف"),
+          h("div",{style:{fontSize:32,fontWeight:700,color:"#1D9E75",direction:"ltr"}},
+            bankModal.amount.toFixed(2)+" د.أ"
+          )
+        ),
+        h("input",{className:"fi",style:{width:"100%",marginBottom:12},
+          placeholder:"🏪 اسم المحل (اختياري)",
+          id:"bank-vendor-input",
+          defaultValue:"",
+          onKeyDown:ev=>{if(ev.key==="Enter")confirmBankExpense(bankModal.amount,ev.target.value.trim());}
+        }),
+        vendors.length>0&&h("div",{className:"mini-vendor-row",style:{marginBottom:14}},
+          vendors.map(v=>h("div",{key:v,className:"mini-vendor-chip",
+            onClick:()=>{
+              const inp=document.getElementById("bank-vendor-input");
+              if(inp) inp.value=v;
+            }},"🏪 "+v))
+        ),
+        h("div",{style:{display:"flex",gap:10}},
+          h("button",{style:{flex:1,background:darkActive?"#262a2f":"#f5f5f2",border:"1px solid #e8e8e5",borderRadius:12,padding:13,fontSize:14,fontFamily:"inherit",fontWeight:500,cursor:"pointer",color:"#888"},
+            onClick:()=>setBankModal(null)},"تجاهل"),
+          h("button",{style:{flex:2,background:"#1D9E75",color:"#fff",border:"none",borderRadius:12,padding:13,fontSize:15,fontFamily:"inherit",fontWeight:700,cursor:"pointer"},
+            onClick:()=>{
+              const inp=document.getElementById("bank-vendor-input");
+              confirmBankExpense(bankModal.amount,(inp?.value||"").trim());
+            }},"✓ أضف للمصاريف")
         )
       )
     ),
