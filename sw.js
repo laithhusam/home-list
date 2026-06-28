@@ -1,7 +1,7 @@
 // ── قايمة البيت — Service Worker ──────────────────────────
 // بيحفظ التطبيق للاستخدام بدون إنترنت
 
-const CACHE_NAME = "beit-v1";
+const CACHE_NAME = "beit-v2";
 
 // الملفات اللي لازم تتحفظ عند أول تحميل
 const STATIC_ASSETS = [
