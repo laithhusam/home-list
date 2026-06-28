@@ -492,6 +492,7 @@ function App(){
   const [receiptVendor,setReceiptVendor]=useState("");
   const [bankModal,setBankModal]=useState(null);
   const [monthlyBudget,setMonthlyBudget]=useState(()=>{try{return parseFloat(lsLoad()?.monthlyBudget||"0")||0;}catch{return 0;}});
+  const [monthlyBudgetTs,setMonthlyBudgetTs]=useState(()=>{try{return lsLoad()?.monthlyBudgetTs||0;}catch{return 0;}});
   const [editingBudget,setEditingBudget]=useState(false);
   const [budgetInput,setBudgetInput]=useState(""); // {amount, from}
   const [manualAmt,setManualAmt]=useState("");
@@ -520,8 +521,8 @@ function App(){
   const [manualVendor,setManualVendor]=useState(null);
   const swipeRef=useRef({x:0,y:0,t:0,active:false});
 
-  const R=useRef({stores,items,saved,ts,history,tripLog,vendors,monthlyBudget});
-  R.current={stores,items,saved,ts,history,tripLog,vendors,monthlyBudget};
+  const R=useRef({stores,items,saved,ts,history,tripLog,vendors,monthlyBudget,monthlyBudgetTs});
+  R.current={stores,items,saved,ts,history,tripLog,vendors,monthlyBudget,monthlyBudgetTs};
 
   // ── Theme (dark mode) ───────────────────────────────────
   function setTheme(val){
@@ -602,9 +603,9 @@ function App(){
         const nh=rec.history||{};
         const ntl=rec.tripLog||{};
         const nv=rec.vendors||[];
-        const nb=rec.monthlyBudget!=null?rec.monthlyBudget:R.current.monthlyBudget;
-        setItems(ni);setStores(nst);setSaved(ns);setTs(remoteTs);setHistory(nh);setTripLog(ntl);setVendors(nv);setMonthlyBudget(nb);
-        lsSave({items:ni,stores:nst,saved:ns,ts:remoteTs,history:nh,tripLog:ntl,vendors:nv,monthlyBudget:nb});
+        const nb2=rec.monthlyBudget!=null?rec.monthlyBudget:R.current.monthlyBudget;
+        setItems(ni);setStores(nst);setSaved(ns);setTs(remoteTs);setHistory(nh);setTripLog(ntl);setVendors(nv);setMonthlyBudget(nb2);
+        lsSave({items:ni,stores:nst,saved:ns,ts:remoteTs,history:nh,tripLog:ntl,vendors:nv,monthlyBudget:nb2});
       }
       setSync("ok");setSyncMsg("محفوظ");
       if(lastErrRef.current){showToast("✓ عاد الاتصال","success");lastErrRef.current=false;}
@@ -1539,17 +1540,17 @@ function App(){
                     onKeyDown:ev=>{
                       if(ev.key==="Enter"){
                         const v=parseFloat(budgetInput)||0;
-                        setMonthlyBudget(v);
-                        try{localStorage.setItem("beit_budget",String(v));}catch{}
+                        commit(R.current.items,R.current.saved,R.current.stores,R.current.history,R.current.tripLog,R.current.vendors,v);
                         setEditingBudget(false);setBudgetInput("");
+                        showToast("✓ تم حفظ الميزانية الشهرية","success");
                       }
                       if(ev.key==="Escape"){setEditingBudget(false);setBudgetInput("");}
                     }}),
                   h("button",{className:"price-save-btn",onClick:()=>{
                     const v=parseFloat(budgetInput)||0;
-                    setMonthlyBudget(v);
-                    try{localStorage.setItem("beit_budget",String(v));}catch{}
+                    commit(R.current.items,R.current.saved,R.current.stores,R.current.history,R.current.tripLog,R.current.vendors,v);
                     setEditingBudget(false);setBudgetInput("");
+                    showToast("✓ تم حفظ الميزانية الشهرية","success");
                   }},"✓")
                 )
               : h("button",{className:"month-edit-btn",onClick:()=>{setEditingBudget(true);setBudgetInput(monthlyBudget>0?String(monthlyBudget):"");}},
