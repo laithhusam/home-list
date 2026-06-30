@@ -11,331 +11,289 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ── Design tokens ─────────────────────────────── */
-:root{
-  --clr:#1D9E75;          /* brand green */
-  --clr-lt:#E6F7F1;       /* light green tint */
-  --clr-dk:#0F6E56;       /* dark green */
-  --clr-soft:#5DCAA5;     /* soft green */
-  --err:#E53935;
-  --warn:#F0A500;
-  --blue:#5B6EE8;
-  --bg:#f2f2ef;
-  --card:#fff;
-  --border:#ececec;
-  --text:#1a1a1a;
-  --sub:#aaa;
-  --muted:#555;
-  --input-bg:#fff;
-  --chip-bg:#fafaf8;
-  --btn-sec:#f5f5f2;
-  --btn-sec-border:#e8e8e5;
-}
-
-/* ── Reset + base ──────────────────────────────── */
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Noto Sans Arabic','Segoe UI',sans-serif}
-body{background:var(--bg);min-height:100vh;padding-bottom:70px}
-
-/* ── Header ────────────────────────────────────── */
-.header{background:var(--card);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;gap:10px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans Arabic','Segoe UI',sans-serif;background:#f2f2ef;min-height:100vh;padding-bottom:70px}
+.header{background:#fff;border-bottom:1px solid #ececec;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;gap:10px}
 .header-info{flex:1;min-width:0}
-.header h1{font-size:16px;font-weight:700;color:var(--text)}
+.header h1{font-size:16px;font-weight:700;color:#1a1a1a}
 .sync-bar{display:flex;align-items:center;gap:5px;font-size:11px;margin-top:2px}
 .sync-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.s-ok{background:var(--clr)}.s-push{background:var(--warn);animation:blink .8s infinite}.s-err{background:var(--err)}.s-offline{background:#888}
+.s-ok{background:#1D9E75}.s-push{background:#F0A500;animation:blink .8s infinite}.s-err{background:#E53935}.s-offline{background:#888}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.sync-txt{color:var(--sub)}.refresh-btn{background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;line-height:1;color:var(--sub)}
+.sync-txt{color:#aaa}.refresh-btn{background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;line-height:1;color:#aaa}
 .header-left{display:flex;align-items:center;gap:6px;flex-shrink:0}
-.gear-btn{background:var(--btn-sec);border:1px solid var(--btn-sec-border);border-radius:9px;padding:6px 9px;font-size:15px;cursor:pointer;line-height:1}
+.gear-btn{background:#f5f5f2;border:1px solid #e8e8e5;border-radius:9px;padding:6px 9px;font-size:15px;cursor:pointer;line-height:1}
 .tabs{display:flex;background:#f0f0ec;border-radius:10px;overflow:hidden;border:1px solid #e5e5e0}
-.tab{flex:1;padding:6px 10px;border:none;cursor:pointer;font-size:11px;font-weight:500;background:transparent;color:#777;white-space:nowrap}
-.tab.active{background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
-
-/* ── Layout ────────────────────────────────────── */
+.tab{flex:1;padding:6px 10px;border:none;cursor:pointer;font-family:inherit;font-size:11px;font-weight:500;background:transparent;color:#777;white-space:nowrap}
+.tab.active{background:#fff;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.08)}
 .container{max-width:600px;margin:0 auto;padding:14px}
-
-/* ── Budget banner ─────────────────────────────── */
-.budget-banner{background:var(--card);border-radius:14px;border:1.5px solid var(--clr);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
-.budget-label{font-size:13px;color:var(--muted);font-weight:500}
-.budget-amount{font-size:24px;font-weight:700;color:var(--clr);direction:ltr}
-.budget-sub{font-size:11px;color:var(--sub);margin-top:2px}
-
-/* ── Category grid ─────────────────────────────── */
+.budget-banner{background:#fff;border-radius:14px;border:1.5px solid #1D9E75;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.budget-label{font-size:13px;color:#555;font-weight:500}.budget-amount{font-size:24px;font-weight:700;color:#1D9E75;direction:ltr}.budget-sub{font-size:11px;color:#aaa;margin-top:2px}
 .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-.cat-card{background:var(--card);border-radius:14px;border:1.5px solid var(--border);padding:14px 10px;text-align:center;cursor:pointer;position:relative;transition:all .15s}
-.cat-card:active{transform:scale(.95)}.cat-card.has-pending{border-color:var(--clr)}
+.cat-card{background:#fff;border-radius:14px;border:1.5px solid #ececec;padding:14px 10px;text-align:center;cursor:pointer;position:relative;transition:all .15s}
+.cat-card:active{transform:scale(.95)}.cat-card.has-pending{border-color:#1D9E75}
 .c-icon{font-size:26px;margin-bottom:5px}.c-label{font-size:12px;font-weight:500;color:#444;line-height:1.3}
-.badge{position:absolute;top:7px;left:7px;background:var(--clr);color:#fff;font-size:10px;font-weight:700;border-radius:20px;padding:1px 6px}
-
-/* ── Category screen ───────────────────────────── */
+.badge{position:absolute;top:7px;left:7px;background:#1D9E75;color:#fff;font-size:10px;font-weight:700;border-radius:20px;padding:1px 6px}
 .back-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.back-btn{background:var(--card);border:1px solid #e0e0e0;border-radius:10px;padding:7px 13px;font-size:13px;cursor:pointer;color:var(--muted)}
-.cat-title{font-size:16px;font-weight:700;color:var(--text)}
-.saved-section{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:14px;margin-bottom:12px}
+.back-btn{background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:7px 13px;font-family:inherit;font-size:13px;cursor:pointer;color:#555}
+.cat-title{font-size:16px;font-weight:700;color:#1a1a1a}
+.saved-section{background:#fff;border-radius:14px;border:1px solid #ececec;padding:14px;margin-bottom:12px}
 .saved-section h3{font-size:12px;font-weight:500;color:#999;margin-bottom:10px}
 .chips-wrap{display:flex;flex-wrap:wrap;gap:8px}
 .chip-outer{display:flex;flex-direction:column;align-items:center;gap:4px}
-.item-chip{padding:8px 12px;border-radius:30px;border:1.5px solid #e0e0e0;background:var(--chip-bg);color:#333;font-size:13px;font-weight:500;display:flex;align-items:center;gap:5px;transition:all .15s;cursor:pointer}
-.item-chip:active{transform:scale(.93)}.item-chip.in-list{background:var(--clr-lt);border-color:var(--clr);color:var(--clr-dk)}
-.chip-check{font-size:13px;color:transparent}.item-chip.in-list .chip-check{color:var(--clr)}
+.item-chip{padding:8px 12px;border-radius:30px;border:1.5px solid #e0e0e0;background:#fafaf8;color:#333;font-size:13px;font-family:inherit;font-weight:500;display:flex;align-items:center;gap:5px;transition:all .15s;cursor:pointer}
+.item-chip:active{transform:scale(.93)}.item-chip.in-list{background:#E6F7F1;border-color:#1D9E75;color:#0F6E56}
+.chip-check{font-size:13px;color:transparent}.item-chip.in-list .chip-check{color:#1D9E75}
 .chip-del{font-size:11px;color:#ccc;background:none;border:none;cursor:pointer;line-height:1;padding:0 2px}
-
-/* ── Price badge + edit ────────────────────────── */
-.price-badge{font-size:11px;background:#f0f0ec;color:#666;padding:2px 8px;border-radius:20px;cursor:pointer;border:none;white-space:nowrap}
+.price-badge{font-size:11px;background:#f0f0ec;color:#666;padding:2px 8px;border-radius:20px;cursor:pointer;border:none;font-family:inherit;white-space:nowrap}
 .price-badge:hover{background:#e0e0de}.price-badge.no-price{color:#bbb;border:1px dashed #ddd;background:transparent}
 .price-edit-row{display:flex;gap:4px;align-items:center}
-.price-input{width:70px;padding:3px 8px;border-radius:8px;border:1px solid var(--clr);font-size:12px;text-align:center;outline:none}
-.price-save-btn{background:var(--clr);color:#fff;border:none;border-radius:7px;padding:3px 8px;font-size:12px;cursor:pointer}
-
-/* ── Add row / form inputs ─────────────────────── */
+.price-input{width:70px;padding:3px 8px;border-radius:8px;border:1px solid #1D9E75;font-size:12px;text-align:center;outline:none;font-family:inherit}
+.price-save-btn{background:#1D9E75;color:#fff;border:none;border-radius:7px;padding:3px 8px;font-size:12px;cursor:pointer;font-family:inherit}
 .add-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-.fi{flex:1;min-width:120px;padding:10px 13px;border-radius:10px;border:1px solid #ddd;background:var(--input-bg);color:var(--text);font-size:14px;outline:none}
-.fi:focus{border-color:var(--clr)}
-.sm-input{width:70px;padding:10px 8px;border-radius:10px;border:1px solid #ddd;background:var(--input-bg);color:var(--text);font-size:13px;outline:none;text-align:center}
-.green-btn{background:var(--clr);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.fi{flex:1;min-width:120px;padding:10px 13px;border-radius:10px;border:1px solid #ddd;background:#fff;color:#1a1a1a;font-size:14px;outline:none;font-family:inherit}
+.fi:focus{border-color:#1D9E75}
+.sm-input{width:70px;padding:10px 8px;border-radius:10px;border:1px solid #ddd;background:#fff;color:#1a1a1a;font-size:13px;outline:none;font-family:inherit;text-align:center}
+.green-btn{background:#1D9E75;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer;white-space:nowrap}
 .green-btn:disabled{background:#9FE1CB;cursor:not-allowed}
-
-/* ── List card / item row ──────────────────────── */
-.list-card{background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden}
-.sec-lbl{font-size:11px;font-weight:500;color:var(--sub);padding:0 2px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
-.sec-total{font-size:11px;color:var(--clr);font-weight:600}
-.list-sec-title{font-size:11px;font-weight:500;color:var(--sub);margin-bottom:8px;padding:0 2px}
+.list-card{background:#fff;border-radius:14px;border:1px solid #ececec;overflow:hidden}
+.sec-lbl{font-size:11px;font-weight:500;color:#aaa;padding:0 2px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.sec-total{font-size:11px;color:#1D9E75;font-weight:600}
+.list-sec-title{font-size:11px;font-weight:500;color:#aaa;margin-bottom:8px;padding:0 2px}
 .item-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #f2f2f0}
 .item-row:last-child{border-bottom:none}.item-row.done{opacity:.5}
-.icat{width:28px;height:28px;border-radius:8px;background:var(--clr-lt);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.iname{font-size:14px;font-weight:500;color:var(--text)}.item-row.done .iname{text-decoration:line-through}
-.isub{font-size:11px;color:var(--sub);margin-top:1px}
-.item-price{font-size:12px;color:var(--clr);font-weight:600;white-space:nowrap;direction:ltr}
-
-/* ── Quantity control ──────────────────────────── */
-.qty-ctrl{display:flex;align-items:center;background:var(--btn-sec);border-radius:10px;overflow:hidden;border:1px solid var(--btn-sec-border);flex-shrink:0}
+.icat{width:28px;height:28px;border-radius:8px;background:#E6F7F1;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.iname{font-size:14px;font-weight:500;color:#1a1a1a}.item-row.done .iname{text-decoration:line-through}
+.isub{font-size:11px;color:#aaa;margin-top:1px}
+.item-price{font-size:12px;color:#1D9E75;font-weight:600;white-space:nowrap;direction:ltr}
+.qty-ctrl{display:flex;align-items:center;background:#f5f5f2;border-radius:10px;overflow:hidden;border:1px solid #e8e8e5;flex-shrink:0}
 .qty-btn{width:30px;height:30px;border:none;background:transparent;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;padding:0;line-height:1}
-.qty-btn.minus{color:var(--sub)}.qty-btn.minus:disabled{color:#ddd;cursor:not-allowed}.qty-btn.plus{color:var(--clr)}
-.qty-num{width:30px;text-align:center;font-size:13px;font-weight:700;color:var(--text);user-select:none;cursor:pointer}
+.qty-btn.minus{color:#aaa}.qty-btn.minus:disabled{color:#ddd;cursor:not-allowed}.qty-btn.plus{color:#1D9E75}
+.qty-num{width:30px;text-align:center;font-size:13px;font-weight:700;color:#1a1a1a;user-select:none;cursor:pointer}
 .qty-edit-row{display:flex;align-items:center}
-.qty-edit-input{width:64px;padding:5px 6px;border-radius:10px;border:2px solid var(--clr);font-size:13px;font-weight:700;text-align:center;outline:none;direction:ltr}
+.qty-edit-input{width:64px;padding:5px 6px;border-radius:10px;border:2px solid #1D9E75;font-size:13px;font-weight:700;text-align:center;outline:none;font-family:inherit;direction:ltr}
 .xbtn{background:none;border:none;cursor:pointer;color:#ccc;font-size:15px;padding:3px;opacity:0;line-height:1}
 .item-row:hover .xbtn{opacity:1}
 .chk{width:24px;height:24px;border-radius:50%;border:2px solid #d0d0d0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;color:transparent;transition:all .15s}
-.chk.on{background:var(--clr);border-color:var(--clr);color:#fff}
-
-/* ── Info banner ───────────────────────────────── */
-.info-banner{background:var(--clr-lt);border:1px solid var(--clr-soft);border-radius:12px;padding:11px 14px;margin-bottom:14px;display:flex;gap:10px;align-items:center}
-.info-banner p{font-size:13px;font-weight:500;color:var(--clr-dk)}
-.info-banner small{font-size:11px;color:var(--clr);display:block;margin-top:2px}
-
-/* ── Done section controls ─────────────────────── */
+.chk.on{background:#1D9E75;border-color:#1D9E75;color:#fff}
+.info-banner{background:#E6F7F1;border:1px solid #5DCAA5;border-radius:12px;padding:11px 14px;margin-bottom:14px;display:flex;gap:10px;align-items:center}
+.info-banner p{font-size:13px;font-weight:500;color:#0F6E56}
+.info-banner small{font-size:11px;color:#1D9E75;display:block;margin-top:2px}
 .done-hdr{display:flex;justify-content:space-between;align-items:center;margin:14px 0 8px}
-.clear-btn{background:none;border:none;color:var(--sub);font-size:12px;cursor:pointer}
-.record-btn{background:var(--clr);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-weight:500}
-
-/* ── Bottom bar ────────────────────────────────── */
-.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;z-index:20}
-.pending-count{font-size:13px;font-weight:500;color:var(--text)}
-.pending-count b{color:var(--clr)}
-
-/* ── Settings screen ───────────────────────────── */
+.clear-btn{background:none;border:none;color:#aaa;font-size:12px;cursor:pointer;font-family:inherit}
+.record-btn{background:#1D9E75;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:500}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ececec;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;z-index:20}
+.pending-count{font-size:13px;font-weight:500;color:#1a1a1a}
+.pending-count b{color:#1D9E75}
+/* Settings */
 .settings-screen{max-width:600px;margin:0 auto;padding:14px}
-.settings-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:16px}
-.store-list{background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-bottom:16px}
+.settings-title{font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:16px}
+.store-list{background:#fff;border-radius:14px;border:1px solid #ececec;overflow:hidden;margin-bottom:16px}
 .store-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #f2f2f0}
 .store-row:last-child{border-bottom:none}
 .store-icon-big{font-size:22px;width:40px;text-align:center}
-.store-name-txt{font-size:15px;font-weight:500;color:var(--text);flex:1}.store-cnt{font-size:11px;color:var(--sub)}
-.del-store-btn{background:none;border:1px solid #ffcdd2;border-radius:8px;padding:5px 10px;color:var(--err);font-size:12px;cursor:pointer}
-.add-store-card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:16px}
+.store-name-txt{font-size:15px;font-weight:500;color:#1a1a1a;flex:1}.store-cnt{font-size:11px;color:#aaa}
+.del-store-btn{background:none;border:1px solid #ffcdd2;border-radius:8px;padding:5px 10px;color:#E53935;font-size:12px;cursor:pointer;font-family:inherit}
+.add-store-card{background:#fff;border-radius:14px;border:1px solid #ececec;padding:16px}
 .add-store-card h3{font-size:14px;font-weight:600;color:#333;margin-bottom:12px}
 .emoji-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-.emoji-opt{width:40px;height:40px;border-radius:10px;border:1.5px solid #e8e8e8;background:var(--chip-bg);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.emoji-opt.selected{border-color:var(--clr);background:var(--clr-lt)}
+.emoji-opt{width:40px;height:40px;border-radius:10px;border:1.5px solid #e8e8e8;background:#fafaf8;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.emoji-opt.selected{border-color:#1D9E75;background:#E6F7F1}
 .add-store-row{display:flex;gap:8px}
-
-/* ── Empty state ───────────────────────────────── */
-.empty{text-align:center;padding:44px 20px;color:var(--sub)}
+.empty{text-align:center;padding:44px 20px;color:#aaa}
 .empty .big{font-size:40px;margin-bottom:10px}
-
-/* ── Search ────────────────────────────────────── */
+/* Search */
 .search-wrap{position:relative;margin-bottom:14px}
-.search-input{width:100%;padding:12px 42px 12px 14px;border-radius:14px;border:1.5px solid var(--border);background:var(--card);font-size:14px;outline:none;color:var(--text)}
-.search-input:focus{border-color:var(--clr)}
+.search-input{width:100%;padding:12px 42px 12px 14px;border-radius:14px;border:1.5px solid #ececec;background:#fff;font-size:14px;outline:none;font-family:inherit;color:#1a1a1a}
+.search-input:focus{border-color:#1D9E75}
 .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:15px;color:#bbb;pointer-events:none}
 .search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#f0f0ec;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;color:#999;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.search-results{background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-bottom:16px}
+.search-results{background:#fff;border-radius:14px;border:1px solid #ececec;overflow:hidden;margin-bottom:16px}
 .search-result-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #f2f2f0;cursor:pointer;transition:background .1s}
 .search-result-row:last-child{border-bottom:none}
 .search-result-row:active{background:#f7f7f5}
 .search-result-row.added{background:#F7FDF9}
-.search-result-name{font-size:14px;font-weight:500;color:var(--text);flex:1}
-.search-result-store{font-size:11px;color:var(--sub)}
-.search-result-price{font-size:12px;color:var(--clr);font-weight:600;direction:ltr}
-.search-add-mark{font-size:13px;color:var(--clr)}
+.search-result-name{font-size:14px;font-weight:500;color:#1a1a1a;flex:1}
+.search-result-store{font-size:11px;color:#aaa}
+.search-result-price{font-size:12px;color:#1D9E75;font-weight:600;direction:ltr}
+.search-add-mark{font-size:13px;color:#1D9E75}
 .search-empty{text-align:center;padding:30px 20px;color:#bbb;font-size:13px}
-
-/* ── Toast notifications ───────────────────────── */
+/* Toast */
 .toast-stack{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:100%;max-width:360px;padding:0 14px}
 .toast{background:#1a1a1a;color:#fff;padding:10px 18px;border-radius:30px;font-size:13px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.18);display:flex;align-items:center;gap:8px;animation:toastIn .25s ease-out;max-width:100%}
-.toast.success{background:var(--clr)}.toast.error{background:var(--err)}.toast.info{background:#333}
+.toast.success{background:#1D9E75}
+.toast.error{background:#E53935}
+.toast.info{background:#333}
 @keyframes toastIn{from{opacity:0;transform:translateY(-10px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
 .toast.leaving{animation:toastOut .2s ease-in forwards}
 @keyframes toastOut{to{opacity:0;transform:translateY(-8px) scale(.9)}}
-
-/* ── Confetti ──────────────────────────────────── */
+/* Confetti */
 .confetti-layer{position:fixed;inset:0;pointer-events:none;z-index:300;overflow:hidden}
 .confetti-piece{position:absolute;top:-20px;border-radius:2px;animation:confettiFall linear forwards}
 @keyframes confettiFall{to{transform:translateY(110vh) rotate(720deg);opacity:.3}}
-
-/* ── Shopping mode overlay ─────────────────────── */
-.shop-overlay{position:fixed;inset:0;background:var(--bg);z-index:100;overflow-y:auto;padding-bottom:90px}
-.shop-header{background:var(--card);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
-.shop-title{font-size:16px;font-weight:700;color:var(--text)}
-.shop-budget{font-size:20px;font-weight:700;color:var(--clr);direction:ltr}
-.shop-budget-lbl{font-size:10px;color:var(--sub);text-align:left}
+/* Shopping mode */
+.shop-overlay{position:fixed;inset:0;background:#f2f2ef;z-index:100;overflow-y:auto;padding-bottom:90px}
+.shop-header{background:#fff;border-bottom:1px solid #ececec;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.shop-title{font-size:16px;font-weight:700;color:#1a1a1a}
+.shop-budget{font-size:20px;font-weight:700;color:#1D9E75;direction:ltr}
+.shop-budget-lbl{font-size:10px;color:#aaa;text-align:left}
 .shop-progress{height:4px;background:#e8e8e8;margin:0}
-.shop-progress-bar{height:4px;background:var(--clr);transition:width .4s}
+.shop-progress-bar{height:4px;background:#1D9E75;transition:width .4s}
 .shop-body{max-width:600px;margin:0 auto;padding:14px}
-.shop-store-lbl{font-size:12px;font-weight:600;color:var(--sub);margin:16px 0 8px;padding:0 2px;display:flex;justify-content:space-between}
-.shop-store-total{color:var(--clr)}
+.shop-store-lbl{font-size:12px;font-weight:600;color:#aaa;margin:16px 0 8px;padding:0 2px;display:flex;justify-content:space-between}
+.shop-store-total{color:#1D9E75}
 .shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.shop-item{background:var(--card);border-radius:16px;border:2px solid var(--border);padding:16px 14px;cursor:pointer;transition:all .15s;position:relative}
+.shop-item{background:#fff;border-radius:16px;border:2px solid #ececec;padding:16px 14px;cursor:pointer;transition:all .15s;position:relative;active:transform scale(.95)}
 .shop-item:active{transform:scale(.96)}
-.shop-item.bought{background:var(--clr-lt);border-color:var(--clr);opacity:.7}
-.shop-item-name{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;line-height:1.3}
-.shop-item.bought .shop-item-name{text-decoration:line-through;color:var(--sub)}
+.shop-item.bought{background:#E6F7F1;border-color:#1D9E75;opacity:.7}
+.shop-item-name{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:6px;line-height:1.3}
+.shop-item.bought .shop-item-name{text-decoration:line-through;color:#aaa}
 .shop-item-meta{display:flex;align-items:center;justify-content:space-between}
-.shop-item-qty{font-size:12px;color:var(--sub);background:var(--btn-sec);padding:2px 8px;border-radius:8px}
-.shop-item-price{font-size:13px;font-weight:600;color:var(--clr);direction:ltr}
-.shop-check{position:absolute;top:10px;left:10px;width:22px;height:22px;border-radius:50%;border:2px solid #d0d0d0;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent}
-.shop-item.bought .shop-check{background:var(--clr);border-color:var(--clr);color:#fff}
-.shop-footer{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:10px;z-index:110}
-.shop-end-btn{flex:1;background:var(--clr);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer}
-.shop-cancel-btn{background:var(--btn-sec);color:#888;border:1px solid var(--btn-sec-border);border-radius:12px;padding:14px 18px;font-size:14px;font-weight:500;cursor:pointer}
-.start-shop-btn{width:100%;background:var(--clr);color:#fff;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px}
+.shop-item-qty{font-size:12px;color:#aaa;background:#f5f5f2;padding:2px 8px;border-radius:8px}
+.shop-item-price{font-size:13px;font-weight:600;color:#1D9E75;direction:ltr}
+.shop-check{position:absolute;top:10px;left:10px;width:22px;height:22px;border-radius:50%;border:2px solid #d0d0d0;background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent}
+.shop-item.bought .shop-check{background:#1D9E75;border-color:#1D9E75;color:#fff}
+.shop-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ececec;padding:12px 16px;display:flex;gap:10px;z-index:110}
+.shop-end-btn{flex:1;background:#1D9E75;color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-family:inherit;font-weight:700;cursor:pointer}
+.shop-cancel-btn{background:#f5f5f2;color:#888;border:1px solid #e8e8e5;border-radius:12px;padding:14px 18px;font-size:14px;font-family:inherit;font-weight:500;cursor:pointer}
+.start-shop-btn{width:100%;background:#1D9E75;color:#fff;border:none;border-radius:12px;padding:16px;font-size:16px;font-family:inherit;font-weight:700;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px}
 .start-shop-btn:disabled{background:#9FE1CB;cursor:not-allowed}
-
-/* ── Analysis screen ───────────────────────────── */
+/* Analysis */
 .analysis-screen{max-width:600px;margin:0 auto;padding:14px}
 .analysis-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.analysis-title{font-size:18px;font-weight:700;color:var(--text)}
-.year-badge{font-size:11px;color:var(--sub);background:var(--card);border:1px solid var(--border);border-radius:8px;padding:4px 10px}
+.analysis-title{font-size:18px;font-weight:700;color:#1a1a1a}
+.year-badge{font-size:11px;color:#aaa;background:#fff;border:1px solid #ececec;border-radius:8px;padding:4px 10px}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.stat-card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:14px 16px}
-.stat-label{font-size:11px;color:var(--sub);margin-bottom:5px}
+.stat-card{background:#fff;border-radius:14px;border:1px solid #ececec;padding:14px 16px}
+.stat-label{font-size:11px;color:#aaa;margin-bottom:5px}
 .stat-val{font-size:17px;font-weight:700;direction:ltr}
-.chart-card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:16px;margin-bottom:14px}
+.chart-card{background:#fff;border-radius:14px;border:1px solid #ececec;padding:16px;margin-bottom:14px}
 .chart-title{font-size:13px;font-weight:600;color:#333;margin-bottom:14px}
 .bar-chart{display:flex;align-items:flex-end;gap:5px;height:130px;padding-bottom:22px;position:relative}
 .bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;position:relative}
 .bar-val{font-size:8px;font-weight:600;margin-bottom:2px;white-space:nowrap}
 .bar{width:100%;border-radius:4px 4px 0 0;transition:height .3s;min-height:0}
 .bar-lbl{font-size:8px;margin-top:3px;text-align:center;position:absolute;bottom:0;white-space:nowrap}
-.chart-legend{display:flex;gap:10px;font-size:10px;color:var(--sub);margin-top:10px;flex-wrap:wrap}
+.chart-legend{display:flex;gap:10px;font-size:10px;color:#aaa;margin-top:10px;flex-wrap:wrap}
 .chart-legend span{display:flex;align-items:center;gap:3px}
-.detail-card{background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-bottom:14px}
+.detail-card{background:#fff;border-radius:14px;border:1px solid #ececec;overflow:hidden;margin-bottom:14px}
 .detail-header{padding:12px 16px;border-bottom:1px solid #f2f2f0;font-size:13px;font-weight:600;color:#333}
 .month-row{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid #f5f5f3}
 .month-row:last-child{border-bottom:none}
 .month-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.month-name{flex:1;font-size:13px;font-weight:400;color:var(--muted)}
-.month-name.active{font-weight:600;color:var(--text)}
-.cur-badge{font-size:10px;background:var(--clr-lt);color:var(--clr);border-radius:6px;padding:1px 5px;margin-right:4px}
-.month-trips{font-size:10px;color:var(--sub);margin-top:1px}
+.month-name{flex:1;font-size:13px;font-weight:400;color:#555}
+.month-name.active{font-weight:600;color:#1a1a1a}
+.cur-badge{font-size:10px;background:#E6F7F1;color:#1D9E75;border-radius:6px;padding:1px 5px;margin-right:4px}
+.month-trips{font-size:10px;color:#aaa;margin-top:1px}
 .month-val{font-size:14px;font-weight:600;direction:ltr;text-align:left}
 .month-change{font-size:10px;text-align:right;margin-top:1px}
-.month-edit-btn{background:var(--btn-sec);border:1px solid var(--btn-sec-border);border-radius:8px;width:28px;height:28px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.month-edit-btn{background:#f5f5f2;border:1px solid #e8e8e5;border-radius:8px;width:28px;height:28px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .month-edit-row{display:flex;align-items:center;gap:5px}
-.month-edit-input{width:80px;padding:6px 8px;border-radius:8px;border:2px solid var(--clr);font-size:13px;font-weight:600;text-align:center;outline:none;direction:ltr}
+.month-edit-input{width:80px;padding:6px 8px;border-radius:8px;border:2px solid #1D9E75;font-size:13px;font-weight:600;text-align:center;outline:none;font-family:inherit;direction:ltr}
 .month-act-btn{width:28px;height:28px;border-radius:8px;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.month-act-btn.save{background:var(--clr);color:#fff}
+.month-act-btn.save{background:#1D9E75;color:#fff}
 .month-act-btn.del{background:#fdecea}
-.month-act-btn.cancel{background:var(--btn-sec);color:#999}
-.manual-card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:16px}
+.month-act-btn.cancel{background:#f5f5f2;color:#999}
+.manual-card{background:#fff;border-radius:14px;border:1px solid #ececec;padding:16px}
 .manual-card h3{font-size:13px;font-weight:600;color:#333;margin-bottom:12px}
 .manual-row{display:flex;gap:8px}
-.sel{flex:1;padding:10px 12px;border-radius:10px;border:1px solid #ddd;background:var(--input-bg);font-size:13px;outline:none;color:var(--text)}
-.num-input{width:90px;padding:10px 8px;border-radius:10px;border:1px solid #ddd;background:var(--input-bg);font-size:14px;text-align:center;outline:none}
-
-/* ── Receipt scan ──────────────────────────────── */
-.receipt-card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:16px;margin-top:14px}
+.sel{flex:1;padding:10px 12px;border-radius:10px;border:1px solid #ddd;background:#fff;font-size:13px;font-family:inherit;outline:none;color:#1a1a1a}
+.num-input{width:90px;padding:10px 8px;border-radius:10px;border:1px solid #ddd;background:#fff;font-size:14px;text-align:center;outline:none;font-family:inherit}
+/* Receipt scan */
+.receipt-card{background:#fff;border-radius:14px;border:1px solid #ececec;padding:16px;margin-top:14px}
 .receipt-card h3{font-size:13px;font-weight:600;color:#333;margin-bottom:4px}
-.receipt-sub{font-size:11px;color:var(--sub);margin-bottom:12px}
-.receipt-btn{width:100%;background:var(--card);border:2px dashed var(--clr);border-radius:12px;padding:18px;color:var(--clr);font-size:14px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px}
+.receipt-sub{font-size:11px;color:#aaa;margin-bottom:12px}
+.receipt-btn{width:100%;background:#fff;border:2px dashed #1D9E75;border-radius:12px;padding:18px;color:#1D9E75;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px}
 .receipt-btn .ic{font-size:26px}
 .receipt-loading{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px}
-.receipt-spinner{width:30px;height:30px;border:3px solid var(--clr-lt);border-top-color:var(--clr);border-radius:50%;animation:spin .8s linear infinite}
+.receipt-spinner{width:30px;height:30px;border:3px solid #E6F7F1;border-top-color:#1D9E75;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .receipt-result{display:flex;flex-direction:column;gap:10px;align-items:center;padding:8px 0}
-.receipt-img-preview{max-width:140px;max-height:140px;border-radius:10px;border:1px solid var(--border)}
+.receipt-img-preview{max-width:140px;max-height:140px;border-radius:10px;border:1px solid #ececec}
 .receipt-amount-row{display:flex;align-items:center;gap:8px}
-.receipt-amount-input{width:120px;padding:10px;border-radius:10px;border:2px solid var(--clr);font-size:18px;font-weight:700;text-align:center;outline:none;direction:ltr}
+.receipt-amount-input{width:120px;padding:10px;border-radius:10px;border:2px solid #1D9E75;font-size:18px;font-weight:700;text-align:center;outline:none;font-family:inherit;direction:ltr}
 .receipt-actions{display:flex;gap:8px;width:100%}
-.receipt-confirm-btn{flex:1;background:var(--clr);color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer}
-.receipt-cancel-btn{background:var(--btn-sec);color:#888;border:1px solid var(--btn-sec-border);border-radius:10px;padding:11px 16px;font-size:13px;cursor:pointer}
+.receipt-confirm-btn{flex:1;background:#1D9E75;color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer}
+.receipt-cancel-btn{background:#f5f5f2;color:#888;border:1px solid #e8e8e5;border-radius:10px;padding:11px 16px;font-size:13px;font-family:inherit;cursor:pointer}
 .receipt-hint{font-size:11px;color:#bbb;text-align:center}
-
-/* ── Vendor tagging modal ──────────────────────── */
+/* Vendor tagging */
 .vendor-modal-overlay{position:fixed;inset:0;background:rgba(20,22,26,.45);z-index:250;display:flex;align-items:flex-end;justify-content:center}
-.vendor-modal-card{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:600px;padding:20px;max-height:75vh;overflow-y:auto;animation:slideUp .25s ease-out}
-@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
-/* alias for legacy refs */
+.vendor-modal-card{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:600px;padding:20px;max-height:75vh;overflow-y:auto;animation:vendorUp .25s ease-out}
 @keyframes vendorUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
-.vendor-modal-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px}
+.vendor-modal-title{font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:4px}
 .vendor-modal-sub{font-size:12px;color:#999;margin-bottom:16px}
 .vendor-chips-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-.vendor-chip{padding:9px 16px;border-radius:30px;border:1.5px solid #e0e0e0;background:var(--chip-bg);color:#333;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.vendor-chip{padding:9px 16px;border-radius:30px;border:1.5px solid #e0e0e0;background:#fafaf8;color:#333;cursor:pointer;font-size:13px;font-family:inherit;font-weight:500;transition:all .15s}
 .vendor-chip:active{transform:scale(.94)}
-.vendor-chip.selected{background:var(--clr-lt);border-color:var(--clr);color:var(--clr-dk)}
+.vendor-chip.selected{background:#E6F7F1;border-color:#1D9E75;color:#0F6E56}
 .vendor-add-row{display:flex;gap:8px;margin-bottom:14px}
-.vendor-skip-btn{width:100%;background:none;border:none;color:#999;font-size:13px;cursor:pointer;padding:10px;text-align:center}
+.vendor-skip-btn{width:100%;background:none;border:none;color:#999;font-size:13px;cursor:pointer;font-family:inherit;padding:10px;text-align:center}
 .vendor-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;background:#f0f0ec;color:#777;padding:3px 9px;border-radius:20px;margin-top:4px}
 .mini-vendor-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.mini-vendor-chip{padding:5px 12px;border-radius:20px;border:1px solid #e0e0e0;background:var(--chip-bg);color:var(--muted);cursor:pointer;font-size:12px}
-.mini-vendor-chip.selected{background:var(--clr-lt);border-color:var(--clr);color:var(--clr-dk)}
-
-/* ══ DARK MODE ══════════════════════════════════
-   Override tokens — all component styles above
-   use variables, so most rules are automatic.
-   Rules here handle the exceptions that need
-   explicit overrides (nested backgrounds, animations).
-   ─────────────────────────────────────────────── */
-body.dark{
-  --bg:#14161a;
-  --card:#1d2024;
-  --border:#2e3338;
-  --text:#ECECEC;
-  --sub:#8a8f94;
-  --muted:#8a8f94;
-  --input-bg:#262a2f;
-  --chip-bg:#262a2f;
-  --btn-sec:#262a2f;
-  --btn-sec-border:#383d42;
-  --clr:#22B989;
-  --clr-lt:rgba(34,185,137,.15);
-  --clr-dk:#5fe0b5;
-  --clr-soft:#1f6e54;
-}
-/* Overrides that can't be expressed as token swaps */
+.mini-vendor-chip{padding:5px 12px;border-radius:20px;border:1px solid #e0e0e0;background:#fafaf8;color:#555;cursor:pointer;font-size:12px;font-family:inherit}
+.mini-vendor-chip.selected{background:#E6F7F1;border-color:#1D9E75;color:#0F6E56}
+/* ════════ DARK MODE ════════ */
+body.dark{background:#14161a}
+body.dark .header,body.dark .shop-header,body.dark .bottom-bar,body.dark .shop-footer{background:#1d2024;border-color:#2e3338}
+body.dark .header h1,body.dark .cat-title,body.dark .settings-title,body.dark .analysis-title,
+body.dark .iname,body.dark .item-name,body.dark .store-name-txt,body.dark .pending-count,
+body.dark .shop-title,body.dark .shop-item-name,body.dark .stat-val,body.dark .search-result-name,
+body.dark .month-val,body.dark .month-name.active{color:#ECECEC}
+body.dark .sync-txt,body.dark .refresh-btn,body.dark .isub,body.dark .c-label,body.dark .sec-lbl,
+body.dark .list-sec-title,body.dark .month-trips,body.dark .stat-label,body.dark .year-badge,
+body.dark .store-cnt,body.dark .search-result-store,body.dark .shop-budget-lbl,body.dark .shop-item-qty,
+body.dark .receipt-sub,body.dark .receipt-hint,body.dark .search-empty,body.dark .saved-section h3,
+body.dark .budget-label,body.dark .month-name{color:#8a8f94}
+body.dark .gear-btn,body.dark .back-btn,body.dark .month-edit-btn,body.dark .month-act-btn.cancel,
+body.dark .shop-cancel-btn,body.dark .receipt-cancel-btn,body.dark .clear-btn{background:#262a2f;border-color:#383d42;color:#bbb}
 body.dark .tabs{background:#1d2024;border-color:#2e3338}
-body.dark .tab.active{box-shadow:none}
+body.dark .tab{color:#8a8f94}
+body.dark .tab.active{background:#2a2e33;color:#ECECEC;box-shadow:none}
+body.dark .cat-card,body.dark .list-card,body.dark .saved-section,body.dark .add-store-card,
+body.dark .store-list,body.dark .stat-card,body.dark .chart-card,body.dark .detail-card,
+body.dark .manual-card,body.dark .receipt-card,body.dark .search-results,body.dark .budget-banner,
+body.dark .shop-item{background:#1d2024;border-color:#2e3338}
 body.dark .cat-card.has-pending{border-color:#22B989}
 body.dark .item-row,body.dark .store-row,body.dark .search-result-row,body.dark .month-row{border-color:#262a2f}
-body.dark .detail-header{border-color:#262a2f}
-body.dark .shop-item.bought{background:rgba(34,185,137,.12);border-color:#22B989}
-body.dark .shop-item.bought .shop-item-name{color:#7a7e83}
+body.dark .detail-header,body.dark .chart-title,body.dark .add-store-card h3,
+body.dark .manual-card h3,body.dark .receipt-card h3{color:#ECECEC;border-color:#262a2f}
+body.dark .fi,body.dark .sm-input,body.dark .sel,body.dark .num-input,body.dark .search-input,
+body.dark .price-input,body.dark .qty-edit-input,body.dark .month-edit-input,
+body.dark .receipt-amount-input{background:#262a2f;border-color:#383d42;color:#ECECEC}
+body.dark .item-chip{background:#262a2f;border-color:#383d42;color:#ddd}
+body.dark .item-chip.in-list{background:rgba(34,185,137,.15);border-color:#22B989;color:#5fe0b5}
+body.dark .price-badge{background:#262a2f;color:#bbb}
+body.dark .price-badge.no-price{color:#666;border-color:#383d42}
+body.dark .icat,body.dark .shop-check{background:rgba(34,185,137,.15)}
+body.dark .qty-ctrl{background:#262a2f;border-color:#383d42}
+body.dark .qty-num{color:#ECECEC}
+body.dark .qty-btn.minus{color:#7a7e83}
+body.dark .info-banner{background:rgba(34,185,137,.12);border-color:#1f6e54}
+body.dark .info-banner p{color:#5fe0b5}
+body.dark .emoji-opt{background:#262a2f;border-color:#383d42}
+body.dark .emoji-opt.selected{background:rgba(34,185,137,.15);border-color:#22B989}
 body.dark .del-store-btn{background:rgba(229,57,53,.1);border-color:rgba(229,57,53,.3)}
 body.dark .month-act-btn.del{background:rgba(229,57,53,.18)}
 body.dark .search-result-row.added{background:rgba(34,185,137,.08)}
+body.dark .search-clear{background:#262a2f;color:#aaa}
 body.dark .shop-overlay{background:#14161a}
 body.dark .shop-progress{background:#262a2f}
-body.dark .info-banner{background:rgba(34,185,137,.12);border-color:#1f6e54}
-body.dark .info-banner p{color:#5fe0b5}
-body.dark .green-btn:disabled,body.dark .start-shop-btn:disabled{background:#1f4a3c;color:#5a6e67}
-body.dark .item-chip.in-list{color:#5fe0b5}
-body.dark .price-badge{color:#bbb}
-body.dark .price-badge.no-price{color:#666;border-color:#383d42}
-body.dark .vendor-modal-card{background:#1d2024}
+body.dark .shop-item.bought{background:rgba(34,185,137,.12);border-color:#22B989}
+body.dark .shop-item.bought .shop-item-name{color:#7a7e83}
+body.dark .receipt-btn{background:#1d2024;border-color:#22B989;color:#5fe0b5}
+body.dark .receipt-spinner{border-color:#262a2f;border-top-color:#22B989}
+body.dark .cur-badge{background:rgba(34,185,137,.15);color:#5fe0b5}
+body.dark .green-btn:disabled{background:#1f4a3c;color:#5a6e67}
+body.dark .start-shop-btn:disabled{background:#1f4a3c;color:#5a6e67}
 body.dark .empty{color:#6b6f75}
 body.dark .chip-del,body.dark .xbtn{color:#6b6f75}
-body.dark .cur-badge{background:rgba(34,185,137,.15);color:#5fe0b5}
+body.dark .vendor-modal-card{background:#1d2024}
+body.dark .vendor-modal-title{color:#ECECEC}
+body.dark .vendor-modal-sub{color:#8a8f94}
+body.dark .vendor-chip,body.dark .mini-vendor-chip{background:#262a2f;border-color:#383d42;color:#ddd}
+body.dark .vendor-chip.selected,body.dark .mini-vendor-chip.selected{background:rgba(34,185,137,.15);border-color:#22B989;color:#5fe0b5}
+body.dark .vendor-skip-btn{color:#7a7e83}
+body.dark .vendor-tag{background:#262a2f;color:#9a9ea3}
 </style>
 </head>
 <body>
@@ -344,15 +302,8 @@ body.dark .cur-badge{background:rgba(34,185,137,.15);color:#5fe0b5}
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script>
-/* ═══════════════════════════════════════════════
-   قايمة البيت — Single-file PWA
-   Stack: React 18 (UMD), Firebase RTDB, Tesseract OCR
-   All state lives in one App component.
-   Syncs every 10s + on focus; queues writes offline.
-   ═══════════════════════════════════════════════ */
 const {useState,useEffect,useRef,useCallback,useMemo}=React;
 
-/* ── Firebase & storage keys ─────────────────── */
 const FB_URL="https://home-list-96cde-default-rtdb.firebaseio.com/beit.json";
 const FB_API_KEY="AIzaSyDi6hL_c2Bds8AqcZA7GWgXDJ7668SoeKc";
 const FB_AUTH_KEY="beit_auth_v1";
@@ -360,7 +311,6 @@ const LS_KEY="beit_v7";
 const THEME_KEY="beit_theme_v1";
 const MONTHS=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
 
-/* ── Default data ────────────────────────────── */
 const DEF_STORES=[
   {id:"s1",label:"خضار وفواكه",icon:"🥦"},{id:"s2",label:"مواد مطبخ",icon:"🛒"},
   {id:"s3",label:"نظافة",icon:"🧹"},{id:"s4",label:"صيدلية",icon:"💊"},
@@ -376,7 +326,6 @@ const DEF_SAVED={
   s7:[],
 };
 
-/* ── Pure helpers ────────────────────────────── */
 function normSaved(raw){
   if(!raw)return DEF_SAVED;
   const out={};
@@ -404,55 +353,29 @@ function fmtQty(q){
 function calcTotal(items){return items.filter(i=>!i.done&&i.price!=null).reduce((s,i)=>s+(i.price*(safeNum(i.qty)||1)),0);}
 function calcStoreTotal(items,storeId){return items.filter(i=>!i.done&&i.storeId===storeId&&i.price!=null).reduce((s,i)=>s+(i.price*(safeNum(i.qty)||1)),0);}
 function safeNum(v,fallback){const n=parseFloat(v);return(isFinite(n)&&n>=0)?n:(fallback!=null?fallback:null);}
-function fmtTripDate(ts){const d=new Date(ts);return d.getDate()+" "+MONTHS[d.getMonth()];}
-function addVendorIfNew(vendors,name){
-  const n=name.trim();
-  if(!n||vendors.includes(n))return vendors;
-  return [...vendors,n];
-}
-
-/* ── Trip recording: shared core used by all expense sources
-   Sources: 'shopping' (from list), 'clear' (clear done),
-            'receipt' (OCR scan), 'sms' (shortcut), 'bank' (URL param), 'manual'
-   ─────────────────────────────────────────────── */
 function buildTripItems(doneItems){return doneItems.map(i=>({name:i.name,qty:i.qty,price:i.price,storeId:i.storeId}));}
 function addTripToLog(tripLog,yr,mo,trip){
   const yrTrips=tripLog[yr]||{};
   const moTrips=yrTrips[mo]||[];
   return {...tripLog,[yr]:{...yrTrips,[mo]:[trip,...moTrips]}};
 }
-/**
- * recordTrip — adds a trip to both history totals and tripLog.
- * @param {object} history  - current history state
- * @param {object} tripLog  - current tripLog state
- * @param {number} amount   - JOD total
- * @param {string} source   - 'shopping'|'receipt'|'sms'|'bank'|'manual'
- * @param {string|null} vendor
- * @param {Array}  items    - list items array (empty for non-shopping sources)
- * @param {number} [atTs]   - optional timestamp override (for manual past months)
- * @returns {{nh, ntl}}     - new history and tripLog
- */
-function recordTrip(history,tripLog,amount,source,vendor,items=[],atTs=null){
-  const d=atTs?new Date(atTs):new Date();
-  const yr=d.getFullYear().toString();
-  const mo=d.getMonth();
-  const yrData=history[yr]||{};
-  const moData=yrData[mo]||{total:0,trips:0};
-  const nh={...history,[yr]:{...yrData,[mo]:{total:moData.total+amount,trips:moData.trips+1}}};
-  const trip={id:genId(),ts:atTs||Date.now(),items,total:amount,source,vendor:vendor||null};
-  const ntl=addTripToLog(tripLog,yr,mo,trip);
-  return {nh,ntl};
+function fmtTripDate(ts){
+  const d=new Date(ts);
+  return d.getDate()+" "+MONTHS[d.getMonth()];
+}
+function addVendorIfNew(vendors,name){
+  const n=name.trim();
+  if(!n||vendors.includes(n))return vendors;
+  return [...vendors,n];
 }
 
-/* ── Receipt image preprocessing ────────────────
-   Grayscale + contrast boost + upscale improves
-   Tesseract accuracy on faded thermal receipts.
-   ─────────────────────────────────────────────── */
+// ── Receipt image preprocessing: grayscale + contrast boost + upscale ──
+// improves Tesseract.js OCR accuracy on faded thermal-printer receipts
 function preprocessReceiptImage(dataUrl){
   return new Promise((resolve)=>{
     const img=new Image();
     img.onload=()=>{
-      const scale=img.width<1100?1.6:1;
+      const scale=img.width<1100?1.6:1; // upscale small photos so small digits are sharper
       const canvas=document.createElement("canvas");
       canvas.width=Math.round(img.width*scale);
       canvas.height=Math.round(img.height*scale);
@@ -470,16 +393,16 @@ function preprocessReceiptImage(dataUrl){
         }
         ctx.putImageData(imgData,0,0);
         resolve(canvas.toDataURL("image/png"));
-      }catch{resolve(dataUrl);}
+      }catch{
+        resolve(dataUrl); // fallback to original if canvas processing fails (e.g. CORS)
+      }
     };
     img.onerror=()=>resolve(dataUrl);
     img.src=dataUrl;
   });
 }
 
-/* ── iOS Shortcut: URL param helpers ─────────────
-   Shortcut sends ?amount=X&from=Y on bank SMS
-   ─────────────────────────────────────────────── */
+// ── Read URL params on startup (iOS Shortcut integration) ─
 function readUrlParams(){
   try{
     const p=new URLSearchParams(window.location.search);
@@ -489,55 +412,61 @@ function readUrlParams(){
   }catch{}
   return null;
 }
+// Clean URL after reading params (so refresh doesn't re-trigger)
 function clearUrlParams(){
   try{window.history.replaceState({},"",window.location.pathname);}catch{}
 }
-
-/* ── Firebase auth: anonymous sign-in with token refresh ── */
+// Token cache: {idToken, refreshToken, expiresAt}
 let _authCache=null;
-function loadAuthCache(){try{const s=localStorage.getItem(FB_AUTH_KEY);return s?JSON.parse(s):null;}catch{return null;}}
-function saveAuthCache(c){try{localStorage.setItem(FB_AUTH_KEY,JSON.stringify(c));}catch{}}
+function loadAuthCache(){
+  try{const s=localStorage.getItem(FB_AUTH_KEY);return s?JSON.parse(s):null;}catch{return null;}
+}
+function saveAuthCache(c){
+  try{localStorage.setItem(FB_AUTH_KEY,JSON.stringify(c));}catch{}
+}
 async function getAuthToken(){
+  // Return valid cached token
   if(_authCache&&_authCache.expiresAt>Date.now()+60000) return _authCache.idToken;
+  // Try refresh token from localStorage
   const stored=loadAuthCache();
   if(stored?.refreshToken){
     try{
       const r=await fetch("https://securetoken.googleapis.com/v1/token?key="+FB_API_KEY,{
-        method:"POST",headers:{"Content-Type":"application/json"},
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
         body:JSON.stringify({grant_type:"refresh_token",refresh_token:stored.refreshToken})
       });
       if(r.ok){
         const d=await r.json();
         const cache={idToken:d.id_token,refreshToken:d.refresh_token,expiresAt:Date.now()+parseInt(d.expires_in)*1000};
-        _authCache=cache;saveAuthCache(cache);return cache.idToken;
+        _authCache=cache;saveAuthCache(cache);
+        return cache.idToken;
       }
     }catch{}
   }
-  // First-time anonymous sign-in
+  // Anonymous sign-in (first time)
   const r=await fetch("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key="+FB_API_KEY,{
-    method:"POST",headers:{"Content-Type":"application/json"},
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
     body:JSON.stringify({returnSecureToken:true})
   });
   if(!r.ok) throw new Error("auth failed");
   const d=await r.json();
   const cache={idToken:d.idToken,refreshToken:d.refreshToken,expiresAt:Date.now()+parseInt(d.expiresIn)*1000};
-  _authCache=cache;saveAuthCache(cache);return cache.idToken;
+  _authCache=cache;saveAuthCache(cache);
+  return cache.idToken;
 }
 async function fbUrl(){
   const token=await getAuthToken();
   return "https://home-list-96cde-default-rtdb.firebaseio.com/beit.json?auth="+token;
 }
 
-/* ═══════════════════════════════════════════════
-   App component
-   ═══════════════════════════════════════════════ */
 function App(){
   const init=getInit();
   const now=new Date();
   const CUR_YEAR=now.getFullYear().toString();
   const CUR_MONTH=now.getMonth();
 
-  /* ── Core data state ──────────────────────── */
   const [stores,setStores]=useState(init.stores);
   const [items,setItems]=useState(init.items);
   const [saved,setSaved]=useState(init.saved);
@@ -545,83 +474,65 @@ function App(){
   const [history,setHistory]=useState(init.history);
   const [tripLog,setTripLog]=useState(init.tripLog);
   const [vendors,setVendors]=useState(init.vendors);
-  const [monthlyBudget,setMonthlyBudget]=useState(()=>{try{return parseFloat(lsLoad()?.monthlyBudget||"0")||0;}catch{return 0;}});
-
-  /* ── Sync state ───────────────────────────── */
   const [sync,setSync]=useState("ok");
   const [syncMsg,setSyncMsg]=useState("محفوظ");
-
-  /* ── Navigation state ─────────────────────── */
-  const [mode,setMode]=useState("wife");       // 'wife'|'husband'|'analysis'
-  const [screen,setScreen]=useState("home");   // 'home'|'cat'|'settings'
-  const [curCat,setCurCat]=useState(null);     // active store id in cat screen
-
-  /* ── Inline editing state ─────────────────── */
+  const [mode,setMode]=useState("wife");
+  const [screen,setScreen]=useState("home");
+  const [curCat,setCurCat]=useState(null);
   const [newName,setNewName]=useState("");
   const [newQty,setNewQty]=useState("");
   const [newPrice,setNewPrice]=useState("");
-  const [editingPrice,setEditingPrice]=useState(null);  // {storeId, name}
+  const [editingPrice,setEditingPrice]=useState(null);
   const [editPriceVal,setEditPriceVal]=useState("");
-  const [editingQty,setEditingQty]=useState(null);      // item id
-  const [editQtyVal,setEditQtyVal]=useState("");
-  const [editingMonth,setEditingMonth]=useState(null);  // month index
-  const [editMonthVal,setEditMonthVal]=useState("");
-  const [editingBudget,setEditingBudget]=useState(false);
-  const [budgetInput,setBudgetInput]=useState("");
-  const [editingTripVendor,setEditingTripVendor]=useState(null); // trip id
-  const [editTripVendorVal,setEditTripVendorVal]=useState("");
-
-  /* ── Store management ─────────────────────── */
   const [newStoreLabel,setNewStoreLabel]=useState("");
   const [newStoreIcon,setNewStoreIcon]=useState("🏪");
-  const [delConfirm,setDelConfirm]=useState(null);  // {type, label, payload}
-
-  /* ── Vendor tagging modal ─────────────────── */
-  const [vendorModalFor,setVendorModalFor]=useState(null); // null|'shop'|'clear'
-  const [vendorInput,setVendorInput]=useState("");
-
-  /* ── Analysis state ───────────────────────── */
-  const [viewingMonth,setViewingMonth]=useState(null);   // month index or null
-  const [expandedTrip,setExpandedTrip]=useState(null);   // trip id
+  const [delConfirm,setDelConfirm]=useState(null);  // {type,payload} for any delete
+  const [editingTripVendor,setEditingTripVendor]=useState(null); // tripId being edited
+  const [editTripVendorVal,setEditTripVendorVal]=useState("");
+  const [editingTripNote,setEditingTripNote]=useState(null); // tripId being edited
+  const [editTripNoteVal,setEditTripNoteVal]=useState("");
+  const [editingTripItem,setEditingTripItem]=useState(null); // {tripId, itemIdx}
+  const [editTripItemVal,setEditTripItemVal]=useState("");
+  const [receiptVendor,setReceiptVendor]=useState("");
+  const [bankModal,setBankModal]=useState(null);
+  const [monthlyBudget,setMonthlyBudget]=useState(()=>{try{return parseFloat(lsLoad()?.monthlyBudget||"0")||0;}catch{return 0;}});
+  const [monthlyBudgetTs,setMonthlyBudgetTs]=useState(()=>{try{return lsLoad()?.monthlyBudgetTs||0;}catch{return 0;}});
+  const [editingBudget,setEditingBudget]=useState(false);
+  const [budgetInput,setBudgetInput]=useState(""); // {amount, from}
   const [manualAmt,setManualAmt]=useState("");
+  const [smsModal,setSmsModal]=useState(null); // {amount, vendor}
   const [manualMonth,setManualMonth]=useState(CUR_MONTH);
-  const [manualVendor,setManualVendor]=useState(null);
-
-  /* ── Receipt OCR state ────────────────────── */
+  const [shopMode,setShopMode]=useState(false);
   const [receiptImg,setReceiptImg]=useState(null);
   const [receiptLoading,setReceiptLoading]=useState(false);
   const [receiptAmount,setReceiptAmount]=useState(null);
   const [receiptErr,setReceiptErr]=useState(null);
-  const [receiptVendor,setReceiptVendor]=useState("");
   const fileInputRef=useRef(null);
-
-  /* ── Modal state (bank SMS / iOS Shortcut) ── */
-  const [smsModal,setSmsModal]=useState(null);   // {amount, vendor}
-  const [bankModal,setBankModal]=useState(null); // {amount, from}
-
-  /* ── UI state ─────────────────────────────── */
-  const [shopMode,setShopMode]=useState(false);
+  const [editingQty,setEditingQty]=useState(null);
+  const [editQtyVal,setEditQtyVal]=useState("");
+  const [editingMonth,setEditingMonth]=useState(null);
+  const [editMonthVal,setEditMonthVal]=useState("");
   const [searchQ,setSearchQ]=useState("");
   const deferredSearchQ=React.useDeferredValue(searchQ);
   const [toasts,setToasts]=useState([]);
   const [confetti,setConfetti]=useState(false);
   const [themeMode,setThemeMode]=useState(loadTheme);
+  const [viewingMonth,setViewingMonth]=useState(null);
+  const [expandedTrip,setExpandedTrip]=useState(null);
+  const [vendorModalFor,setVendorModalFor]=useState(null); // null|'shop'|'clear'
+  const [vendorInput,setVendorInput]=useState("");
 
-  /* ── Swipe gesture ref ────────────────────── */
+  const [manualVendor,setManualVendor]=useState(null);
   const swipeRef=useRef({x:0,y:0,t:0,active:false});
 
-  /* ── Ref mirror: lets async callbacks read latest state ── */
-  const R=useRef({stores,items,saved,ts,history,tripLog,vendors,monthlyBudget});
-  R.current={stores,items,saved,ts,history,tripLog,vendors,monthlyBudget};
+  const R=useRef({stores,items,saved,ts,history,tripLog,vendors,monthlyBudget,monthlyBudgetTs});
+  R.current={stores,items,saved,ts,history,tripLog,vendors,monthlyBudget,monthlyBudgetTs};
 
-  /* ── Sync / Firebase refs ─────────────────── */
-  const lastErrRef=useRef(false);
-  const pendingDataRef=useRef(null);
-  const offlineNotifiedRef=useRef(false);
-  const pushTimer=useRef(null);
-
-  /* ── Theme ────────────────────────────────── */
-  function setTheme(val){setThemeMode(val);try{localStorage.setItem(THEME_KEY,val);}catch{}}
+  // ── Theme (dark mode) ───────────────────────────────────
+  function setTheme(val){
+    setThemeMode(val);
+    try{localStorage.setItem(THEME_KEY,val);}catch{}
+  }
   function cycleTheme(){
     const next=themeMode==="auto"?"light":themeMode==="light"?"dark":"auto";
     setTheme(next);
@@ -633,7 +544,7 @@ function App(){
     if(meta) meta.setAttribute("content",darkActive?"#14161a":"#1D9E75");
   },[darkActive]);
 
-  /* ── Toast notifications ──────────────────── */
+  // ── Toast notifications ────────────────────────────────
   function showToast(msg,type){
     const id=Date.now()+Math.random();
     setToasts(t=>[...t,{id,msg,type:type||"info",leaving:false}]);
@@ -643,10 +554,17 @@ function App(){
     },2600);
   }
 
-  /* ── Confetti ─────────────────────────────── */
-  function fireConfetti(){setConfetti(true);setTimeout(()=>setConfetti(false),2500);}
+  // ── Confetti ────────────────────────────────────────────
+  function fireConfetti(){
+    setConfetti(true);
+    setTimeout(()=>setConfetti(false),2500);
+  }
 
-  /* ── Firebase: push ───────────────────────── */
+  const lastErrRef=useRef(false);
+  const pendingDataRef=useRef(null);
+  const offlineNotifiedRef=useRef(false);
+
+  // ── Firebase: push helper (used by both debounced save & retry) ──
   async function pushNow(data){
     setSync("push");setSyncMsg("جاري الحفظ...");
     try{
@@ -655,7 +573,8 @@ function App(){
       if(!r.ok)throw 0;
       pendingDataRef.current=null;
       setSync("ok");setSyncMsg("تم الحفظ ✓");
-      lastErrRef.current=false;return true;
+      lastErrRef.current=false;
+      return true;
     }catch{
       setSync("err");setSyncMsg("فشل الحفظ، هتُعاد المحاولة");
       if(!lastErrRef.current){showToast("⚠️ فشل الحفظ، هتُعاد المحاولة تلقائياً","error");lastErrRef.current=true;}
@@ -663,10 +582,16 @@ function App(){
     }
   }
 
-  /* ── Firebase: pull + flush pending offline changes ── */
+  // ── Firebase: pull + flush any queued offline changes first ──
   const pull=useCallback(async()=>{
-    if(!navigator.onLine){setSync("offline");setSyncMsg("غير متصل - هيُحفظ تلقائياً");return;}
-    if(pendingDataRef.current){const ok=await pushNow(pendingDataRef.current);if(!ok)return;}
+    if(!navigator.onLine){
+      setSync("offline");setSyncMsg("غير متصل - هيُحفظ تلقائياً");
+      return;
+    }
+    if(pendingDataRef.current){
+      const ok=await pushNow(pendingDataRef.current);
+      if(!ok)return; // will retry on next tick / online event
+    }
     try{
       const url=await fbUrl();
       const r=await fetch(url);
@@ -682,9 +607,9 @@ function App(){
         const nh=rec.history||{};
         const ntl=rec.tripLog||{};
         const nv=rec.vendors||[];
-        const nb=rec.monthlyBudget!=null?rec.monthlyBudget:R.current.monthlyBudget;
-        setItems(ni);setStores(nst);setSaved(ns);setTs(remoteTs);setHistory(nh);setTripLog(ntl);setVendors(nv);setMonthlyBudget(nb);
-        lsSave({items:ni,stores:nst,saved:ns,ts:remoteTs,history:nh,tripLog:ntl,vendors:nv,monthlyBudget:nb});
+        const nb2=rec.monthlyBudget!=null?rec.monthlyBudget:R.current.monthlyBudget;
+        setItems(ni);setStores(nst);setSaved(ns);setTs(remoteTs);setHistory(nh);setTripLog(ntl);setVendors(nv);setMonthlyBudget(nb2);
+        lsSave({items:ni,stores:nst,saved:ns,ts:remoteTs,history:nh,tripLog:ntl,vendors:nv,monthlyBudget:nb2});
       }
       setSync("ok");setSyncMsg("محفوظ");
       if(lastErrRef.current){showToast("✓ عاد الاتصال","success");lastErrRef.current=false;}
@@ -694,16 +619,18 @@ function App(){
     }
   },[]);
 
-  /* ── Debounced push: waits 500ms, merges rapid changes ── */
+  const pushTimer=useRef(null);
   function schedulePush(data){
     pendingDataRef.current=data;
     if(pushTimer.current)clearTimeout(pushTimer.current);
-    if(!navigator.onLine){setSync("offline");setSyncMsg("غير متصل - هيُحفظ تلقائياً");return;}
+    if(!navigator.onLine){
+      setSync("offline");setSyncMsg("غير متصل - هيُحفظ تلقائياً");
+      return;
+    }
     setSync("push");setSyncMsg("جاري الحفظ...");
     pushTimer.current=setTimeout(()=>{pushNow(pendingDataRef.current);},500);
   }
 
-  /* ── commit: single entry point for all state mutations ── */
   function commit(ni,ns,nst,nh,ntl,nv,nb){
     const newTs=Date.now();
     const nh2=nh||R.current.history;
@@ -715,11 +642,12 @@ function App(){
     lsSave(data);schedulePush(data);
   }
 
-  /* ── Online/offline listeners ─────────────── */
+  // ── Online/offline detection ──
   useEffect(()=>{
     function handleOnline(){
       offlineNotifiedRef.current=false;
-      showToast("✓ عاد الاتصال، جاري المزامنة...","success");pull();
+      showToast("✓ عاد الاتصال، جاري المزامنة...","success");
+      pull();
     }
     function handleOffline(){
       setSync("offline");setSyncMsg("غير متصل - هيُحفظ تلقائياً");
@@ -731,26 +659,40 @@ function App(){
     window.addEventListener("online",handleOnline);
     window.addEventListener("offline",handleOffline);
     if(!navigator.onLine)handleOffline();
-    return()=>{window.removeEventListener("online",handleOnline);window.removeEventListener("offline",handleOffline);};
+    return()=>{
+      window.removeEventListener("online",handleOnline);
+      window.removeEventListener("offline",handleOffline);
+    };
   },[pull]);
 
-  /* Poll every 10s + immediate pull on mount */
   useEffect(()=>{pull();const t=setInterval(pull,10000);return()=>clearInterval(t);},[pull]);
 
-  /* ── iOS Shortcut: read URL params on mount ── */
+  // ── iOS Shortcut: read URL params on startup ───────────────
   useEffect(()=>{
     const params=readUrlParams();
-    if(params){clearUrlParams();setBankModal(params);}
+    if(params){
+      clearUrlParams();
+      setBankModal(params);
+    }
   },[]);
 
-  /* ── SMS amount shortcut (?amount=X&from=Y) ── */
+  // ── iOS Shortcut: detect ?amount=X&from=Y on load ─────
   useEffect(()=>{
-    const p=new URLSearchParams(window.location.search);
-    const amount=p.get("amount");const from=p.get("from");
-    if(amount){const n=safeNum(amount);if(n&&n>0){setSmsModal({amount:n,vendor:from||null});window.history.replaceState({},"",window.location.pathname);}}
+    const params=new URLSearchParams(window.location.search);
+    const amount=params.get("amount");
+    const from=params.get("from");
+    if(amount){
+      const n=safeNum(amount);
+      if(n&&n>0){
+        setSmsModal({amount:n,vendor:from||null});
+        // Clean URL so refresh doesn't re-trigger
+        window.history.replaceState({},"",window.location.pathname);
+      }
+    }
   },[]);
 
-  /* ── Store actions ────────────────────────── */
+
+  // ── Store actions ──────────────────────────────────────
   function addStore(){
     if(!newStoreLabel.trim())return;
     const id=genId();
@@ -773,7 +715,7 @@ function App(){
     setDelConfirm({type:"store",label:siInfo(R.current.stores,id).label,payload:id});
   }
 
-  /* ── Item actions ─────────────────────────── */
+  // ── Item actions ───────────────────────────────────────
   function addItem(savedItem,storeId){
     if(R.current.items.find(i=>!i.done&&i.name===savedItem.name&&i.storeId===storeId))return;
     commit([{id:genId(),name:savedItem.name,qty:1,price:savedItem.price,storeId,done:false,at:Date.now()},...R.current.items],R.current.saved,R.current.stores);
@@ -781,7 +723,7 @@ function App(){
   }
   function addNew(){
     if(!newName.trim()||!curCat)return;
-    const name=newName.trim();
+    const name=newName.trim(),qty=newQty.trim();
     const price=safeNum(newPrice);
     const cur=R.current.saved[curCat]||[];
     const exists=cur.find(i=>i.name===name);
@@ -801,21 +743,33 @@ function App(){
   }
   function toggleDone(id){commit(R.current.items.map(i=>i.id===id?{...i,done:!i.done}:i),R.current.saved,R.current.stores);}
 
-  /* ── Expense recording actions ────────────── */
   function doClearDone(vendor){
     const doneItems=R.current.items.filter(i=>i.done);
     const doneTotal=doneItems.filter(i=>i.price!=null).reduce((s,i)=>s+(i.price*(safeNum(i.qty)||1)),0);
     const ni=R.current.items.filter(i=>!i.done);
-    let nh=R.current.history,ntl=R.current.tripLog;
-    if(doneItems.length>0&&doneTotal>0){
-      const r=recordTrip(nh,ntl,doneTotal,"shopping",vendor,buildTripItems(doneItems));
-      nh=r.nh;ntl=r.ntl;
+    let nh=R.current.history;
+    let ntl=R.current.tripLog;
+    if(doneItems.length>0){
+      const now=new Date();
+      const yr=now.getFullYear().toString();
+      const mo=now.getMonth();
+      if(doneTotal>0){
+        const yrData=nh[yr]||{};
+        const moData=yrData[mo]||{total:0,trips:0};
+        nh={...nh,[yr]:{...yrData,[mo]:{total:moData.total+doneTotal,trips:moData.trips+1}}};
+      }
+      const trip={id:genId(),ts:now.getTime(),items:buildTripItems(doneItems),total:doneTotal,source:"shopping",vendor:vendor||null};
+      ntl=addTripToLog(ntl,yr,mo,trip);
     }
     commit(ni,R.current.saved,R.current.stores,nh,ntl);
-    if(doneItems.length>0){fireConfetti();showToast("🎉 تم تسجيل "+doneTotal.toFixed(2)+" د.أ بمصاريف الشهر","success");}
+    if(doneItems.length>0){
+      fireConfetti();
+      showToast("🎉 تم تسجيل "+doneTotal.toFixed(2)+" د.أ بمصاريف الشهر","success");
+    }
   }
   function clearDone(){
-    if(R.current.items.some(i=>i.done)) setVendorModalFor("clear");
+    const hasDone=R.current.items.some(i=>i.done);
+    if(hasDone){setVendorModalFor("clear");}
     else doClearDone(null);
   }
 
@@ -823,33 +777,45 @@ function App(){
     const doneItems=R.current.items.filter(i=>i.done);
     const doneTotal=doneItems.filter(i=>i.price!=null).reduce((s,i)=>s+(i.price*(safeNum(i.qty)||1)),0);
     const ni=R.current.items.filter(i=>!i.done);
-    let nh=R.current.history,ntl=R.current.tripLog;
-    if(doneItems.length>0&&doneTotal>0){
-      const r=recordTrip(nh,ntl,doneTotal,"shopping",vendor,buildTripItems(doneItems));
-      nh=r.nh;ntl=r.ntl;
+    let nh=R.current.history;
+    let ntl=R.current.tripLog;
+    if(doneItems.length>0){
+      const now=new Date();
+      const yr=now.getFullYear().toString();
+      const mo=now.getMonth();
+      if(doneTotal>0){
+        const yrData=nh[yr]||{};
+        const moData=yrData[mo]||{total:0,trips:0};
+        nh={...nh,[yr]:{...yrData,[mo]:{total:moData.total+doneTotal,trips:moData.trips+1}}};
+      }
+      const trip={id:genId(),ts:now.getTime(),items:buildTripItems(doneItems),total:doneTotal,source:"shopping",vendor:vendor||null};
+      ntl=addTripToLog(ntl,yr,mo,trip);
     }
     commit(ni,R.current.saved,R.current.stores,nh,ntl);
     setShopMode(false);
-    if(doneItems.length>0){fireConfetti();showToast("🎉 خلصتي التسوق! "+doneTotal.toFixed(2)+" د.أ","success");}
+    if(doneItems.length>0){
+      fireConfetti();
+      showToast("🎉 خلصتي التسوق! "+doneTotal.toFixed(2)+" د.أ","success");
+    }
   }
   function endShopping(){
-    if(R.current.items.some(i=>i.done)) setVendorModalFor("shop");
+    const hasDone=R.current.items.some(i=>i.done);
+    if(hasDone){setVendorModalFor("shop");}
     else doEndShopping(null);
   }
 
-  /* ── Vendor modal confirm/skip ────────────── */
+  // ── Vendor tagging modal ──
   function confirmVendor(vendor){
-    if(vendor?.trim()){
+    if(vendor&&vendor.trim()){
       const nv=addVendorIfNew(R.current.vendors,vendor);
-      if(nv!==R.current.vendors){setVendors(nv);R.current.vendors=nv;}
+      if(nv!==R.current.vendors)setVendors(nv); // local immediate; full sync happens in the commit below
+      R.current.vendors=nv;
     }
     if(vendorModalFor==="clear") doClearDone(vendor);
     else if(vendorModalFor==="shop") doEndShopping(vendor);
     setVendorModalFor(null);setVendorInput("");
   }
   function skipVendor(){confirmVendor(null);}
-
-  /* ── Price editing ────────────────────────── */
   function savePrice(storeId,name){
     const price=safeNum(editPriceVal);
     const ns={...R.current.saved,[storeId]:(R.current.saved[storeId]||[]).map(i=>i.name===name?{...i,price}:i)};
@@ -863,85 +829,128 @@ function App(){
   }
   function doDelSaved(storeId,name){
     const ns={...R.current.saved,[storeId]:(R.current.saved[storeId]||[]).filter(i=>i.name!==name)};
-    commit(R.current.items,ns,R.current.stores);setDelConfirm(null);
+    commit(R.current.items,ns,R.current.stores);
+    setDelConfirm(null);
   }
 
-  /* ── Receipt OCR ──────────────────────────── */
+  // ── Receipt scan ────────────────────────────────────────
   function onReceiptFile(e){
-    const file=e.target.files[0];if(!file)return;
+    const file=e.target.files[0];
+    if(!file)return;
     setReceiptErr(null);setReceiptAmount(null);
     const reader=new FileReader();
     reader.onload=async ev=>{
       const dataUrl=ev.target.result;
-      setReceiptImg(dataUrl);setReceiptLoading(true);
+      setReceiptImg(dataUrl);
+      setReceiptLoading(true);
       let worker=null;
       try{
         const processedUrl=await preprocessReceiptImage(dataUrl);
         worker=await Tesseract.createWorker(["eng","ara"]);
         const {data:{text}}=await worker.recognize(processedUrl);
+        // Clean OCR text: remove currency symbols, Arabic chars, extra spaces
         const cleanText=text.replace(/[^\d.\s]/g," ").replace(/\s+/g," ");
         const matches=cleanText.match(/\d{1,4}\.\d{2}/g)||[];
         const nums=matches.map(m=>parseFloat(m.replace(/[^\d.]/g,""))).filter(n=>isFinite(n)&&n>0&&n<5000);
-        if(nums.length>0){setReceiptAmount(Math.max(...nums));}
-        else{
+        if(nums.length>0){
+          setReceiptAmount(Math.max(...nums));
+        }else{
           const whole=(cleanText.match(/\b\d{1,4}\b/g)||[]).map(Number).filter(n=>isFinite(n)&&n>0&&n<5000);
           if(whole.length>0) setReceiptAmount(Math.max(...whole));
           else setReceiptErr("ما قدرت أقرأ رقم واضح — اكتب المبلغ يدوياً");
         }
-      }catch{setReceiptErr("صار خطأ في قراءة الصورة");}
-      finally{if(worker)await worker.terminate().catch(()=>{});setReceiptLoading(false);}
+      }catch{
+        setReceiptErr("صار خطأ في قراءة الصورة");
+      }finally{
+        if(worker) await worker.terminate().catch(()=>{});
+        setReceiptLoading(false);
+      }
     };
     reader.readAsDataURL(file);
   }
   function confirmReceipt(){
     if(receiptAmount==null||receiptAmount<=0)return;
-    const {nh,ntl}=recordTrip(R.current.history,R.current.tripLog,receiptAmount,"receipt",receiptVendor||null);
+    const now=new Date();
+    const yr=now.getFullYear().toString();
+    const mo=now.getMonth();
+    const yrData=R.current.history[yr]||{};
+    const moData=yrData[mo]||{total:0,trips:0};
+    const nh={...R.current.history,[yr]:{...yrData,[mo]:{total:moData.total+receiptAmount,trips:moData.trips+1}}};
+    const trip={id:genId(),ts:now.getTime(),items:[],total:receiptAmount,source:"receipt",vendor:receiptVendor||null};
+    const ntl=addTripToLog(R.current.tripLog,yr,mo,trip);
     const nv=receiptVendor?addVendorIfNew(R.current.vendors,receiptVendor):R.current.vendors;
     commit(R.current.items,R.current.saved,R.current.stores,nh,ntl,nv);
     showToast("✓ أضيف "+receiptAmount.toFixed(2)+" د.أ من الفاتورة","success");
     cancelReceipt();
   }
   function cancelReceipt(){
-    setReceiptImg(null);setReceiptAmount(null);setReceiptErr(null);setReceiptLoading(false);setReceiptVendor("");
+    setReceiptImg(null);setReceiptAmount(null);setReceiptErr(null);setReceiptLoading(false);setReceiptVendor(null);
     if(fileInputRef.current) fileInputRef.current.value="";
   }
 
-  /* ── SMS shortcut modal confirm ───────────── */
   function confirmSmsModal(){
     if(!smsModal||smsModal.amount<=0)return;
-    const {nh,ntl}=recordTrip(R.current.history,R.current.tripLog,smsModal.amount,"sms",smsModal.vendor||null);
-    if(smsModal.vendor)addVendorIfNew(R.current.vendors,smsModal.vendor);
+    const yr=new Date().getFullYear().toString();
+    const mo=new Date().getMonth();
+    const yrData=R.current.history[yr]||{};
+    const moData=yrData[mo]||{total:0,trips:0};
+    const trip={
+      id:genId(),
+      source:"sms",
+      vendor:smsModal.vendor||null,
+      total:smsModal.amount,
+      items:[],
+      ts:Date.now()
+    };
+    const nh={...R.current.history,[yr]:{...yrData,[mo]:{total:moData.total+smsModal.amount,trips:moData.trips+1}}};
+    const ntl=addTripToLog(R.current.tripLog,yr,mo,trip);
+    if(smsModal.vendor) addVendorIfNew(R.current.vendors,smsModal.vendor);
     commit(R.current.items,R.current.saved,R.current.stores,nh,ntl);
     showToast("✓ سُجّل "+smsModal.amount.toFixed(2)+" د.أ"+(smsModal.vendor?" من "+smsModal.vendor:""),"success");
     setSmsModal(null);
   }
 
-  /* ── Bank URL param modal confirm ─────────── */
   function confirmBankExpense(amount,vendor){
-    const {nh,ntl}=recordTrip(R.current.history,R.current.tripLog,amount,"bank",vendor||null);
-    if(vendor)addVendorIfNew(R.current.vendors,vendor);
+    const yr=new Date().getFullYear().toString();
+    const mo=new Date().getMonth();
+    const yrData=R.current.history[yr]||{};
+    const moData=yrData[mo]||{total:0,trips:0};
+    const nh={...R.current.history,[yr]:{...yrData,[mo]:{total:moData.total+amount,trips:moData.trips+1}}};
+    const trip={
+      id:genId(),ts:Date.now(),total:amount,
+      vendor:vendor||null,
+      source:"bank",items:[]
+    };
+    const ntl=addTripToLog(R.current.tripLog,yr,mo,trip);
+    if(vendor) addVendorIfNew(R.current.vendors,vendor);
     commit(R.current.items,R.current.saved,R.current.stores,nh,ntl);
     showToast("✓ سُجّل "+amount.toFixed(2)+" د.أ من رسالة البنك","success");
     setBankModal(null);
   }
 
-  /* ── Manual history add ───────────────────── */
+  // ── Manual history add ─────────────────────────────────
   function addManualHistory(){
     if(!manualAmt||safeNum(manualAmt,0)<=0)return;
+    const now=new Date();
+    const yr=now.getFullYear().toString();
     const amt=safeNum(manualAmt,0);
-    const yr=new Date().getFullYear().toString();
-    // For past months use day 1 of that month; for current month use now
-    const isCurrentMonth=manualMonth===new Date().getMonth();
-    const atTs=isCurrentMonth?null:new Date(parseInt(yr),manualMonth,1).getTime();
-    const {nh,ntl}=recordTrip(R.current.history,R.current.tripLog,amt,"manual",manualVendor||null,[],atTs);
+    const yrData=R.current.history[yr]||{};
+    const moData=yrData[manualMonth]||{total:0,trips:0};
+    const nh={...R.current.history,[yr]:{...yrData,[manualMonth]:{total:moData.total+amt,trips:moData.trips+1}}};
+    // use day 1 of selected month if it's not the current month, else now
+    const tripTs=manualMonth===now.getMonth()?now.getTime():new Date(parseInt(yr),manualMonth,1).getTime();
+    const trip={id:genId(),ts:tripTs,items:[],total:amt,source:"manual",vendor:manualVendor||null};
+    const ntl=addTripToLog(R.current.tripLog,yr,manualMonth,trip);
     const nv=manualVendor?addVendorIfNew(R.current.vendors,manualVendor):R.current.vendors;
     commit(R.current.items,R.current.saved,R.current.stores,nh,ntl,nv);
     showToast("✓ أضيف "+amt.toFixed(2)+" د.أ لـ"+MONTHS[manualMonth],"success");
     setManualAmt("");setManualVendor(null);
   }
 
-  /* ── Month editing ────────────────────────── */
-  function startEditMonth(i){setEditingMonth(i);setEditMonthVal(monthTotals[i]>0?String(monthTotals[i]):"");}
+  function startEditMonth(i){
+    setEditingMonth(i);
+    setEditMonthVal(monthTotals[i]>0?String(monthTotals[i]):"");
+  }
   function saveEditMonth(i){
     const val=editMonthVal.trim()?safeNum(editMonthVal,0):0;
     const yr=CUR_YEAR;
@@ -952,33 +961,43 @@ function App(){
     setEditingMonth(null);setEditMonthVal("");
     showToast("✓ تم تحديث "+MONTHS[i],"success");
   }
-  function deleteMonth(i){setDelConfirm({type:"month",label:"كل بيانات "+MONTHS[i],payload:i});}
+  function deleteMonth(i){
+    setDelConfirm({type:"month",label:"كل بيانات "+MONTHS[i],payload:i});
+  }
   function doDeleteMonth(i){
     const yr=CUR_YEAR;
-    const yrData={...(R.current.history[yr]||{})};delete yrData[i];
+    const yrData={...(R.current.history[yr]||{})};
+    delete yrData[i];
     const nh={...R.current.history,[yr]:yrData};
-    const tlYrData={...(R.current.tripLog[yr]||{})};delete tlYrData[i];
+    const tlYrData={...(R.current.tripLog[yr]||{})};
+    delete tlYrData[i];
     const ntl={...R.current.tripLog,[yr]:tlYrData};
     commit(R.current.items,R.current.saved,R.current.stores,nh,ntl);
-    setEditingMonth(null);if(viewingMonth===i)setViewingMonth(null);
-    showToast("🗑️ تم حذف بيانات "+MONTHS[i],"info");setDelConfirm(null);
+    setEditingMonth(null);
+    if(viewingMonth===i)setViewingMonth(null);
+    showToast("🗑️ تم حذف بيانات "+MONTHS[i],"info");
+    setDelConfirm(null);
   }
-
-  /* ── Trip management ──────────────────────── */
-  function deleteTrip(yr,mo,tripId){setDelConfirm({type:"trip",payload:{yr,mo,tripId}});}
+  function deleteTrip(yr,mo,tripId){
+    // Route through confirmation instead of deleting directly
+    setDelConfirm({type:"trip",payload:{yr,mo,tripId}});
+  }
   function doDeleteTrip(yr,mo,tripId){
     const moTrips=(R.current.tripLog[yr]||{})[mo]||[];
     const trip=moTrips.find(t=>t.id===tripId);
     const remaining=moTrips.filter(t=>t.id!==tripId);
-    const ntl={...R.current.tripLog,[yr]:{...(R.current.tripLog[yr]||{}),[mo]:remaining}};
+    const yrTrips={...(R.current.tripLog[yr]||{}),[mo]:remaining};
+    const ntl={...R.current.tripLog,[yr]:yrTrips};
     let nh=R.current.history;
     if(trip&&trip.total>0){
-      const yrData=nh[yr]||{};const moData=yrData[mo]||{total:0,trips:0};
+      const yrData=nh[yr]||{};
+      const moData=yrData[mo]||{total:0,trips:0};
       nh={...nh,[yr]:{...yrData,[mo]:{total:Math.max(0,moData.total-trip.total),trips:Math.max(0,moData.trips-1)}}};
     }
     commit(R.current.items,R.current.saved,R.current.stores,nh,ntl);
     if(expandedTrip===tripId)setExpandedTrip(null);
-    showToast("🗑️ تم حذف الرحلة","info");setDelConfirm(null);
+    showToast("🗑️ تم حذف الرحلة","info");
+    setDelConfirm(null);
   }
   function saveTripVendor(yr,mo,tripId){
     const val=editTripVendorVal.trim();
@@ -991,7 +1010,48 @@ function App(){
     showToast("✓ تم تحديث اسم المحل","success");
   }
 
-  /* ── Derived analysis values ──────────────── */
+  function saveTripNote(yr,mo,tripId){
+    const val=editTripNoteVal.trim();
+    const ntl={...R.current.tripLog};
+    ntl[yr]={...ntl[yr]};
+    ntl[yr][mo]=(ntl[yr][mo]||[]).map(t=>t.id===tripId?{...t,note:val||null}:t);
+    commit(R.current.items,R.current.saved,R.current.stores,R.current.history,ntl);
+    setEditingTripNote(null);setEditTripNoteVal("");
+    showToast("✓ تم حفظ الملاحظة","success");
+  }
+
+  // تعديل سعر غرض داخل رحلة — بيعيد حساب إجمالي الرحلة والشهر معاً
+  function saveTripItemPrice(yr,mo,tripId,itemIdx){
+    const newPrice=safeNum(editTripItemVal);
+    const yrTrips={...(R.current.tripLog[yr]||{})};
+    const moTrips=[...(yrTrips[mo]||[])];
+    const tripIdx=moTrips.findIndex(t=>t.id===tripId);
+    if(tripIdx===-1)return;
+    const trip=moTrips[tripIdx];
+    const oldItems=trip.items||[];
+    const oldItem=oldItems[itemIdx];
+    if(!oldItem)return;
+    const oldLineTotal=(oldItem.price||0)*(parseFloat(oldItem.qty)||1);
+    const newLineTotal=(newPrice||0)*(parseFloat(oldItem.qty)||1);
+    const diff=newLineTotal-oldLineTotal;
+
+    const newItems=oldItems.map((it,i)=>i===itemIdx?{...it,price:newPrice}:it);
+    const newTripTotal=Math.max(0,trip.total+diff);
+    moTrips[tripIdx]={...trip,items:newItems,total:newTripTotal};
+    yrTrips[mo]=moTrips;
+    const ntl={...R.current.tripLog,[yr]:yrTrips};
+
+    // تحديث إجمالي الشهر بنفس الفرق
+    const yrHist=R.current.history[yr]||{};
+    const moHist=yrHist[mo]||{total:0,trips:0};
+    const nh={...R.current.history,[yr]:{...yrHist,[mo]:{...moHist,total:Math.max(0,moHist.total+diff)}}};
+
+    commit(R.current.items,R.current.saved,R.current.stores,nh,ntl);
+    setEditingTripItem(null);setEditTripItemVal("");
+    showToast(diff!==0?(diff>0?"📈 ":"📉 ")+"تم تعديل السعر — تأثرت الميزانية بـ"+(diff>0?"+":"")+diff.toFixed(2)+" د.أ":"✓ تم الحفظ","success");
+  }
+
+
   const yearData=history[CUR_YEAR]||{};
   const monthTotals=Array.from({length:12},(_,i)=>yearData[i]?.total||0);
   const monthTrips=Array.from({length:12},(_,i)=>yearData[i]?.trips||0);
@@ -1002,7 +1062,7 @@ function App(){
   const maxMonthIdx=monthTotals.indexOf(Math.max(...monthTotals));
   const minMonthIdx=activeMonths.length?monthTotals.findIndex(v=>v===Math.min(...activeMonths)):-1;
 
-  /* Top-10 products by purchase count from trip logs */
+  // ── Top products from trip logs ────────────────────────
   const topProducts=useMemo(()=>{
     const counts={};
     Object.values(tripLog[CUR_YEAR]||{}).forEach(moTrips=>{
@@ -1017,30 +1077,23 @@ function App(){
     return Object.values(counts).sort((a,b)=>b.count-a.count).slice(0,10);
   },[tripLog,CUR_YEAR]);
 
-  /* ── Derived list values ──────────────────── */
   const pending=items.filter(i=>!i.done);
   const done=items.filter(i=>i.done);
   const total=useMemo(()=>calcTotal(pending),[pending]);
-
-  /* Search across all saved items in all stores */
   const searchResults=useMemo(()=>deferredSearchQ.trim().length>0
-    ?stores.flatMap(s=>(saved[s.id]||[])
+    ? stores.flatMap(s=>(saved[s.id]||[])
         .filter(si=>si.name.includes(deferredSearchQ.trim()))
-        .map(si=>({...si,storeId:s.id,storeLabel:s.label,storeIcon:s.icon})))
-    :[]
+        .map(si=>({...si,storeId:s.id,storeLabel:s.label,storeIcon:s.icon}))
+      )
+    : []
   ,[deferredSearchQ,stores,saved]);
-
-  /* ── Shorthand helpers ────────────────────── */
   const h=React.createElement;
   const stInfo=id=>siInfo(stores,id);
   const syncCls=sync==="push"?"s-push":sync==="err"?"s-err":sync==="offline"?"s-offline":"s-ok";
 
-  /* ── QtyCtrl: inline quantity editor/stepper ──
-     Shows stepper by default; tapping the number
-     switches to a free-text input for precision entry.
-     ─────────────────────────────────────────────── */
   const QtyCtrl=(id,qty)=>{
-    if(editingQty===id){
+    const isEditing=editingQty===id;
+    if(isEditing){
       return h("div",{className:"qty-edit-row"},
         h("input",{className:"qty-edit-input",type:"number",step:"0.1",inputMode:"decimal",value:editQtyVal,autoFocus:true,
           onChange:ev=>setEditQtyVal(ev.target.value),
@@ -1056,7 +1109,7 @@ function App(){
     );
   };
 
-  /* ── Swipe back: right-edge swipe-left (RTL) ── */
+  // ── Swipe to go back (right-edge swipe-left, RTL convention) ──
   function goBack(){
     setEditingQty(null);
     if(shopMode){setShopMode(false);return;}
@@ -1064,11 +1117,13 @@ function App(){
     if(mode==="wife"&&screen==="cat"){
       setScreen("home");setCurCat(null);
       setNewName("");setNewQty("");setNewPrice("");setEditingPrice(null);
+      return;
     }
   }
   function onTouchStart(e){
     const t=e.touches[0];
-    swipeRef.current={x:t.clientX,y:t.clientY,t:Date.now(),active:t.clientX>window.innerWidth-56};
+    const nearRightEdge=t.clientX>window.innerWidth-56;
+    swipeRef.current={x:t.clientX,y:t.clientY,t:Date.now(),active:nearRightEdge};
   }
   function onTouchEnd(e){
     if(!swipeRef.current.active)return;
@@ -1080,31 +1135,28 @@ function App(){
     if(dx<-70&&Math.abs(dy)<70&&dt<700) goBack();
   }
 
-  /* ══════════════════════════════════════════════
-     RENDER
-     ══════════════════════════════════════════════ */
-  return h("div",{onTouchStart,onTouchEnd},
-
-    /* ── Toasts ─────────────────────────────── */
+  return h("div",{onTouchStart:onTouchStart,onTouchEnd:onTouchEnd},
+    // ── Toast notifications ──
     toasts.length>0&&h("div",{className:"toast-stack"},
       toasts.map(t=>h("div",{key:t.id,className:"toast "+t.type+(t.leaving?" leaving":"")},t.msg))
     ),
-
-    /* ── Confetti ───────────────────────────── */
+    // ── Confetti ──
     confetti&&h("div",{className:"confetti-layer"},
       Array.from({length:60}).map((_,i)=>{
         const colors=["#1D9E75","#F0A500","#5B6EE8","#E85B5B","#5DCAA5","#FFD166"];
-        const left=Math.random()*100,size=6+Math.random()*6;
-        const dur=2+Math.random()*1.5,delay=Math.random()*0.4;
+        const left=Math.random()*100;
+        const size=6+Math.random()*6;
+        const dur=2+Math.random()*1.5;
+        const delay=Math.random()*0.4;
+        const color=colors[i%colors.length];
+        const rot=Math.random()>0.5?"50%":"2px";
         return h("div",{key:i,className:"confetti-piece",style:{
-          left:left+"%",width:size,height:size*1.4,background:colors[i%colors.length],
-          animationDuration:dur+"s",animationDelay:delay+"s",
-          borderRadius:Math.random()>0.5?"50%":"2px"
+          left:left+"%",width:size,height:size*1.4,background:color,
+          animationDuration:dur+"s",animationDelay:delay+"s",borderRadius:rot
         }});
       })
     ),
-
-    /* ── SMS shortcut modal ─────────────────── */
+    // ══ SMS SHORTCUT MODAL ══
     smsModal&&h("div",{
       style:{position:"fixed",inset:0,background:"rgba(20,22,26,.55)",zIndex:450,display:"flex",alignItems:"flex-end",justifyContent:"center"},
       onClick:()=>setSmsModal(null)},
@@ -1112,25 +1164,35 @@ function App(){
         style:{background:darkActive?"#1d2024":"#fff",borderRadius:"20px 20px 0 0",width:"100%",maxWidth:540,padding:24,animation:"vendorUp .25s ease-out"},
         onClick:e=>e.stopPropagation()},
         h("div",{style:{fontSize:36,textAlign:"center",marginBottom:8}},"💳"),
-        h("div",{style:{fontSize:16,fontWeight:700,color:darkActive?"#ECECEC":"#1a1a1a",textAlign:"center",marginBottom:4}},"دفعة جديدة من JKB"),
+        h("div",{style:{fontSize:16,fontWeight:700,color:darkActive?"#ECECEC":"#1a1a1a",textAlign:"center",marginBottom:4}},
+          "دفعة جديدة من JKB"
+        ),
         smsModal.vendor&&h("div",{style:{fontSize:13,color:"#888",textAlign:"center",marginBottom:12}},"🏪 "+smsModal.vendor),
-        h("div",{style:{fontSize:38,fontWeight:700,color:"#1D9E75",textAlign:"center",marginBottom:4,direction:"ltr"}},smsModal.amount.toFixed(2)+" JOD"),
-        h("div",{style:{fontSize:12,color:"#aaa",textAlign:"center",marginBottom:20}},"هل تضيف هذه الدفعة لمصاريف الشهر؟"),
+        h("div",{style:{fontSize:38,fontWeight:700,color:"#1D9E75",textAlign:"center",marginBottom:4,direction:"ltr"}},
+          smsModal.amount.toFixed(2)+" JOD"
+        ),
+        h("div",{style:{fontSize:12,color:"#aaa",textAlign:"center",marginBottom:20}},
+          "هل تضيف هذه الدفعة لمصاريف الشهر؟"
+        ),
+        // Editable amount in case OCR was wrong
         h("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:20,justifyContent:"center"}},
           h("span",{style:{fontSize:12,color:"#aaa"}},"تعديل المبلغ:"),
           h("input",{type:"number",step:"0.001",
-            style:{width:120,padding:"8px 10px",borderRadius:10,border:"1.5px solid #1D9E75",fontSize:16,fontWeight:700,textAlign:"center",outline:"none",direction:"ltr",background:darkActive?"#262a2f":"#fff",color:darkActive?"#ECECEC":"#1a1a1a"},
+            style:{width:120,padding:"8px 10px",borderRadius:10,border:"1.5px solid #1D9E75",fontSize:16,fontWeight:700,textAlign:"center",outline:"none",fontFamily:"inherit",direction:"ltr",background:darkActive?"#262a2f":"#fff",color:darkActive?"#ECECEC":"#1a1a1a"},
             value:smsModal.amount,
             onChange:ev=>setSmsModal(s=>({...s,amount:safeNum(ev.target.value)||s.amount}))})
         ),
         h("div",{style:{display:"flex",gap:10}},
-          h("button",{style:{flex:1,background:"#f5f5f2",border:"1px solid #e8e8e5",borderRadius:12,padding:13,fontSize:14,cursor:"pointer",color:"#555"},onClick:()=>setSmsModal(null)},"تجاهل"),
-          h("button",{style:{flex:2,background:"#1D9E75",color:"#fff",border:"none",borderRadius:12,padding:13,fontSize:15,fontWeight:700,cursor:"pointer"},onClick:confirmSmsModal},"✓ أضف للمصاريف")
+          h("button",{
+            style:{flex:1,background:"#f5f5f2",border:"1px solid #e8e8e5",borderRadius:12,padding:13,fontSize:14,fontFamily:"inherit",fontWeight:500,cursor:"pointer",color:"#555"},
+            onClick:()=>setSmsModal(null)},"تجاهل"),
+          h("button",{
+            style:{flex:2,background:"#1D9E75",color:"#fff",border:"none",borderRadius:12,padding:13,fontSize:15,fontFamily:"inherit",fontWeight:700,cursor:"pointer"},
+            onClick:confirmSmsModal},"✓ أضف للمصاريف")
         )
       )
     ),
-
-    /* ── Bank URL modal ─────────────────────── */
+    // ══ BANK SMS MODAL ══
     bankModal&&h("div",{
       style:{position:"fixed",inset:0,background:"rgba(20,22,26,.55)",zIndex:500,display:"flex",alignItems:"flex-end",justifyContent:"center"},
       onClick:()=>setBankModal(null)},
@@ -1138,42 +1200,60 @@ function App(){
         style:{background:darkActive?"#1d2024":"#fff",borderRadius:"20px 20px 0 0",width:"100%",maxWidth:540,padding:24,animation:"vendorUp .2s ease-out"},
         onClick:e=>e.stopPropagation()},
         h("div",{style:{fontSize:32,textAlign:"center",marginBottom:6}},"🏦"),
-        h("div",{style:{fontSize:15,fontWeight:700,color:darkActive?"#ECECEC":"#1a1a1a",textAlign:"center",marginBottom:4}},"رسالة بنكية جديدة"),
-        h("div",{style:{fontSize:13,color:"#888",textAlign:"center",marginBottom:16}},"JKBCC"+(bankModal.from?" · "+bankModal.from.slice(0,60):"")),
+        h("div",{style:{fontSize:15,fontWeight:700,color:darkActive?"#ECECEC":"#1a1a1a",textAlign:"center",marginBottom:4}},
+          "رسالة بنكية جديدة"
+        ),
+        h("div",{style:{fontSize:13,color:"#888",textAlign:"center",marginBottom:16}},
+          "JKBCC"+(bankModal.from?" · "+bankModal.from.slice(0,60):"")
+        ),
         h("div",{style:{background:darkActive?"#262a2f":"#f5f5f2",borderRadius:14,padding:"16px",textAlign:"center",marginBottom:16}},
           h("div",{style:{fontSize:11,color:"#aaa",marginBottom:4}},"المبلغ المكتشف"),
-          h("div",{style:{fontSize:32,fontWeight:700,color:"#1D9E75",direction:"ltr"}},bankModal.amount.toFixed(2)+" د.أ")
+          h("div",{style:{fontSize:32,fontWeight:700,color:"#1D9E75",direction:"ltr"}},
+            bankModal.amount.toFixed(2)+" د.أ"
+          )
         ),
-        h("input",{className:"fi",style:{width:"100%",marginBottom:12},placeholder:"🏪 اسم المحل (اختياري)",
-          id:"bank-vendor-input",defaultValue:"",
-          onKeyDown:ev=>{if(ev.key==="Enter")confirmBankExpense(bankModal.amount,ev.target.value.trim());}}),
+        h("input",{className:"fi",style:{width:"100%",marginBottom:12},
+          placeholder:"🏪 اسم المحل (اختياري)",
+          id:"bank-vendor-input",
+          defaultValue:"",
+          onKeyDown:ev=>{if(ev.key==="Enter")confirmBankExpense(bankModal.amount,ev.target.value.trim());}
+        }),
         vendors.length>0&&h("div",{className:"mini-vendor-row",style:{marginBottom:14}},
           vendors.map(v=>h("div",{key:v,className:"mini-vendor-chip",
-            onClick:()=>{const inp=document.getElementById("bank-vendor-input");if(inp)inp.value=v;}},"🏪 "+v))
+            onClick:()=>{
+              const inp=document.getElementById("bank-vendor-input");
+              if(inp) inp.value=v;
+            }},"🏪 "+v))
         ),
         h("div",{style:{display:"flex",gap:10}},
-          h("button",{style:{flex:1,background:darkActive?"#262a2f":"#f5f5f2",border:"1px solid #e8e8e5",borderRadius:12,padding:13,fontSize:14,cursor:"pointer",color:"#888"},onClick:()=>setBankModal(null)},"تجاهل"),
-          h("button",{style:{flex:2,background:"#1D9E75",color:"#fff",border:"none",borderRadius:12,padding:13,fontSize:15,fontWeight:700,cursor:"pointer"},
-            onClick:()=>{const inp=document.getElementById("bank-vendor-input");confirmBankExpense(bankModal.amount,(inp?.value||"").trim());}},"✓ أضف للمصاريف")
+          h("button",{style:{flex:1,background:darkActive?"#262a2f":"#f5f5f2",border:"1px solid #e8e8e5",borderRadius:12,padding:13,fontSize:14,fontFamily:"inherit",fontWeight:500,cursor:"pointer",color:"#888"},
+            onClick:()=>setBankModal(null)},"تجاهل"),
+          h("button",{style:{flex:2,background:"#1D9E75",color:"#fff",border:"none",borderRadius:12,padding:13,fontSize:15,fontFamily:"inherit",fontWeight:700,cursor:"pointer"},
+            onClick:()=>{
+              const inp=document.getElementById("bank-vendor-input");
+              confirmBankExpense(bankModal.amount,(inp?.value||"").trim());
+            }},"✓ أضف للمصاريف")
         )
       )
     ),
-
-    /* ── Delete confirm dialog ──────────────── */
+    // ══ UNIFIED DELETE CONFIRM DIALOG ══
     delConfirm&&!["store"].includes(delConfirm.type)&&h("div",{
       style:{position:"fixed",inset:0,background:"rgba(20,22,26,.5)",zIndex:400,display:"flex",alignItems:"flex-end",justifyContent:"center"},
       onClick:()=>setDelConfirm(null)},
-      h("div",{style:{background:darkActive?"#1d2024":"#fff",borderRadius:"20px 20px 0 0",width:"100%",maxWidth:540,padding:24,animation:"vendorUp .2s ease-out"},
+      h("div",{style:{background: document.body.classList.contains("dark")?"#1d2024":"#fff",borderRadius:"20px 20px 0 0",width:"100%",maxWidth:540,padding:24,animation:"vendorUp .2s ease-out"},
         onClick:e=>e.stopPropagation()},
         h("div",{style:{fontSize:32,textAlign:"center",marginBottom:8}},"🗑️"),
-        h("div",{style:{fontSize:16,fontWeight:700,color:darkActive?"#ECECEC":"#1a1a1a",textAlign:"center",marginBottom:6}},"تأكيد الحذف"),
+        h("div",{style:{fontSize:16,fontWeight:700,color:darkActive?"#ECECEC":"#1a1a1a",textAlign:"center",marginBottom:6}},
+          "تأكيد الحذف"
+        ),
         h("div",{style:{fontSize:13,color:"#888",textAlign:"center",marginBottom:20,lineHeight:1.6}},
           "هل أنت متأكد من حذف "+delConfirm.label+"؟",h("br"),
           h("span",{style:{color:"#E53935",fontWeight:500}},"هذا الإجراء لا يمكن التراجع عنه")
         ),
         h("div",{style:{display:"flex",gap:10}},
-          h("button",{style:{flex:1,background:"#f5f5f2",border:"1px solid #e8e8e5",borderRadius:12,padding:13,fontSize:14,cursor:"pointer",color:"#555"},onClick:()=>setDelConfirm(null)},"إلغاء"),
-          h("button",{style:{flex:1,background:"#E53935",color:"#fff",border:"none",borderRadius:12,padding:13,fontSize:14,fontWeight:700,cursor:"pointer"},
+          h("button",{style:{flex:1,background:"#f5f5f2",border:"1px solid #e8e8e5",borderRadius:12,padding:13,fontSize:14,fontFamily:"inherit",fontWeight:500,cursor:"pointer",color:"#555"},
+            onClick:()=>setDelConfirm(null)},"إلغاء"),
+          h("button",{style:{flex:1,background:"#E53935",color:"#fff",border:"none",borderRadius:12,padding:13,fontSize:14,fontFamily:"inherit",fontWeight:700,cursor:"pointer"},
             onClick:()=>{
               if(delConfirm.type==="trip") doDeleteTrip(delConfirm.payload.yr,delConfirm.payload.mo,delConfirm.payload.tripId);
               else if(delConfirm.type==="month") doDeleteMonth(delConfirm.payload);
@@ -1182,9 +1262,8 @@ function App(){
         )
       )
     ),
-
-    /* ── Vendor tagging modal ───────────────── */
-    vendorModalFor&&h("div",{className:"vendor-modal-overlay",onClick:skipVendor},
+    // ══ VENDOR TAGGING MODAL ══
+    vendorModalFor&&h("div",{className:"vendor-modal-overlay",onClick:()=>skipVendor()},
       h("div",{className:"vendor-modal-card",onClick:e=>e.stopPropagation()},
         h("div",{className:"vendor-modal-title"},"🏪 من أي محل اشتريتي؟"),
         h("div",{className:"vendor-modal-sub"},"بنحفظ الاسم لمرات جاية، ومفيد للمقارنة بين المحلات لاحقاً"),
@@ -1200,9 +1279,9 @@ function App(){
         h("button",{className:"vendor-skip-btn",onClick:skipVendor},"تخطي بدون تحديد المحل")
       )
     ),
-
-    /* ── Shopping mode overlay ──────────────── */
+    // ══ SHOPPING MODE OVERLAY ══
     shopMode&&h("div",{className:"shop-overlay",onTouchStart:e=>e.stopPropagation(),onTouchEnd:e=>e.stopPropagation()},
+      // progress bar
       h("div",{className:"shop-progress"},
         h("div",{className:"shop-progress-bar",style:{width:(done.length/(pending.length+done.length||1)*100)+"%"}})
       ),
@@ -1210,7 +1289,8 @@ function App(){
         h("div",null,
           h("div",{className:"shop-title"},"🛒 وضع التسوق"),
           h("div",{style:{fontSize:11,color:"#aaa",marginTop:2}},
-            done.length>0?done.length+" اشتريت · "+pending.length+" باقي":pending.length+" غرض")
+            done.length>0?done.length+" اشتريت · "+pending.length+" باقي":pending.length+" غرض"
+          )
         ),
         h("div",{style:{textAlign:"left"}},
           h("div",{className:"shop-budget"},total>0?total.toFixed(2)+" د.أ":"—"),
@@ -1222,6 +1302,7 @@ function App(){
           const ci=items.filter(i=>i.storeId===s.id);
           if(!ci.length)return null;
           const stDone=ci.filter(i=>i.done).length;
+          const stPending=ci.filter(i=>!i.done).length;
           const stTotal=ci.filter(i=>i.done&&i.price!=null).reduce((sum,i)=>sum+(i.price*(safeNum(i.qty)||1)),0);
           return h("div",{key:s.id},
             h("div",{className:"shop-store-lbl"},
@@ -1245,11 +1326,11 @@ function App(){
       ),
       h("div",{className:"shop-footer"},
         h("button",{className:"shop-cancel-btn",onClick:()=>setShopMode(false)},"← رجوع"),
-        h("button",{className:"shop-end-btn",onClick:endShopping},done.length>0?"✅ انهاء وتسجيل المصاريف":"انهاء التسوق")
+        h("button",{className:"shop-end-btn",onClick:endShopping},
+          done.length>0?"✅ انهاء وتسجيل المصاريف":"انهاء التسوق"
+        )
       )
     ),
-
-    /* ── Header ─────────────────────────────── */
     h("div",{className:"header"},
       h("div",{className:"header-info"},
         h("h1",null,"🏠 قايمة البيت"),
@@ -1265,16 +1346,16 @@ function App(){
         ),
         screen!=="settings"&&mode!=="analysis"&&h("button",{className:"gear-btn",onClick:()=>setScreen("settings")},"⚙️"),
         screen==="settings"
-          ?h("button",{className:"gear-btn",style:{fontSize:12,padding:"6px 11px"},onClick:()=>setScreen("home")},"← رجوع")
-          :h("div",{className:"tabs"},
-              h("button",{className:"tab"+(mode==="wife"?" active":""),onClick:()=>{setMode("wife");setScreen("home");setCurCat(null);setSearchQ("");setEditingQty(null);}},"🧺 زوجة"),
-              h("button",{className:"tab"+(mode==="husband"?" active":""),onClick:()=>{setMode("husband");setScreen("home");setSearchQ("");setEditingQty(null);}},"🛍️ زوج"),
+          ? h("button",{className:"gear-btn",style:{fontSize:12,padding:"6px 11px"},onClick:()=>setScreen("home")},"← رجوع")
+          : h("div",{className:"tabs"},
+              h("button",{className:"tab"+(mode==="wife"    ?" active":""),onClick:()=>{setMode("wife");   setScreen("home");setCurCat(null);setSearchQ("");setEditingQty(null);}},"🧺 زوجة"),
+              h("button",{className:"tab"+(mode==="husband" ?" active":""),onClick:()=>{setMode("husband");setScreen("home");setSearchQ("");setEditingQty(null);}},"🛍️ زوج"),
               h("button",{className:"tab"+(mode==="analysis"?" active":""),onClick:()=>{setMode("analysis");setScreen("home");setSearchQ("");setEditingQty(null);}},"📊 جدوى")
             )
       )
     ),
 
-    /* ── Settings screen ────────────────────── */
+    // ══ SETTINGS ══
     screen==="settings"&&h("div",{className:"settings-screen"},
       h("div",{className:"settings-title"},"⚙️ إدارة المتاجر"),
       h("div",{className:"store-list"},
@@ -1286,11 +1367,11 @@ function App(){
               h("div",{className:"store-cnt"},(saved[s.id]||[]).length+" محفوظ · "+items.filter(i=>i.storeId===s.id&&!i.done).length+" في القايمة")
             ),
             delConfirm?.type==="store"&&delConfirm.payload===s.id
-              ?h("div",{style:{display:"flex",gap:6}},
-                  h("button",{style:{background:"none",border:"1px solid #ddd",borderRadius:8,padding:"5px 10px",cursor:"pointer",fontSize:12},onClick:()=>setDelConfirm(null)},"إلغاء"),
-                  h("button",{style:{background:"#E53935",color:"#fff",border:"none",borderRadius:8,padding:"5px 10px",cursor:"pointer",fontSize:12},onClick:()=>deleteStore(s.id)},"تأكيد")
+              ? h("div",{style:{display:"flex",gap:6}},
+                  h("button",{style:{background:"none",border:"1px solid #ddd",borderRadius:8,padding:"5px 10px",cursor:"pointer",fontSize:12,fontFamily:"inherit"},onClick:()=>setDelConfirm(null)},"إلغاء"),
+                  h("button",{style:{background:"#E53935",color:"#fff",border:"none",borderRadius:8,padding:"5px 10px",cursor:"pointer",fontSize:12,fontFamily:"inherit"},onClick:()=>deleteStore(s.id)},"تأكيد")
                 )
-              :h("button",{className:"del-store-btn",onClick:()=>confirmDeleteStore(s.id)},"🗑️ حذف")
+              : h("button",{className:"del-store-btn",onClick:()=>confirmDeleteStore(s.id)},"🗑️ حذف")
           )
         )
       ),
@@ -1310,22 +1391,24 @@ function App(){
 
     screen!=="settings"&&h("div",{className:"container"},
 
-      /* ══ WIFE TAB ══════════════════════════ */
+      // ══ WIFE ══
       mode==="wife"&&screen==="home"&&h("div",null,
-        /* Search across all stores */
         h("div",{className:"search-wrap"},
           h("span",{className:"search-icon"},"🔍"),
-          h("input",{className:"search-input",placeholder:"دوّري على أي غرض بكل المتاجر...",value:searchQ,onChange:ev=>setSearchQ(ev.target.value)}),
+          h("input",{className:"search-input",placeholder:"دوّري على أي غرض بكل المتاجر...",value:searchQ,
+            onChange:ev=>setSearchQ(ev.target.value)}),
           searchQ&&h("button",{className:"search-clear",onClick:()=>setSearchQ("")},"✕")
         ),
+
         deferredSearchQ.trim().length>0
-          ?h("div",null,
+          ? h("div",null,
               searchResults.length===0
-                ?h("div",{className:"search-empty"},"ما في نتائج لـ \""+searchQ+"\"")
-                :h("div",{className:"search-results"},
+                ? h("div",{className:"search-empty"},"ما في نتائج لـ \""+searchQ+"\"")
+                : h("div",{className:"search-results"},
                     searchResults.map((si_item,idx)=>{
                       const inList=!!pending.find(i=>i.name===si_item.name&&i.storeId===si_item.storeId);
-                      return h("div",{key:si_item.storeId+si_item.name+idx,className:"search-result-row"+(inList?" added":""),onClick:()=>addItem(si_item,si_item.storeId)},
+                      return h("div",{key:si_item.storeId+si_item.name+idx,className:"search-result-row"+(inList?" added":""),
+                        onClick:()=>addItem(si_item,si_item.storeId)},
                         h("span",{style:{fontSize:16}},si_item.storeIcon),
                         h("span",{className:"search-result-name"},si_item.name),
                         h("span",{className:"search-result-store"},si_item.storeLabel),
@@ -1335,8 +1418,7 @@ function App(){
                     })
                   )
             )
-          :h("div",null,
-              /* Category grid */
+          : h("div",null,
               h("div",{className:"cat-grid"},
                 stores.map(s=>{
                   const cnt=pending.filter(i=>i.storeId===s.id).length;
@@ -1347,7 +1429,6 @@ function App(){
                   );
                 })
               ),
-              /* Current list overview */
               items.length>0&&h("div",null,
                 h("div",{className:"list-sec-title"},"📋 القايمة الحالية"),
                 h("div",{className:"list-card"},
@@ -1369,7 +1450,6 @@ function App(){
             )
       ),
 
-      /* ── Wife: category detail screen ─────── */
       mode==="wife"&&screen==="cat"&&curCat&&h("div",null,
         h("div",{className:"back-bar"},
           h("button",{className:"back-btn",onClick:()=>{setScreen("home");setCurCat(null);setNewName("");setNewQty("");setNewPrice("");setEditingPrice(null);}},"→ رجوع"),
@@ -1378,8 +1458,8 @@ function App(){
         h("div",{className:"saved-section"},
           h("h3",null,"اضغط على الشيء لإضافته — اضغط على السعر لتعديله"),
           (saved[curCat]||[]).length===0
-            ?h("p",{style:{fontSize:13,color:"#bbb",textAlign:"center",padding:"8px 0"}},"ما في أغراض — أضيفي من الأسفل")
-            :h("div",{className:"chips-wrap"},
+            ? h("p",{style:{fontSize:13,color:"#bbb",textAlign:"center",padding:"8px 0"}},"ما في أغراض — أضيفي من الأسفل")
+            : h("div",{className:"chips-wrap"},
                 (saved[curCat]||[]).map(si_item=>{
                   const inList=!!pending.find(i=>i.name===si_item.name&&i.storeId===curCat);
                   const isEditing=editingPrice?.storeId===curCat&&editingPrice?.name===si_item.name;
@@ -1390,13 +1470,13 @@ function App(){
                       h("button",{className:"chip-del",onClick:e=>{e.stopPropagation();delSaved(curCat,si_item.name);}},"✕")
                     ),
                     isEditing
-                      ?h("div",{className:"price-edit-row"},
+                      ? h("div",{className:"price-edit-row"},
                           h("input",{className:"price-input",type:"number",placeholder:"السعر",value:editPriceVal,autoFocus:true,
                             onChange:ev=>setEditPriceVal(ev.target.value),
                             onKeyDown:ev=>{if(ev.key==="Enter")savePrice(curCat,si_item.name);if(ev.key==="Escape")setEditingPrice(null);}}),
                           h("button",{className:"price-save-btn",onClick:()=>savePrice(curCat,si_item.name)},"✓")
                         )
-                      :h("button",{
+                      : h("button",{
                           className:"price-badge"+(si_item.price==null?" no-price":""),
                           onClick:()=>{setEditingPrice({storeId:curCat,name:si_item.name});setEditPriceVal(si_item.price!=null?String(si_item.price):"");}
                         },si_item.price!=null?si_item.price.toFixed(2)+" د.أ":"+ سعر")
@@ -1425,9 +1505,11 @@ function App(){
         )
       ),
 
-      /* ══ HUSBAND TAB ═══════════════════════ */
+      // ══ HUSBAND ══
       mode==="husband"&&h("div",null,
-        pending.length>0&&h("button",{className:"start-shop-btn",onClick:()=>setShopMode(true)},"🛒 ابدأ التسوق"),
+        pending.length>0&&h("button",{className:"start-shop-btn",onClick:()=>setShopMode(true)},
+          "🛒 ابدأ التسوق"
+        ),
         pending.length>0&&h("div",{className:"budget-banner"},
           h("div",null,
             h("div",{className:"budget-label"},"💰 الميزانية المطلوبة"),
@@ -1436,16 +1518,17 @@ function App(){
           h("div",{className:"budget-amount"},total>0?total.toFixed(2)+" د.أ":"—")
         ),
         pending.length===0&&done.length===0
-          ?h("div",{className:"empty"},h("div",{className:"big"},"🛒"),h("p",null,"ما في شي مطلوب حالياً"))
-          :pending.length===0
-          ?h("div",{className:"empty"},h("div",{className:"big"},"🎉"),h("p",{style:{fontWeight:600}},"ما شاء الله! خلصت كل المشتريات!"))
-          :h("div",null,
+          ? h("div",{className:"empty"},h("div",{className:"big"},"🛒"),h("p",null,"ما في شي مطلوب حالياً"))
+          : pending.length===0
+          ? h("div",{className:"empty"},h("div",{className:"big"},"🎉"),h("p",{style:{fontWeight:600}},"ما شاء الله! خلصت كل المشتريات!"))
+          : h("div",null,
               h("div",{className:"info-banner"},
                 h("span",{style:{fontSize:22}},"🛍️"),
                 h("div",null,h("p",null,"عندك "+pending.length+" طلب"),h("small",null,"اضغط على كل شيء لما تشتريه ✓"))
               ),
               stores.map(s=>{
-                const ci=pending.filter(i=>i.storeId===s.id);if(!ci.length)return null;
+                const ci=pending.filter(i=>i.storeId===s.id);
+                if(!ci.length)return null;
                 const st=calcStoreTotal(pending,s.id);
                 return h("div",{key:s.id,style:{marginBottom:14}},
                   h("div",{className:"sec-lbl"},
@@ -1481,14 +1564,14 @@ function App(){
         )
       ),
 
-      /* ══ ANALYSIS TAB ══════════════════════ */
+      // ══ ANALYSIS ══
       mode==="analysis"&&viewingMonth==null&&h("div",{className:"analysis-screen",style:{padding:0}},
         h("div",{className:"analysis-header"},
           h("div",{className:"analysis-title"},"📊 جدوى "+CUR_YEAR),
           h("div",{className:"year-badge"},"تتجدد كل سنة تلقائياً")
         ),
 
-        /* Budget tracker */
+        // Budget alert + setter
         h("div",{style:{background:darkActive?"#1d2024":"#fff",borderRadius:14,border:"1px solid #ececec",padding:"14px 16px",marginBottom:14}},
           h("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:monthlyBudget>0?10:0}},
             h("div",null,
@@ -1496,21 +1579,34 @@ function App(){
               h("div",{style:{fontSize:11,color:"#aaa",marginTop:2}},monthlyBudget>0?monthlyBudget.toFixed(2)+" د.أ":"لم تُحدد بعد")
             ),
             editingBudget
-              ?h("div",{style:{display:"flex",gap:6}},
+              ? h("div",{style:{display:"flex",gap:6}},
                   h("input",{className:"fi",style:{width:90,fontSize:13,padding:"6px 10px"},type:"number",placeholder:"المبلغ",value:budgetInput,autoFocus:true,
                     onChange:ev=>setBudgetInput(ev.target.value),
                     onKeyDown:ev=>{
-                      if(ev.key==="Enter"){const v=parseFloat(budgetInput)||0;commit(R.current.items,R.current.saved,R.current.stores,R.current.history,R.current.tripLog,R.current.vendors,v);setEditingBudget(false);setBudgetInput("");showToast("✓ تم حفظ الميزانية الشهرية","success");}
+                      if(ev.key==="Enter"){
+                        const v=parseFloat(budgetInput)||0;
+                        commit(R.current.items,R.current.saved,R.current.stores,R.current.history,R.current.tripLog,R.current.vendors,v);
+                        setEditingBudget(false);setBudgetInput("");
+                        showToast("✓ تم حفظ الميزانية الشهرية","success");
+                      }
                       if(ev.key==="Escape"){setEditingBudget(false);setBudgetInput("");}
                     }}),
-                  h("button",{className:"price-save-btn",onClick:()=>{const v=parseFloat(budgetInput)||0;commit(R.current.items,R.current.saved,R.current.stores,R.current.history,R.current.tripLog,R.current.vendors,v);setEditingBudget(false);setBudgetInput("");showToast("✓ تم حفظ الميزانية الشهرية","success");}},"✓")
+                  h("button",{className:"price-save-btn",onClick:()=>{
+                    const v=parseFloat(budgetInput)||0;
+                    commit(R.current.items,R.current.saved,R.current.stores,R.current.history,R.current.tripLog,R.current.vendors,v);
+                    setEditingBudget(false);setBudgetInput("");
+                    showToast("✓ تم حفظ الميزانية الشهرية","success");
+                  }},"✓")
                 )
-              :h("button",{className:"month-edit-btn",onClick:()=>{setEditingBudget(true);setBudgetInput(monthlyBudget>0?String(monthlyBudget):"");}},monthlyBudget>0?"✏️":"+ حدد")
+              : h("button",{className:"month-edit-btn",onClick:()=>{setEditingBudget(true);setBudgetInput(monthlyBudget>0?String(monthlyBudget):"");}},
+                  monthlyBudget>0?"✏️":"+ حدد"
+                )
           ),
           monthlyBudget>0&&(()=>{
             const curMonthTotal=monthTotals[CUR_MONTH]||0;
             const pct=Math.min(100,Math.round(curMonthTotal/monthlyBudget*100));
-            const over=curMonthTotal>monthlyBudget,warn=pct>=80&&!over;
+            const over=curMonthTotal>monthlyBudget;
+            const warn=pct>=80&&!over;
             const barColor=over?"#E53935":warn?"#F0A500":"#1D9E75";
             return h("div",null,
               h("div",{style:{display:"flex",justifyContent:"space-between",fontSize:11,color:"#aaa",marginBottom:4}},
@@ -1530,21 +1626,35 @@ function App(){
           })()
         ),
 
-        /* Summary stat cards */
+        // Summary cards
         h("div",{className:"stat-grid"},
-          h("div",{className:"stat-card"},h("div",{className:"stat-label"},"💰 إجمالي السنة"),h("div",{className:"stat-val",style:{color:"#1D9E75"}},yearTotal>0?yearTotal.toFixed(2)+" د.أ":"—")),
-          h("div",{className:"stat-card"},h("div",{className:"stat-label"},"📈 متوسط الشهر"),h("div",{className:"stat-val",style:{color:"#5B6EE8"}},avgMonthly>0?avgMonthly.toFixed(2)+" د.أ":"—")),
-          h("div",{className:"stat-card"},h("div",{className:"stat-label"},"🔺 أعلى شهر"),h("div",{className:"stat-val",style:{color:"#E85B5B",fontSize:15}},maxMonthIdx>=0&&monthTotals[maxMonthIdx]>0?MONTHS[maxMonthIdx]:"—")),
-          h("div",{className:"stat-card"},h("div",{className:"stat-label"},"🔻 أقل شهر"),h("div",{className:"stat-val",style:{color:"#1D9E75",fontSize:15}},minMonthIdx>=0?MONTHS[minMonthIdx]:"—"))
+          h("div",{className:"stat-card"},
+            h("div",{className:"stat-label"},"💰 إجمالي السنة"),
+            h("div",{className:"stat-val",style:{color:"#1D9E75"}},yearTotal>0?yearTotal.toFixed(2)+" د.أ":"—")
+          ),
+          h("div",{className:"stat-card"},
+            h("div",{className:"stat-label"},"📈 متوسط الشهر"),
+            h("div",{className:"stat-val",style:{color:"#5B6EE8"}},avgMonthly>0?avgMonthly.toFixed(2)+" د.أ":"—")
+          ),
+          h("div",{className:"stat-card"},
+            h("div",{className:"stat-label"},"🔺 أعلى شهر"),
+            h("div",{className:"stat-val",style:{color:"#E85B5B",fontSize:15}},maxMonthIdx>=0&&monthTotals[maxMonthIdx]>0?MONTHS[maxMonthIdx]:"—")
+          ),
+          h("div",{className:"stat-card"},
+            h("div",{className:"stat-label"},"🔻 أقل شهر"),
+            h("div",{className:"stat-val",style:{color:"#1D9E75",fontSize:15}},minMonthIdx>=0?MONTHS[minMonthIdx]:"—")
+          )
         ),
 
-        /* Bar chart */
+        // Bar chart
         h("div",{className:"chart-card"},
           h("div",{className:"chart-title"},"المصاريف الشهرية"),
           h("div",{className:"bar-chart"},
             monthTotals.map((val,i)=>{
               const barH=val>0?Math.max(8,(val/maxVal)*100):0;
-              const isMax=i===maxMonthIdx&&val>0,isCur=i===CUR_MONTH,isFuture=i>CUR_MONTH;
+              const isMax=i===maxMonthIdx&&val>0;
+              const isCur=i===CUR_MONTH;
+              const isFuture=i>CUR_MONTH;
               const barColor=isFuture?"#f0f0ec":isMax?"#E85B5B":isCur?"#1D9E75":"#5DCAA5";
               return h("div",{key:i,className:"bar-wrap"},
                 val>0&&h("div",{className:"bar-val",style:{color:isMax?"#E85B5B":"#1D9E75"}},val.toFixed(0)),
@@ -1561,12 +1671,14 @@ function App(){
           )
         ),
 
-        /* Monthly detail list */
+        // Monthly detail
         h("div",{className:"detail-card"},
           h("div",{className:"detail-header"},"تفاصيل الأشهر"),
           MONTHS.map((m,i)=>{
-            const val=monthTotals[i],trips=monthTrips[i];
-            const isCur=i===CUR_MONTH,isFuture=i>CUR_MONTH;
+            const val=monthTotals[i];
+            const trips=monthTrips[i];
+            const isCur=i===CUR_MONTH;
+            const isFuture=i>CUR_MONTH;
             if(isFuture&&val===0)return null;
             const prevVal=i>0?monthTotals[i-1]:null;
             const change=prevVal&&prevVal>0?((val-prevVal)/prevVal*100):null;
@@ -1577,11 +1689,13 @@ function App(){
               onClick:()=>{if(!isEditingThis)setViewingMonth(i);}},
               h("div",{className:"month-dot",style:{background:dotColor}}),
               h("div",{style:{flex:1}},
-                h("div",{className:"month-name"+(val>0||isCur?" active":"")},isCur&&h("span",{className:"cur-badge"},"الآن"),m),
+                h("div",{className:"month-name"+(val>0||isCur?" active":"")},
+                  isCur&&h("span",{className:"cur-badge"},"الآن"), m
+                ),
                 trips>0&&!isEditingThis&&h("div",{className:"month-trips"},trips+(trips===1?" رحلة":" رحلات")+" · اضغط للتفاصيل")
               ),
               isEditingThis
-                ?h("div",{className:"month-edit-row",onClick:e=>e.stopPropagation()},
+                ? h("div",{className:"month-edit-row",onClick:e=>e.stopPropagation()},
                     h("input",{className:"month-edit-input",type:"number",placeholder:"0.00",value:editMonthVal,autoFocus:true,
                       onChange:ev=>setEditMonthVal(ev.target.value),
                       onKeyDown:ev=>{if(ev.key==="Enter")saveEditMonth(i);if(ev.key==="Escape")setEditingMonth(null);}}),
@@ -1589,14 +1703,16 @@ function App(){
                     h("button",{className:"month-act-btn del",onClick:()=>deleteMonth(i)},"🗑️"),
                     h("button",{className:"month-act-btn cancel",onClick:()=>setEditingMonth(null)},"✕")
                   )
-                :h("div",{style:{display:"flex",alignItems:"center",gap:6}},
+                : h("div",{style:{display:"flex",alignItems:"center",gap:6}},
                     h("div",{style:{textAlign:"left"}},
                       val>0
-                        ?h("div",null,
+                        ? h("div",null,
                             h("div",{className:"month-val"},val.toFixed(2)+" د.أ"),
-                            change!==null&&h("div",{className:"month-change",style:{color:change>0?"#E85B5B":"#1D9E75"}},(change>0?"▲ ":"▼ ")+Math.abs(change).toFixed(0)+"% "+(change>0?"زيادة":"انخفاض"))
+                            change!==null&&h("div",{className:"month-change",style:{color:change>0?"#E85B5B":"#1D9E75"}},
+                              (change>0?"▲ ":"▼ ")+Math.abs(change).toFixed(0)+"% "+(change>0?"زيادة":"انخفاض")
+                            )
                           )
-                        :h("div",{style:{fontSize:12,color:"#ddd"}},"—")
+                        : h("div",{style:{fontSize:12,color:"#ddd"}},"—")
                     ),
                     h("button",{className:"month-edit-btn",onClick:e=>{e.stopPropagation();startEditMonth(i);}},"✏️")
                   )
@@ -1604,7 +1720,8 @@ function App(){
           })
         ),
 
-        /* Top products */
+        // Manual add
+        // Top products section
         topProducts.length>0&&h("div",{className:"detail-card",style:{marginBottom:14}},
           h("div",{className:"detail-header"},"⭐ الأكثر شراءً هذا العام"),
           topProducts.map((p,idx)=>{
@@ -1625,27 +1742,31 @@ function App(){
           })
         ),
 
-        /* Manual expense entry */
         h("div",{className:"manual-card"},
           h("h3",null,"✏️ إضافة مصاريف يدوياً"),
           h("div",{className:"manual-row"},
             h("select",{className:"sel",value:manualMonth,onChange:ev=>setManualMonth(parseInt(ev.target.value))},
               MONTHS.map((m,i)=>h("option",{key:i,value:i},m))
             ),
-            h("input",{className:"num-input",type:"number",placeholder:"المبلغ",value:manualAmt,onChange:ev=>setManualAmt(ev.target.value),onKeyDown:ev=>ev.key==="Enter"&&addManualHistory()}),
+            h("input",{className:"num-input",type:"number",placeholder:"المبلغ",value:manualAmt,onChange:ev=>setManualAmt(ev.target.value),
+              onKeyDown:ev=>ev.key==="Enter"&&addManualHistory()}),
             h("button",{className:"green-btn",disabled:!manualAmt||safeNum(manualAmt,0)<=0,onClick:addManualHistory},"+ أضف")
           ),
           vendors.length>0&&h("div",{className:"mini-vendor-row"},
-            vendors.map(v=>h("div",{key:v,className:"mini-vendor-chip"+(manualVendor===v?" selected":""),onClick:()=>setManualVendor(manualVendor===v?null:v)},"🏪 "+v))
+            vendors.map(v=>h("div",{key:v,className:"mini-vendor-chip"+(manualVendor===v?" selected":""),
+              onClick:()=>setManualVendor(manualVendor===v?null:v)},"🏪 "+v))
           )
         ),
 
-        /* Receipt OCR scan */
+        // Receipt scan
         h("div",{className:"receipt-card"},
           h("h3",null,"📷 مسح فاتورة"),
           h("div",{className:"receipt-sub"},"صوّر الفاتورة وراح يحاول يقرأ المبلغ تلقائياً — للشهر الحالي ("+MONTHS[CUR_MONTH]+")"),
           h("input",{ref:fileInputRef,type:"file",accept:"image/*",capture:"environment",style:{display:"none"},onChange:onReceiptFile}),
-          !receiptImg&&h("button",{className:"receipt-btn",onClick:()=>fileInputRef.current?.click()},h("span",{className:"ic"},"📷"),h("span",null,"اضغط لتصوير الفاتورة")),
+          !receiptImg&&h("button",{className:"receipt-btn",onClick:()=>fileInputRef.current?.click()},
+            h("span",{className:"ic"},"📷"),
+            h("span",null,"اضغط لتصوير الفاتورة")
+          ),
           receiptImg&&receiptLoading&&h("div",{className:"receipt-loading"},
             h("img",{src:receiptImg,className:"receipt-img-preview"}),
             h("div",{className:"receipt-spinner"}),
@@ -1653,7 +1774,9 @@ function App(){
           ),
           receiptImg&&!receiptLoading&&h("div",{className:"receipt-result"},
             h("img",{src:receiptImg,className:"receipt-img-preview"}),
-            receiptErr&&h("div",{style:{fontSize:12,color:"#E53935",textAlign:"center"}},receiptErr),
+            receiptErr
+              ? h("div",{style:{fontSize:12,color:"#E53935",textAlign:"center"}},receiptErr)
+              : null,
             h("div",{className:"receipt-amount-row"},
               h("input",{className:"receipt-amount-input",type:"number",placeholder:"0.00",
                 value:receiptAmount!=null?receiptAmount:"",
@@ -1665,7 +1788,8 @@ function App(){
             h("input",{className:"fi",style:{width:"100%",marginTop:8},placeholder:"🏪 اسم المحل (اختياري — مثلاً: كارفور، المحمص...)",
               value:receiptVendor||"",onChange:ev=>setReceiptVendor(ev.target.value)}),
             vendors.length>0&&h("div",{className:"mini-vendor-row"},
-              vendors.map(v=>h("div",{key:v,className:"mini-vendor-chip"+(receiptVendor===v?" selected":""),onClick:()=>setReceiptVendor(receiptVendor===v?"":v)},"🏪 "+v))
+              vendors.map(v=>h("div",{key:v,className:"mini-vendor-chip"+(receiptVendor===v?" selected":""),
+                onClick:()=>setReceiptVendor(receiptVendor===v?"":v)},"🏪 "+v))
             ),
             h("div",{className:"receipt-actions"},
               h("button",{className:"receipt-cancel-btn",onClick:cancelReceipt},"إلغاء"),
@@ -1675,7 +1799,7 @@ function App(){
         )
       ),
 
-      /* ── Analysis: trip detail for a month ── */
+      // ══ MONTH TRIPS DETAIL ══
       mode==="analysis"&&viewingMonth!=null&&h("div",{className:"analysis-screen",style:{padding:0}},
         h("div",{className:"back-bar"},
           h("button",{className:"back-btn",onClick:()=>{setViewingMonth(null);setExpandedTrip(null);}},"→ رجوع"),
@@ -1698,45 +1822,86 @@ function App(){
                 const isExpanded=expandedTrip===trip.id;
                 const sourceIcon=trip.source==="receipt"?"📷":trip.source==="manual"?"✏️":"🛒";
                 const sourceLbl=trip.source==="receipt"?"من فاتورة":trip.source==="manual"?"إدخال يدوي":"رحلة تسوق";
+                const vendorLbl=trip.vendor?" · 🏪 "+trip.vendor:"";
                 return h("div",{key:trip.id,style:{borderBottom:idx<moTrips.length-1?"1px solid #f5f5f3":"none"}},
-                  h("div",{className:"month-row",style:{cursor:"pointer"},onClick:()=>setExpandedTrip(isExpanded?null:trip.id)},
+                  h("div",{className:"month-row",style:{cursor:"pointer"},
+                    onClick:()=>setExpandedTrip(isExpanded?null:trip.id)},
                     h("span",{style:{fontSize:18}},sourceIcon),
                     h("div",{style:{flex:1}},
-                      h("div",{className:"month-name active"},trip.vendor?("🏪 "+trip.vendor):sourceLbl),
+                      h("div",{className:"month-name active"},
+                        trip.vendor ? ("🏪 "+trip.vendor) : sourceLbl
+                      ),
                       h("div",{className:"month-trips"},
-                        fmtTripDate(trip.ts)+(trip.vendor?" · "+sourceLbl:"")+((trip.items||[]).length>0?" · "+(trip.items||[]).length+" غرض":"")
+                        fmtTripDate(trip.ts)
+                        +(trip.vendor?" · "+sourceLbl:"")
+                        +(( trip.items||[] ).length>0?" · "+( trip.items||[] ).length+" غرض":"")
+                        +(trip.note?" · 📝":"")
                       )
                     ),
                     h("div",{className:"month-val"},trip.total.toFixed(2)+" د.أ"),
                     h("span",{style:{fontSize:11,color:"#bbb",marginRight:4}},isExpanded?"▲":"▼")
                   ),
                   isExpanded&&h("div",{style:{padding:"0 16px 14px",background:"rgba(0,0,0,0.015)"}},
+                    // Vendor edit row
                     editingTripVendor===trip.id
-                      ?h("div",{style:{display:"flex",gap:6,marginBottom:10},onClick:e=>e.stopPropagation()},
+                      ? h("div",{style:{display:"flex",gap:6,marginBottom:10},onClick:e=>e.stopPropagation()},
                           h("input",{className:"fi",placeholder:"اسم المحل...",value:editTripVendorVal,autoFocus:true,
                             onChange:ev=>setEditTripVendorVal(ev.target.value),
                             onKeyDown:ev=>{if(ev.key==="Enter")saveTripVendor(CUR_YEAR,viewingMonth,trip.id);if(ev.key==="Escape")setEditingTripVendor(null);}}),
                           h("button",{className:"green-btn",style:{padding:"10px 14px"},onClick:()=>saveTripVendor(CUR_YEAR,viewingMonth,trip.id)},"✓"),
                           h("button",{className:"month-act-btn cancel",onClick:()=>setEditingTripVendor(null)},"✕")
                         )
-                      :h("button",{className:"month-edit-btn",style:{marginBottom:10,display:"flex",alignItems:"center",gap:5,padding:"5px 12px",width:"auto",borderRadius:20,fontSize:12},
+                      : h("button",{className:"month-edit-btn",style:{marginBottom:10,display:"flex",alignItems:"center",gap:5,padding:"5px 12px",width:"auto",borderRadius:20,fontSize:12},
                           onClick:e=>{e.stopPropagation();setEditingTripVendor(trip.id);setEditTripVendorVal(trip.vendor||"");}},
                           "✏️ "+(trip.vendor?"تعديل اسم المحل":"إضافة اسم المحل")
                         ),
-                    (trip.items||[]).length===0
-                      ?h("p",{style:{fontSize:12,color:"#bbb",padding:"6px 2px"}},"ما في تفاصيل أغراض مسجلة لهذا الإدخال")
-                      :h("div",{className:"list-card",style:{marginBottom:8}},
-                          (trip.items||[]).map((it,ii)=>
-                            h("div",{key:ii,className:"item-row",style:{padding:"9px 12px"}},
+                    // Note section
+                    editingTripNote===trip.id
+                      ? h("div",{style:{display:"flex",gap:6,marginBottom:10},onClick:e=>e.stopPropagation()},
+                          h("input",{className:"fi",placeholder:"ملاحظة عن الرحلة...",value:editTripNoteVal,autoFocus:true,
+                            onChange:ev=>setEditTripNoteVal(ev.target.value),
+                            onKeyDown:ev=>{if(ev.key==="Enter")saveTripNote(CUR_YEAR,viewingMonth,trip.id);if(ev.key==="Escape")setEditingTripNote(null);}}),
+                          h("button",{className:"green-btn",style:{padding:"10px 14px"},onClick:()=>saveTripNote(CUR_YEAR,viewingMonth,trip.id)},"✓"),
+                          h("button",{className:"month-act-btn cancel",onClick:()=>setEditingTripNote(null)},"✕")
+                        )
+                      : trip.note
+                        ? h("div",{style:{display:"flex",alignItems:"flex-start",gap:6,marginBottom:10,background:darkActive?"#262a2f":"#fff",border:"1px solid "+(darkActive?"#383d42":"#ececec"),borderRadius:10,padding:"8px 12px",cursor:"pointer"},
+                            onClick:e=>{e.stopPropagation();setEditingTripNote(trip.id);setEditTripNoteVal(trip.note);}},
+                            h("span",{style:{fontSize:13}},"📝"),
+                            h("span",{style:{fontSize:12,color:darkActive?"#ccc":"#555",flex:1,lineHeight:1.5}},trip.note)
+                          )
+                        : h("button",{className:"month-edit-btn",style:{marginBottom:10,display:"flex",alignItems:"center",gap:5,padding:"5px 12px",width:"auto",borderRadius:20,fontSize:12},
+                            onClick:e=>{e.stopPropagation();setEditingTripNote(trip.id);setEditTripNoteVal("");}},
+                            "📝 إضافة ملاحظة"
+                          ),
+                    ( trip.items||[] ).length===0
+                      ? h("p",{style:{fontSize:12,color:"#bbb",padding:"6px 2px"}},"ما في تفاصيل أغراض مسجلة لهذا الإدخال")
+                      : h("div",{className:"list-card",style:{marginBottom:8}},
+                          (trip.items||[]).map((it,ii)=>{
+                            const isEditingItem=editingTripItem?.tripId===trip.id&&editingTripItem?.itemIdx===ii;
+                            return h("div",{key:ii,className:"item-row",style:{padding:"9px 12px"}},
                               h("div",{className:"icat"},siInfo(stores,it.storeId).icon),
                               h("div",{style:{flex:1}},
                                 h("div",{className:"iname",style:{fontSize:13}},it.name,
                                   it.qty&&fmtQty(it.qty)!=="1"&&h("span",{className:"qbadge"},"×"+fmtQty(it.qty))
                                 )
                               ),
-                              it.price!=null&&h("span",{className:"item-price"},(it.price*(parseFloat(it.qty)||1)).toFixed(2)+" د.أ")
-                            )
-                          )
+                              isEditingItem
+                                ? h("div",{style:{display:"flex",gap:4,alignItems:"center"},onClick:e=>e.stopPropagation()},
+                                    h("input",{className:"price-input",type:"number",placeholder:"السعر",value:editTripItemVal,autoFocus:true,
+                                      onChange:ev=>setEditTripItemVal(ev.target.value),
+                                      onKeyDown:ev=>{
+                                        if(ev.key==="Enter")saveTripItemPrice(CUR_YEAR,viewingMonth,trip.id,ii);
+                                        if(ev.key==="Escape")setEditingTripItem(null);
+                                      }}),
+                                    h("button",{className:"price-save-btn",onClick:()=>saveTripItemPrice(CUR_YEAR,viewingMonth,trip.id,ii)},"✓")
+                                  )
+                                : h("button",{
+                                    className:"price-badge"+(it.price==null?" no-price":""),
+                                    onClick:e=>{e.stopPropagation();setEditingTripItem({tripId:trip.id,itemIdx:ii});setEditTripItemVal(it.price!=null?String(it.price):"");}
+                                  },it.price!=null?(it.price*(parseFloat(it.qty)||1)).toFixed(2)+" د.أ":"+ سعر")
+                            );
+                          })
                         ),
                     h("button",{className:"del-store-btn",onClick:e=>{e.stopPropagation();deleteTrip(CUR_YEAR,viewingMonth,trip.id);}},"🗑️ حذف هذه الرحلة")
                   )
@@ -1745,15 +1910,15 @@ function App(){
             )
           );
         })()
-      )
+      ),
     ),
 
-    /* ── Bottom bar ─────────────────────────── */
+    // ── Bottom bar ──
     screen!=="settings"&&h("div",{className:"bottom-bar"},
       h("div",{className:"pending-count"},
         mode==="analysis"
-          ?h("span",{style:{color:"#aaa",fontSize:12}},CUR_YEAR+" · "+activeMonths.length+" أشهر مسجلة")
-          :pending.length===0?"✅ القايمة فاضية":h("span",null,h("b",null,pending.length)," طلب في انتظارك")
+          ? h("span",{style:{color:"#aaa",fontSize:12}},CUR_YEAR+" · "+activeMonths.length+" أشهر مسجلة")
+          : pending.length===0?"✅ القايمة فاضية":h("span",null,h("b",null,pending.length)," طلب في انتظارك")
       ),
       mode==="analysis"&&yearTotal>0&&h("span",{style:{fontSize:13,fontWeight:700,color:"#1D9E75",direction:"ltr"}},yearTotal.toFixed(2)+" د.أ"),
       mode!=="analysis"&&total>0&&h("span",{style:{fontSize:13,fontWeight:700,color:"#1D9E75",direction:"ltr"}},total.toFixed(2)+" د.أ"),
@@ -1762,7 +1927,6 @@ function App(){
   );
 }
 
-/* ── Error boundary: catches render errors gracefully ── */
 class ErrorBoundary extends React.Component{
   constructor(p){super(p);this.state={err:null};}
   static getDerivedStateFromError(e){return{err:e};}
@@ -1788,17 +1952,18 @@ ReactDOM.createRoot(document.getElementById("app")).render(
 </script>
 </body>
 <script>
-/* ── Service Worker registration (PWA offline support) ── */
 if("serviceWorker" in navigator){
   window.addEventListener("load",()=>{
     navigator.serviceWorker.register("/sw.js")
       .then(reg=>{
+        // Check for updates every time app loads
         reg.update();
         reg.addEventListener("updatefound",()=>{
-          const nw=reg.installing;
-          nw.addEventListener("statechange",()=>{
-            if(nw.state==="installed"&&navigator.serviceWorker.controller)
+          const newWorker=reg.installing;
+          newWorker.addEventListener("statechange",()=>{
+            if(newWorker.state==="installed"&&navigator.serviceWorker.controller){
               console.log("تحديث جديد متاح — سيُطبق عند إعادة الفتح");
+            }
           });
         });
       })
