@@ -848,16 +848,48 @@ function App(){
         const processedUrl=await preprocessReceiptImage(dataUrl);
         worker=await Tesseract.createWorker(["eng","ara"]);
         const {data:{text}}=await worker.recognize(processedUrl);
-        // Clean OCR text: remove currency symbols, Arabic chars, extra spaces
-        const cleanText=text.replace(/[^\d.\s]/g," ").replace(/\s+/g," ");
-        const matches=cleanText.match(/\d{1,4}\.\d{2}/g)||[];
-        const nums=matches.map(m=>parseFloat(m.replace(/[^\d.]/g,""))).filter(n=>isFinite(n)&&n>0&&n<5000);
-        if(nums.length>0){
-          setReceiptAmount(Math.max(...nums));
+
+        // ── Strategy 1: find total/مجموع keywords then grab the number on same or next line ──
+        const totalKeywords=/(?:total|grand\s*total|المجموع|الإجمالي|المبلغ\s*الإجمالي|amount\s*due|net\s*amount|subtotal|مجموع\s*الفاتورة|الإجمالي\s*الكلي)/i;
+        let foundByKeyword=null;
+        const lines=text.split(/\n/).map(l=>l.trim()).filter(Boolean);
+        for(let li=0;li<lines.length;li++){
+          if(totalKeywords.test(lines[li])){
+            // Try number on same line first
+            const sameLine=lines[li].match(/(\d{1,4}[.,]\d{2,3})/);
+            if(sameLine){
+              const v=parseFloat(sameLine[0].replace(",","."));
+              if(isFinite(v)&&v>0&&v<5000){foundByKeyword=v;break;}
+            }
+            // Try number on the NEXT line (common in Arabic receipts)
+            if(li+1<lines.length){
+              const nextLine=lines[li+1].match(/(\d{1,4}[.,]\d{2,3})|(\d{1,4})/);
+              if(nextLine){
+                const v=parseFloat(nextLine[0].replace(",","."));
+                if(isFinite(v)&&v>0&&v<5000){foundByKeyword=v;break;}
+              }
+            }
+          }
+        }
+        if(foundByKeyword!=null){
+          setReceiptAmount(foundByKeyword);
         }else{
-          const whole=(cleanText.match(/\b\d{1,4}\b/g)||[]).map(Number).filter(n=>isFinite(n)&&n>0&&n<5000);
-          if(whole.length>0) setReceiptAmount(Math.max(...whole));
-          else setReceiptErr("ما قدرت أقرأ رقم واضح — اكتب المبلغ يدوياً");
+          // ── Strategy 2: all decimal numbers — take LAST large number (totals appear at bottom) ──
+          const cleanText=text.replace(/[^\d.\s\n]/g," ");
+          const matches=cleanText.match(/\d{1,4}\.\d{2}/g)||[];
+          const nums=matches.map(parseFloat).filter(n=>isFinite(n)&&n>0&&n<5000);
+          if(nums.length>0){
+            // Take last number ≥ median (total is usually at the bottom and ≥ most line items)
+            const sorted=[...nums].sort((a,b)=>a-b);
+            const median=sorted[Math.floor(sorted.length/2)];
+            const candidates=nums.filter(n=>n>=median);
+            setReceiptAmount(candidates[candidates.length-1]); // last candidate = bottom of receipt
+          }else{
+            // ── Strategy 3: whole numbers fallback ──
+            const whole=(cleanText.match(/\b\d{1,4}\b/g)||[]).map(Number).filter(n=>isFinite(n)&&n>0&&n<5000);
+            if(whole.length>0) setReceiptAmount(Math.max(...whole));
+            else setReceiptErr("ما قدرت أقرأ رقم واضح — اكتب المبلغ يدوياً");
+          }
         }
       }catch{
         setReceiptErr("صار خطأ في قراءة الصورة");
