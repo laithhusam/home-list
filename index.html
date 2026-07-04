@@ -216,6 +216,9 @@ body{font-family:'Noto Sans Arabic','Segoe UI',sans-serif;background:#f2f2ef;min
 .receipt-confirm-btn{flex:1;background:#1D9E75;color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer}
 .receipt-cancel-btn{background:#f5f5f2;color:#888;border:1px solid #e8e8e5;border-radius:10px;padding:11px 16px;font-size:13px;font-family:inherit;cursor:pointer}
 .receipt-hint{font-size:11px;color:#bbb;text-align:center}
+.cc-toggle{display:flex;align-items:center;gap:7px;font-size:12px;color:#666;background:#f7f7f5;border:1px solid #ececec;border-radius:10px;padding:9px 12px;width:100%;cursor:pointer}
+.cc-toggle input{width:16px;height:16px;accent-color:#1D9E75;cursor:pointer}
+.cc-hint{font-size:10px;color:#1D9E75;margin-top:2px}
 /* Vendor tagging */
 .vendor-modal-overlay{position:fixed;inset:0;background:rgba(20,22,26,.45);z-index:250;display:flex;align-items:flex-end;justify-content:center}
 .vendor-modal-card{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:600px;padding:20px;max-height:75vh;overflow-y:auto;animation:vendorUp .25s ease-out}
@@ -294,6 +297,7 @@ body.dark .vendor-chip,body.dark .mini-vendor-chip{background:#262a2f;border-col
 body.dark .vendor-chip.selected,body.dark .mini-vendor-chip.selected{background:rgba(34,185,137,.15);border-color:#22B989;color:#5fe0b5}
 body.dark .vendor-skip-btn{color:#7a7e83}
 body.dark .vendor-tag{background:#262a2f;color:#9a9ea3}
+body.dark .cc-toggle{background:#262a2f;border-color:#383d42;color:#aaa}
 </style>
 </head>
 <body>
@@ -367,6 +371,16 @@ function addVendorIfNew(vendors,name){
   const n=name.trim();
   if(!n||vendors.includes(n))return vendors;
   return [...vendors,n];
+}
+// ── Credit card billing-cycle mapping: 15th → 14th of next month counts toward NEXT month's budget ──
+function ccBudgetMonth(date){
+  date=date||new Date();
+  let day=date.getDate(),month=date.getMonth(),year=date.getFullYear();
+  if(day>=15){
+    month+=1;
+    if(month>11){month=0;year+=1;}
+  }
+  return {yr:year.toString(),mo:month};
 }
 
 // ── Receipt image preprocessing: grayscale + contrast boost + upscale ──
@@ -507,6 +521,8 @@ function App(){
   const [receiptLoading,setReceiptLoading]=useState(false);
   const [receiptAmount,setReceiptAmount]=useState(null);
   const [receiptErr,setReceiptErr]=useState(null);
+  const [receiptIsCC,setReceiptIsCC]=useState(false);
+  const [manualIsCC,setManualIsCC]=useState(false);
   const fileInputRef=useRef(null);
   const [editingQty,setEditingQty]=useState(null);
   const [editQtyVal,setEditQtyVal]=useState("");
@@ -521,6 +537,7 @@ function App(){
   const [expandedTrip,setExpandedTrip]=useState(null);
   const [vendorModalFor,setVendorModalFor]=useState(null); // null|'shop'|'clear'
   const [vendorInput,setVendorInput]=useState("");
+  const [shopIsCC,setShopIsCC]=useState(false);
 
   const [manualVendor,setManualVendor]=useState(null);
   const swipeRef=useRef({x:0,y:0,t:0,active:false});
@@ -751,21 +768,21 @@ function App(){
     let ntl=R.current.tripLog;
     if(doneItems.length>0){
       const now=new Date();
-      const yr=now.getFullYear().toString();
-      const mo=now.getMonth();
+      const {yr,mo}=shopIsCC?ccBudgetMonth(now):{yr:now.getFullYear().toString(),mo:now.getMonth()};
       if(doneTotal>0){
         const yrData=nh[yr]||{};
         const moData=yrData[mo]||{total:0,trips:0};
         nh={...nh,[yr]:{...yrData,[mo]:{total:moData.total+doneTotal,trips:moData.trips+1}}};
       }
-      const trip={id:genId(),ts:now.getTime(),items:buildTripItems(doneItems),total:doneTotal,source:"shopping",vendor:vendor||null};
+      const trip={id:genId(),ts:now.getTime(),items:buildTripItems(doneItems),total:doneTotal,source:"shopping",vendor:vendor||null,paidByCard:shopIsCC};
       ntl=addTripToLog(ntl,yr,mo,trip);
     }
     commit(ni,R.current.saved,R.current.stores,nh,ntl);
     if(doneItems.length>0){
       fireConfetti();
-      showToast("🎉 تم تسجيل "+doneTotal.toFixed(2)+" د.أ بمصاريف الشهر","success");
+      showToast("🎉 تم تسجيل "+doneTotal.toFixed(2)+" د.أ بمصاريف الشهر"+(shopIsCC?" (بطاقة)":""),"success");
     }
+    setShopIsCC(false);
   }
   function clearDone(){
     const hasDone=R.current.items.some(i=>i.done);
@@ -781,22 +798,22 @@ function App(){
     let ntl=R.current.tripLog;
     if(doneItems.length>0){
       const now=new Date();
-      const yr=now.getFullYear().toString();
-      const mo=now.getMonth();
+      const {yr,mo}=shopIsCC?ccBudgetMonth(now):{yr:now.getFullYear().toString(),mo:now.getMonth()};
       if(doneTotal>0){
         const yrData=nh[yr]||{};
         const moData=yrData[mo]||{total:0,trips:0};
         nh={...nh,[yr]:{...yrData,[mo]:{total:moData.total+doneTotal,trips:moData.trips+1}}};
       }
-      const trip={id:genId(),ts:now.getTime(),items:buildTripItems(doneItems),total:doneTotal,source:"shopping",vendor:vendor||null};
+      const trip={id:genId(),ts:now.getTime(),items:buildTripItems(doneItems),total:doneTotal,source:"shopping",vendor:vendor||null,paidByCard:shopIsCC};
       ntl=addTripToLog(ntl,yr,mo,trip);
     }
     commit(ni,R.current.saved,R.current.stores,nh,ntl);
     setShopMode(false);
     if(doneItems.length>0){
       fireConfetti();
-      showToast("🎉 خلصتي التسوق! "+doneTotal.toFixed(2)+" د.أ","success");
+      showToast("🎉 خلصتي التسوق! "+doneTotal.toFixed(2)+" د.أ"+(shopIsCC?" (بطاقة)":""),"success");
     }
+    setShopIsCC(false);
   }
   function endShopping(){
     const hasDone=R.current.items.some(i=>i.done);
@@ -903,27 +920,25 @@ function App(){
   function confirmReceipt(){
     if(receiptAmount==null||receiptAmount<=0)return;
     const now=new Date();
-    const yr=now.getFullYear().toString();
-    const mo=now.getMonth();
+    const {yr,mo}=receiptIsCC?ccBudgetMonth(now):{yr:now.getFullYear().toString(),mo:now.getMonth()};
     const yrData=R.current.history[yr]||{};
     const moData=yrData[mo]||{total:0,trips:0};
     const nh={...R.current.history,[yr]:{...yrData,[mo]:{total:moData.total+receiptAmount,trips:moData.trips+1}}};
-    const trip={id:genId(),ts:now.getTime(),items:[],total:receiptAmount,source:"receipt",vendor:receiptVendor||null};
+    const trip={id:genId(),ts:now.getTime(),items:[],total:receiptAmount,source:"receipt",vendor:receiptVendor||null,paidByCard:receiptIsCC};
     const ntl=addTripToLog(R.current.tripLog,yr,mo,trip);
     const nv=receiptVendor?addVendorIfNew(R.current.vendors,receiptVendor):R.current.vendors;
     commit(R.current.items,R.current.saved,R.current.stores,nh,ntl,nv);
-    showToast("✓ أضيف "+receiptAmount.toFixed(2)+" د.أ من الفاتورة","success");
+    showToast("✓ أضيف "+receiptAmount.toFixed(2)+" د.أ من الفاتورة"+(receiptIsCC?" (بطاقة → "+MONTHS[mo]+")":""),"success");
     cancelReceipt();
   }
   function cancelReceipt(){
-    setReceiptImg(null);setReceiptAmount(null);setReceiptErr(null);setReceiptLoading(false);setReceiptVendor(null);
+    setReceiptImg(null);setReceiptAmount(null);setReceiptErr(null);setReceiptLoading(false);setReceiptVendor(null);setReceiptIsCC(false);
     if(fileInputRef.current) fileInputRef.current.value="";
   }
 
   function confirmSmsModal(){
     if(!smsModal||smsModal.amount<=0)return;
-    const yr=new Date().getFullYear().toString();
-    const mo=new Date().getMonth();
+    const {yr,mo}=smsModal.isCC?ccBudgetMonth():{yr:new Date().getFullYear().toString(),mo:new Date().getMonth()};
     const yrData=R.current.history[yr]||{};
     const moData=yrData[mo]||{total:0,trips:0};
     const trip={
@@ -932,31 +947,31 @@ function App(){
       vendor:smsModal.vendor||null,
       total:smsModal.amount,
       items:[],
-      ts:Date.now()
+      ts:Date.now(),
+      paidByCard:!!smsModal.isCC
     };
     const nh={...R.current.history,[yr]:{...yrData,[mo]:{total:moData.total+smsModal.amount,trips:moData.trips+1}}};
     const ntl=addTripToLog(R.current.tripLog,yr,mo,trip);
     if(smsModal.vendor) addVendorIfNew(R.current.vendors,smsModal.vendor);
     commit(R.current.items,R.current.saved,R.current.stores,nh,ntl);
-    showToast("✓ سُجّل "+smsModal.amount.toFixed(2)+" د.أ"+(smsModal.vendor?" من "+smsModal.vendor:""),"success");
+    showToast("✓ سُجّل "+smsModal.amount.toFixed(2)+" د.أ"+(smsModal.vendor?" من "+smsModal.vendor:"")+(smsModal.isCC?" (بطاقة → "+MONTHS[mo]+")":""),"success");
     setSmsModal(null);
   }
 
-  function confirmBankExpense(amount,vendor){
-    const yr=new Date().getFullYear().toString();
-    const mo=new Date().getMonth();
+  function confirmBankExpense(amount,vendor,isCC){
+    const {yr,mo}=isCC?ccBudgetMonth():{yr:new Date().getFullYear().toString(),mo:new Date().getMonth()};
     const yrData=R.current.history[yr]||{};
     const moData=yrData[mo]||{total:0,trips:0};
     const nh={...R.current.history,[yr]:{...yrData,[mo]:{total:moData.total+amount,trips:moData.trips+1}}};
     const trip={
       id:genId(),ts:Date.now(),total:amount,
       vendor:vendor||null,
-      source:"bank",items:[]
+      source:"bank",items:[],paidByCard:!!isCC
     };
     const ntl=addTripToLog(R.current.tripLog,yr,mo,trip);
     if(vendor) addVendorIfNew(R.current.vendors,vendor);
     commit(R.current.items,R.current.saved,R.current.stores,nh,ntl);
-    showToast("✓ سُجّل "+amount.toFixed(2)+" د.أ من رسالة البنك","success");
+    showToast("✓ سُجّل "+amount.toFixed(2)+" د.أ من رسالة البنك"+(isCC?" (بطاقة → "+MONTHS[mo]+")":""),"success");
     setBankModal(null);
   }
 
@@ -964,19 +979,25 @@ function App(){
   function addManualHistory(){
     if(!manualAmt||safeNum(manualAmt,0)<=0)return;
     const now=new Date();
-    const yr=now.getFullYear().toString();
     const amt=safeNum(manualAmt,0);
+    // manual add lets the user pick the target month explicitly via the dropdown,
+    // but if they flag it as a credit-card purchase made "today", route it through the 15–14 cycle instead
+    let yr=CUR_YEAR,mo=manualMonth;
+    if(manualIsCC&&manualMonth===CUR_MONTH){
+      const cc=ccBudgetMonth(now);
+      yr=cc.yr;mo=cc.mo;
+    }
     const yrData=R.current.history[yr]||{};
-    const moData=yrData[manualMonth]||{total:0,trips:0};
-    const nh={...R.current.history,[yr]:{...yrData,[manualMonth]:{total:moData.total+amt,trips:moData.trips+1}}};
+    const moData=yrData[mo]||{total:0,trips:0};
+    const nh={...R.current.history,[yr]:{...yrData,[mo]:{total:moData.total+amt,trips:moData.trips+1}}};
     // use day 1 of selected month if it's not the current month, else now
-    const tripTs=manualMonth===now.getMonth()?now.getTime():new Date(parseInt(yr),manualMonth,1).getTime();
-    const trip={id:genId(),ts:tripTs,items:[],total:amt,source:"manual",vendor:manualVendor||null};
-    const ntl=addTripToLog(R.current.tripLog,yr,manualMonth,trip);
+    const tripTs=mo===now.getMonth()&&yr===CUR_YEAR?now.getTime():new Date(parseInt(yr),mo,1).getTime();
+    const trip={id:genId(),ts:tripTs,items:[],total:amt,source:"manual",vendor:manualVendor||null,paidByCard:manualIsCC};
+    const ntl=addTripToLog(R.current.tripLog,yr,mo,trip);
     const nv=manualVendor?addVendorIfNew(R.current.vendors,manualVendor):R.current.vendors;
     commit(R.current.items,R.current.saved,R.current.stores,nh,ntl,nv);
-    showToast("✓ أضيف "+amt.toFixed(2)+" د.أ لـ"+MONTHS[manualMonth],"success");
-    setManualAmt("");setManualVendor(null);
+    showToast("✓ أضيف "+amt.toFixed(2)+" د.أ لـ"+MONTHS[mo]+(manualIsCC?" (بطاقة)":""),"success");
+    setManualAmt("");setManualVendor(null);setManualIsCC(false);
   }
 
   function startEditMonth(i){
@@ -1083,6 +1104,29 @@ function App(){
     showToast(diff!==0?(diff>0?"📈 ":"📉 ")+"تم تعديل السعر — تأثرت الميزانية بـ"+(diff>0?"+":"")+diff.toFixed(2)+" د.أ":"✓ تم الحفظ","success");
   }
 
+  // ── نقل رحلة/مصروف من شهر لآخر (تصحيح يدوي بعد التسجيل) ──
+  function moveTripMonth(yr,mo,tripId,newMo){
+    if(newMo===mo)return;
+    const moTrips=(R.current.tripLog[yr]||{})[mo]||[];
+    const trip=moTrips.find(t=>t.id===tripId);
+    if(!trip)return;
+    const remaining=moTrips.filter(t=>t.id!==tripId);
+    const destTrips=(R.current.tripLog[yr]||{})[newMo]||[];
+    const yrTrips={...(R.current.tripLog[yr]||{}),[mo]:remaining,[newMo]:[trip,...destTrips]};
+    const ntl={...R.current.tripLog,[yr]:yrTrips};
+
+    const yrHist=R.current.history[yr]||{};
+    const oldH=yrHist[mo]||{total:0,trips:0};
+    const newH=yrHist[newMo]||{total:0,trips:0};
+    const nh={...R.current.history,[yr]:{
+      ...yrHist,
+      [mo]:{total:Math.max(0,oldH.total-trip.total),trips:Math.max(0,oldH.trips-1)},
+      [newMo]:{total:newH.total+trip.total,trips:newH.trips+1}
+    }};
+    commit(R.current.items,R.current.saved,R.current.stores,nh,ntl);
+    setExpandedTrip(null);setViewingMonth(null);
+    showToast("✓ تم نقل الرحلة لشهر "+MONTHS[newMo],"success");
+  }
 
   const yearData=history[CUR_YEAR]||{};
   const monthTotals=Array.from({length:12},(_,i)=>yearData[i]?.total||0);
@@ -1207,12 +1251,16 @@ function App(){
           "هل تضيف هذه الدفعة لمصاريف الشهر؟"
         ),
         // Editable amount in case OCR was wrong
-        h("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:20,justifyContent:"center"}},
+        h("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:14,justifyContent:"center"}},
           h("span",{style:{fontSize:12,color:"#aaa"}},"تعديل المبلغ:"),
           h("input",{type:"number",step:"0.001",
             style:{width:120,padding:"8px 10px",borderRadius:10,border:"1.5px solid #1D9E75",fontSize:16,fontWeight:700,textAlign:"center",outline:"none",fontFamily:"inherit",direction:"ltr",background:darkActive?"#262a2f":"#fff",color:darkActive?"#ECECEC":"#1a1a1a"},
             value:smsModal.amount,
             onChange:ev=>setSmsModal(s=>({...s,amount:safeNum(ev.target.value)||s.amount}))})
+        ),
+        h("label",{className:"cc-toggle",style:{marginBottom:16}},
+          h("input",{type:"checkbox",checked:!!smsModal.isCC,onChange:ev=>setSmsModal(s=>({...s,isCC:ev.target.checked}))}),
+          "💳 دفع بالبطاقة الائتمانية (دورة 15-14)"
         ),
         h("div",{style:{display:"flex",gap:10}},
           h("button",{
@@ -1248,7 +1296,10 @@ function App(){
           placeholder:"🏪 اسم المحل (اختياري)",
           id:"bank-vendor-input",
           defaultValue:"",
-          onKeyDown:ev=>{if(ev.key==="Enter")confirmBankExpense(bankModal.amount,ev.target.value.trim());}
+          onKeyDown:ev=>{if(ev.key==="Enter"){
+            const cc=document.getElementById("bank-cc-input");
+            confirmBankExpense(bankModal.amount,ev.target.value.trim(),cc?cc.checked:false);
+          }}
         }),
         vendors.length>0&&h("div",{className:"mini-vendor-row",style:{marginBottom:14}},
           vendors.map(v=>h("div",{key:v,className:"mini-vendor-chip",
@@ -1257,13 +1308,18 @@ function App(){
               if(inp) inp.value=v;
             }},"🏪 "+v))
         ),
+        h("label",{className:"cc-toggle",style:{marginBottom:16}},
+          h("input",{type:"checkbox",id:"bank-cc-input"}),
+          "💳 دفع بالبطاقة الائتمانية (دورة 15-14)"
+        ),
         h("div",{style:{display:"flex",gap:10}},
           h("button",{style:{flex:1,background:darkActive?"#262a2f":"#f5f5f2",border:"1px solid #e8e8e5",borderRadius:12,padding:13,fontSize:14,fontFamily:"inherit",fontWeight:500,cursor:"pointer",color:"#888"},
             onClick:()=>setBankModal(null)},"تجاهل"),
           h("button",{style:{flex:2,background:"#1D9E75",color:"#fff",border:"none",borderRadius:12,padding:13,fontSize:15,fontFamily:"inherit",fontWeight:700,cursor:"pointer"},
             onClick:()=>{
               const inp=document.getElementById("bank-vendor-input");
-              confirmBankExpense(bankModal.amount,(inp?.value||"").trim());
+              const cc=document.getElementById("bank-cc-input");
+              confirmBankExpense(bankModal.amount,(inp?.value||"").trim(),cc?cc.checked:false);
             }},"✓ أضف للمصاريف")
         )
       )
@@ -1307,6 +1363,10 @@ function App(){
             onChange:ev=>setVendorInput(ev.target.value),
             onKeyDown:ev=>ev.key==="Enter"&&vendorInput.trim()&&confirmVendor(vendorInput)}),
           h("button",{className:"green-btn",disabled:!vendorInput.trim(),onClick:()=>confirmVendor(vendorInput)},"إضافة")
+        ),
+        h("label",{className:"cc-toggle",style:{marginBottom:10}},
+          h("input",{type:"checkbox",checked:shopIsCC,onChange:ev=>setShopIsCC(ev.target.checked)}),
+          "💳 دفع بالبطاقة الائتمانية (دورة 15-14)"
         ),
         h("button",{className:"vendor-skip-btn",onClick:skipVendor},"تخطي بدون تحديد المحل")
       )
@@ -1752,7 +1812,6 @@ function App(){
           })
         ),
 
-        // Manual add
         // Top products section
         topProducts.length>0&&h("div",{className:"detail-card",style:{marginBottom:14}},
           h("div",{className:"detail-header"},"⭐ الأكثر شراءً هذا العام"),
@@ -1783,6 +1842,10 @@ function App(){
             h("input",{className:"num-input",type:"number",placeholder:"المبلغ",value:manualAmt,onChange:ev=>setManualAmt(ev.target.value),
               onKeyDown:ev=>ev.key==="Enter"&&addManualHistory()}),
             h("button",{className:"green-btn",disabled:!manualAmt||safeNum(manualAmt,0)<=0,onClick:addManualHistory},"+ أضف")
+          ),
+          manualMonth===CUR_MONTH&&h("label",{className:"cc-toggle",style:{marginTop:10}},
+            h("input",{type:"checkbox",checked:manualIsCC,onChange:ev=>setManualIsCC(ev.target.checked)}),
+            "💳 دفع بالبطاقة الائتمانية (دورة 15-14 — بيتحسب تلقائياً للشهر الصح)"
           ),
           vendors.length>0&&h("div",{className:"mini-vendor-row"},
             vendors.map(v=>h("div",{key:v,className:"mini-vendor-chip"+(manualVendor===v?" selected":""),
@@ -1823,6 +1886,11 @@ function App(){
               vendors.map(v=>h("div",{key:v,className:"mini-vendor-chip"+(receiptVendor===v?" selected":""),
                 onClick:()=>setReceiptVendor(receiptVendor===v?"":v)},"🏪 "+v))
             ),
+            h("label",{className:"cc-toggle"},
+              h("input",{type:"checkbox",checked:receiptIsCC,onChange:ev=>setReceiptIsCC(ev.target.checked)}),
+              "💳 دفع بالبطاقة الائتمانية"
+            ),
+            receiptIsCC&&h("div",{className:"cc-hint"},"راح يُحسب على شهر "+MONTHS[ccBudgetMonth().mo]+" (دورة 15-14)"),
             h("div",{className:"receipt-actions"},
               h("button",{className:"receipt-cancel-btn",onClick:cancelReceipt},"إلغاء"),
               h("button",{className:"receipt-confirm-btn",disabled:!receiptAmount||receiptAmount<=0,onClick:confirmReceipt},"✓ إضافة للمصاريف")
@@ -1852,8 +1920,8 @@ function App(){
             h("div",{className:"detail-card"},
               moTrips.map((trip,idx)=>{
                 const isExpanded=expandedTrip===trip.id;
-                const sourceIcon=trip.source==="receipt"?"📷":trip.source==="manual"?"✏️":"🛒";
-                const sourceLbl=trip.source==="receipt"?"من فاتورة":trip.source==="manual"?"إدخال يدوي":"رحلة تسوق";
+                const sourceIcon=trip.source==="receipt"?"📷":trip.source==="manual"?"✏️":trip.source==="bank"?"🏦":trip.source==="sms"?"💳":"🛒";
+                const sourceLbl=trip.source==="receipt"?"من فاتورة":trip.source==="manual"?"إدخال يدوي":trip.source==="bank"?"رسالة بنكية":trip.source==="sms"?"دفع بالبطاقة":"رحلة تسوق";
                 const vendorLbl=trip.vendor?" · 🏪 "+trip.vendor:"";
                 return h("div",{key:trip.id,style:{borderBottom:idx<moTrips.length-1?"1px solid #f5f5f3":"none"}},
                   h("div",{className:"month-row",style:{cursor:"pointer"},
@@ -1867,6 +1935,7 @@ function App(){
                         fmtTripDate(trip.ts)
                         +(trip.vendor?" · "+sourceLbl:"")
                         +(( trip.items||[] ).length>0?" · "+( trip.items||[] ).length+" غرض":"")
+                        +(trip.paidByCard?" · 💳 بطاقة":"")
                         +(trip.note?" · 📝":"")
                       )
                     ),
@@ -1874,6 +1943,15 @@ function App(){
                     h("span",{style:{fontSize:11,color:"#bbb",marginRight:4}},isExpanded?"▲":"▼")
                   ),
                   isExpanded&&h("div",{style:{padding:"0 16px 14px",background:"rgba(0,0,0,0.015)"}},
+                    // Move to another month
+                    h("div",{style:{display:"flex",gap:6,marginBottom:10,alignItems:"center"},onClick:e=>e.stopPropagation()},
+                      h("span",{style:{fontSize:12,color:"#999"}},"📅 نقل لشهر:"),
+                      h("select",{className:"sel",style:{flex:1,fontSize:12,padding:"6px 8px"},
+                        value:viewingMonth,
+                        onChange:ev=>moveTripMonth(CUR_YEAR,viewingMonth,trip.id,parseInt(ev.target.value))},
+                        MONTHS.map((m,i)=>h("option",{key:i,value:i},m))
+                      )
+                    ),
                     // Vendor edit row
                     editingTripVendor===trip.id
                       ? h("div",{style:{display:"flex",gap:6,marginBottom:10},onClick:e=>e.stopPropagation()},
