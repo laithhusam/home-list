@@ -372,14 +372,16 @@ function addVendorIfNew(vendors,name){
   if(!n||vendors.includes(n))return vendors;
   return [...vendors,n];
 }
-// ── Credit card billing-cycle mapping: 15th → 14th of next month counts toward NEXT month's budget ──
+// ── دورة البطاقة الائتمانية: 1-14 من الشهر → يتسجل على الشهر السابق، 15-آخر الشهر → يتسجل على نفس الشهر ──
 function ccBudgetMonth(date){
   date=date||new Date();
   let day=date.getDate(),month=date.getMonth(),year=date.getFullYear();
-  if(day>=15){
-    month+=1;
-    if(month>11){month=0;year+=1;}
+  if(day<15){
+    // أول الشهر لغاية 14 → الشهر السابق
+    month-=1;
+    if(month<0){month=11;year-=1;}
   }
+  // 15 لآخر الشهر → نفس الشهر (ما في تغيير)
   return {yr:year.toString(),mo:month};
 }
 
