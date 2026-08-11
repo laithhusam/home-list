@@ -541,6 +541,26 @@ function App(){
   const [vendorInput,setVendorInput]=useState("");
   const [shopIsCC,setShopIsCC]=useState(false);
 
+  const [clipChecking,setClipChecking]=useState(false);
+
+  async function importFromClipboard(){
+    setClipChecking(true);
+    try{
+      const text=await navigator.clipboard.readText();
+      const num=parseFloat(text.trim());
+      if(num>0&&num<50000){
+        setSmsModal({amount:num,vendor:null});
+        showToast("✓ استورد "+num.toFixed(2)+" د.أ من الكليب بورد","success");
+      }else{
+        showToast("ما في رقم بالكليب بورد","error");
+      }
+    }catch{
+      showToast("ما قدر يقرا الكليب بورد — افتح التطبيق وحاول مرة","error");
+    }finally{
+      setClipChecking(false);
+    }
+  }
+
   const [manualVendor,setManualVendor]=useState(null);
   const swipeRef=useRef({x:0,y:0,t:0,active:false});
 
@@ -1432,6 +1452,12 @@ function App(){
         h("button",{className:"gear-btn",onClick:cycleTheme,title:"الوضع: "+(themeMode==="auto"?"تلقائي":themeMode==="light"?"فاتح":"داكن")},
           themeMode==="auto"?"🌓":themeMode==="light"?"☀️":"🌙"
         ),
+        h("button",{
+          className:"gear-btn",
+          onClick:importFromClipboard,
+          title:"استورد مبلغ من الكليب بورد",
+          style:{fontSize:13,padding:"6px 9px",opacity:clipChecking?0.5:1}
+        },clipChecking?"⏳":"📋💳"),
         screen!=="settings"&&mode!=="analysis"&&h("button",{className:"gear-btn",onClick:()=>setScreen("settings")},"⚙️"),
         screen==="settings"
           ? h("button",{className:"gear-btn",style:{fontSize:12,padding:"6px 11px"},onClick:()=>setScreen("home")},"← رجوع")
