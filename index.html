@@ -546,53 +546,50 @@ function App(){
   async function importFromClipboard(){
     setClipChecking(true);
     try{
-      const text=await navigator.clipboard.readText();
+      let text="";
+      if(navigator.clipboard&&navigator.clipboard.readText){
+        text=await navigator.clipboard.readText();
+      }
+      if(!text.trim()){throw new Error("empty");}
+
       let num=null;
+
+      // إذا كان URL → اسحب قيمة amount منه
       if(text.includes("amount=")){
         const match=text.match(/amount=([\d.]+)/);
         if(match) num=parseFloat(match[1]);
       }else{
+        // رقم عادي
         num=parseFloat(text.trim());
       }
+
       if(num&&num>0&&num<50000){
         setSmsModal({amount:num,vendor:null});
         showToast("✓ استورد "+num.toFixed(2)+" د.أ","success");
       }else{
         showToast("ما لقى رقم صالح بالكليب بورد","error");
       }
-    }catch{
-      showToast("ما قدر يقرا الكليب بورد","error");
-    }
-    setClipChecking(false);
-  }
-
-  // ── استقبال URL لما يُفتح التطبيق أو يرجع للواجهة ──
-  useEffect(()=>{
-    function checkUrl(){
-      const p=new URLSearchParams(window.location.search);
-      const amount=p.get("amount");
-      if(amount){
-        const n=parseFloat(amount);
-        if(n>0&&n<50000){
-          setSmsModal({amount:n,vendor:p.get("from")||null});
-          window.history.replaceState({},"",window.location.pathname);
+    }catch(e){
+      const val=window.prompt("الصق الرابط أو الرقم هون:");
+      if(val){
+        let num=null;
+        if(val.includes("amount=")){
+          const match=val.match(/amount=([\d.]+)/);
+          if(match) num=parseFloat(match[1]);
+        }else{
+          num=parseFloat(val.trim());
+        }
+        if(num&&num>0&&num<50000){
+          setSmsModal({amount:num,vendor:null});
+          showToast("✓ استورد "+num.toFixed(2)+" د.أ","success");
+        }else{
+          showToast("رقم غير صالح","error");
         }
       }
+    }finally{
+      setClipChecking(false);
     }
-    // لما يرجع التطبيق للواجهة (من الخلفية)
-    function onVisible(){
-      if(document.visibilityState==="visible") checkUrl();
-    }
-    document.addEventListener("visibilitychange",onVisible);
-    // لما يُفتح عبر URL وهو مفتوح مسبقاً
-    window.addEventListener("pageshow",checkUrl);
-    window.addEventListener("focus",checkUrl);
-    return()=>{
-      document.removeEventListener("visibilitychange",onVisible);
-      window.removeEventListener("pageshow",checkUrl);
-      window.removeEventListener("focus",checkUrl);
-    };
-  },[]);
+  }
 
   const [manualVendor,setManualVendor]=useState(null);
   const swipeRef=useRef({x:0,y:0,t:0,active:false});
