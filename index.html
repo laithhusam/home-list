@@ -546,16 +546,46 @@ function App(){
   async function importFromClipboard(){
     setClipChecking(true);
     try{
-      const text=await navigator.clipboard.readText();
-      const num=parseFloat(text.trim());
-      if(num>0&&num<50000){
-        setSmsModal({amount:num,vendor:null});
-        showToast("✓ استورد "+num.toFixed(2)+" د.أ من الكليب بورد","success");
-      }else{
-        showToast("ما في رقم بالكليب بورد","error");
+      let text="";
+      if(navigator.clipboard&&navigator.clipboard.readText){
+        text=await navigator.clipboard.readText();
       }
-    }catch{
-      showToast("ما قدر يقرا الكليب بورد — افتح التطبيق وحاول مرة","error");
+      if(!text.trim()){throw new Error("empty");}
+
+      let num=null;
+
+      // إذا كان URL → اسحب قيمة amount منه
+      if(text.includes("amount=")){
+        const match=text.match(/amount=([\d.]+)/);
+        if(match) num=parseFloat(match[1]);
+      }else{
+        // رقم عادي
+        num=parseFloat(text.trim());
+      }
+
+      if(num&&num>0&&num<50000){
+        setSmsModal({amount:num,vendor:null});
+        showToast("✓ استورد "+num.toFixed(2)+" د.أ","success");
+      }else{
+        showToast("ما لقى رقم صالح بالكليب بورد","error");
+      }
+    }catch(e){
+      const val=window.prompt("الصق الرابط أو الرقم هون:");
+      if(val){
+        let num=null;
+        if(val.includes("amount=")){
+          const match=val.match(/amount=([\d.]+)/);
+          if(match) num=parseFloat(match[1]);
+        }else{
+          num=parseFloat(val.trim());
+        }
+        if(num&&num>0&&num<50000){
+          setSmsModal({amount:num,vendor:null});
+          showToast("✓ استورد "+num.toFixed(2)+" د.أ","success");
+        }else{
+          showToast("رقم غير صالح","error");
+        }
+      }
     }finally{
       setClipChecking(false);
     }
