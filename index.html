@@ -546,49 +546,24 @@ function App(){
   async function importFromClipboard(){
     setClipChecking(true);
     try{
-      let text="";
-      if(navigator.clipboard&&navigator.clipboard.readText){
-        text=await navigator.clipboard.readText();
-      }
-      if(!text.trim()){throw new Error("empty");}
-
+      const text=await navigator.clipboard.readText();
       let num=null;
-
-      // إذا كان URL → اسحب قيمة amount منه
       if(text.includes("amount=")){
         const match=text.match(/amount=([\d.]+)/);
         if(match) num=parseFloat(match[1]);
       }else{
-        // رقم عادي
         num=parseFloat(text.trim());
       }
-
       if(num&&num>0&&num<50000){
         setSmsModal({amount:num,vendor:null});
         showToast("✓ استورد "+num.toFixed(2)+" د.أ","success");
       }else{
         showToast("ما لقى رقم صالح بالكليب بورد","error");
       }
-    }catch(e){
-      const val=window.prompt("الصق الرابط أو الرقم هون:");
-      if(val){
-        let num=null;
-        if(val.includes("amount=")){
-          const match=val.match(/amount=([\d.]+)/);
-          if(match) num=parseFloat(match[1]);
-        }else{
-          num=parseFloat(val.trim());
-        }
-        if(num&&num>0&&num<50000){
-          setSmsModal({amount:num,vendor:null});
-          showToast("✓ استورد "+num.toFixed(2)+" د.أ","success");
-        }else{
-          showToast("رقم غير صالح","error");
-        }
-      }
-    }finally{
-      setClipChecking(false);
+    }catch{
+      showToast("ما قدر يقرا الكليب بورد","error");
     }
+    setClipChecking(false);
   }
 
   const [manualVendor,setManualVendor]=useState(null);
@@ -736,30 +711,31 @@ function App(){
 
   useEffect(()=>{pull();const t=setInterval(pull,10000);return()=>clearInterval(t);},[pull]);
 
-  // ── iOS Shortcut: read URL params on startup ───────────────
+  // ── استقبال URL لما يرجع التطبيق للواجهة (شورت كت البطاقة) ──
   useEffect(()=>{
-    const params=readUrlParams();
-    if(params){
-      clearUrlParams();
-      setBankModal(params);
-    }
-  },[]);
-
-  // ── iOS Shortcut: detect ?amount=X&from=Y on load ─────
-  useEffect(()=>{
-    const params=new URLSearchParams(window.location.search);
-    const amount=params.get("amount");
-    const from=params.get("from");
-    if(amount){
-      const n=safeNum(amount);
-      if(n&&n>0){
-        setSmsModal({amount:n,vendor:from||null});
-        // Clean URL so refresh doesn't re-trigger
-        window.history.replaceState({},"",window.location.pathname);
+    function checkUrl(){
+      const p=new URLSearchParams(window.location.search);
+      const amount=p.get("amount");
+      if(amount){
+        const n=parseFloat(amount);
+        if(n>0&&n<50000){
+          setSmsModal({amount:n,vendor:p.get("from")||null});
+          window.history.replaceState({},"",window.location.pathname);
+        }
       }
     }
+    function onVisible(){
+      if(document.visibilityState==="visible") checkUrl();
+    }
+    document.addEventListener("visibilitychange",onVisible);
+    window.addEventListener("pageshow",checkUrl);
+    window.addEventListener("focus",checkUrl);
+    return()=>{
+      document.removeEventListener("visibilitychange",onVisible);
+      window.removeEventListener("pageshow",checkUrl);
+      window.removeEventListener("focus",checkUrl);
+    };
   },[]);
-
 
   // ── Store actions ──────────────────────────────────────
   function addStore(){
