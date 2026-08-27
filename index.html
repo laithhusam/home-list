@@ -722,21 +722,25 @@ function App(){
       if(amount){
         const n=parseFloat(amount);
         if(n>0&&n<50000){
-          setSmsModal({amount:n,vendor:p.get("from")||null});
+          // تأخير بسيط عشان التطبيق يكون جاهز
+          setTimeout(()=>{
+            setSmsModal({amount:n,vendor:p.get("from")||null});
+          },400);
           window.history.replaceState({},"",window.location.pathname);
         }
       }
     }
     function onVisible(){
-      if(document.visibilityState==="visible") checkUrl();
+      if(document.visibilityState==="visible") setTimeout(checkUrl,300);
     }
     document.addEventListener("visibilitychange",onVisible);
     window.addEventListener("pageshow",checkUrl);
-    window.addEventListener("focus",checkUrl);
+    window.addEventListener("focus",()=>setTimeout(checkUrl,300));
+    // تحقق فوري عند التحميل
+    setTimeout(checkUrl,500);
     return()=>{
       document.removeEventListener("visibilitychange",onVisible);
       window.removeEventListener("pageshow",checkUrl);
-      window.removeEventListener("focus",checkUrl);
     };
   },[]);
 
