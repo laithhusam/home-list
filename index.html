@@ -547,6 +547,8 @@ function App(){
     setClipChecking(true);
     try{
       const text=await navigator.clipboard.readText();
+      // DEBUG مؤقت — بنحذفه بعدين
+      alert("الكليب بورد يحتوي:\n"+text.slice(0,200));
       let num=null;
       if(text.includes("amount=")){
         const match=text.match(/amount=([\d.]+)/);
@@ -560,7 +562,8 @@ function App(){
       }else{
         showToast("ما لقى رقم صالح بالكليب بورد","error");
       }
-    }catch{
+    }catch(e){
+      alert("خطأ بقراءة الكليب بورد:\n"+e.message);
       showToast("ما قدر يقرا الكليب بورد","error");
     }
     setClipChecking(false);
@@ -1461,7 +1464,7 @@ function App(){
         h("button",{
           className:"gear-btn",
           onClick:importFromClipboard,
-          title:"استورد مبلغ من الكليب بورد",
+          title:"استورد مبلغ بطاقة",
           style:{fontSize:13,padding:"6px 9px",opacity:clipChecking?0.5:1}
         },clipChecking?"⏳":"📋💳"),
         screen!=="settings"&&mode!=="analysis"&&h("button",{className:"gear-btn",onClick:()=>setScreen("settings")},"⚙️"),
