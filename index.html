@@ -547,8 +547,6 @@ function App(){
     setClipChecking(true);
     try{
       const text=await navigator.clipboard.readText();
-      // DEBUG مؤقت — بنحذفه بعدين
-      alert("الكليب بورد يحتوي:\n"+text.slice(0,200));
       let num=null;
       if(text.includes("amount=")){
         const match=text.match(/amount=([\d.]+)/);
@@ -560,10 +558,9 @@ function App(){
         setSmsModal({amount:num,vendor:null});
         showToast("✓ استورد "+num.toFixed(2)+" د.أ","success");
       }else{
-        showToast("ما لقى رقم صالح بالكليب بورد","error");
+        showToast("الكليب بورد فاضي — ادفع أول وبعدين افتح التطبيق مباشرة","error");
       }
-    }catch(e){
-      alert("خطأ بقراءة الكليب بورد:\n"+e.message);
+    }catch{
       showToast("ما قدر يقرا الكليب بورد","error");
     }
     setClipChecking(false);
