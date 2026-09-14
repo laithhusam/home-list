@@ -343,8 +343,14 @@ function isNightNow(){const h=new Date().getHours();return h>=19||h<6;}
 function getInit(){
   const ls=lsLoad();
   return {
-    stores:ls?.stores||DEF_STORES, items:ls?.items||[], saved:normSaved(ls?.saved)||DEF_SAVED,
-    ts:ls?.ts||0, history:ls?.history||{}, tripLog:ls?.tripLog||{}, vendors:ls?.vendors||[],
+    stores:ls?.stores||DEF_STORES,
+    items:ls?.items||[],
+    saved:normSaved(ls?.saved)||DEF_SAVED,
+    ts:ls?.ts||0,
+    history:ls?.history||{},
+    tripLog:ls?.tripLog||{},
+    vendors:ls?.vendors||[],
+    monthlyBudget:ls?.monthlyBudget||0,
   };
 }
 function genId(){return "x"+Date.now().toString(36)+Math.random().toString(36).slice(2,4);}
@@ -634,7 +640,7 @@ function App(){
     }
     if(pendingDataRef.current){
       const ok=await pushNow(pendingDataRef.current);
-      if(!ok)return; // will retry on next tick / online event
+      if(!ok)return;
     }
     try{
       const url=await fbUrl();
@@ -643,18 +649,33 @@ function App(){
       const rec=await r.json();
       if(!rec){setSync("ok");setSyncMsg("محفوظ");lastErrRef.current=false;return;}
       const remoteTs=rec.ts||0;
-      if(remoteTs>R.current.ts){
-        const ni=rec.items||[];
-        if(ni.length===0&&R.current.items.length>0){setSync("ok");return;}
-        const nst=rec.stores||DEF_STORES;
-        const ns=normSaved({...DEF_SAVED,...(rec.saved||{})});
-        const nh=rec.history||{};
-        const ntl=rec.tripLog||{};
-        const nv=rec.vendors||[];
-        const nb2=rec.monthlyBudget!=null?rec.monthlyBudget:R.current.monthlyBudget;
-        setItems(ni);setStores(nst);setSaved(ns);setTs(remoteTs);setHistory(nh);setTripLog(ntl);setVendors(nv);setMonthlyBudget(nb2);
-        lsSave({items:ni,stores:nst,saved:ns,ts:remoteTs,history:nh,tripLog:ntl,vendors:nv,monthlyBudget:nb2});
+      const localTs=R.current.ts;
+
+      // لو عندنا بيانات محلية أحدث من السيرفر → ما نكتب فوقها، نرسلها بدل هيك
+      if(remoteTs<=localTs){
+        setSync("ok");setSyncMsg("محفوظ");
+        if(lastErrRef.current){showToast("✓ عاد الاتصال","success");lastErrRef.current=false;}
+        return;
       }
+
+      // السيرفر أحدث → نقبل بياناته بس بشرط إنها ما تمسح items موجودة عندنا
+      const ni=rec.items||[];
+      const localItems=R.current.items||[];
+
+      // إذا السيرفر راجع بـ items فاضية وعندنا items → الغ الـ pull (بيانات مشبوهة)
+      if(ni.length===0&&localItems.length>0){
+        setSync("ok");setSyncMsg("محفوظ");
+        return;
+      }
+
+      const nst=rec.stores||DEF_STORES;
+      const ns=normSaved({...DEF_SAVED,...(rec.saved||{})});
+      const nh=rec.history||{};
+      const ntl=rec.tripLog||{};
+      const nv=rec.vendors||[];
+      const nb2=rec.monthlyBudget!=null?rec.monthlyBudget:R.current.monthlyBudget;
+      setItems(ni);setStores(nst);setSaved(ns);setTs(remoteTs);setHistory(nh);setTripLog(ntl);setVendors(nv);setMonthlyBudget(nb2);
+      lsSave({items:ni,stores:nst,saved:ns,ts:remoteTs,history:nh,tripLog:ntl,vendors:nv,monthlyBudget:nb2});
       setSync("ok");setSyncMsg("محفوظ");
       if(lastErrRef.current){showToast("✓ عاد الاتصال","success");lastErrRef.current=false;}
     }catch{
